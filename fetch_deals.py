@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealDrop — Fresh Deals, Daily</title>
+<meta name="description" content="The best Amazon deals curated daily. Hot deals, coupons, and discounts across every category — updated automatically.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f9f8f5; --surface: #ffffff; --border: #e8e6e1;
+    --text-primary: #1a1a18; --text-secondary: #6b6b65; --text-muted: #9e9e97;
+    --accent: #2a6041; --accent-light: #e8f2ec; --accent-mid: #4a8c62;
+    --red: #c94040; --red-light: #fdf0f0; --red-mid: #e05252;
+    --blue-light: #eef2fe; --blue-text: #3546a0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+  nav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text-primary); letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .nav-tagline { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .hero { max-width: 1100px; margin: 0 auto; padding: 52px 24px 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .hero-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(30px, 4vw, 46px); line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 12px; }
+  .hero-text p { color: var(--text-secondary); font-size: 15px; max-width: 380px; line-height: 1.7; }
+  .signup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: var(--shadow); }
+  .signup-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .signup-box > p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+  .signup-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .tab-btn { flex: 1; padding: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--text-secondary); transition: all 0.15s; }
+  .tab-btn.active { background: var(--accent); color: white; }
+  .signup-field { display: flex; gap: 8px; }
+  .signup-field input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-primary); background: var(--bg); outline: none; transition: border-color 0.15s; }
+  .signup-field input:focus { border-color: var(--accent); }
+  .signup-field input::placeholder { color: var(--text-muted); }
+  .btn-sub { padding: 10px 18px; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .btn-sub:hover { background: var(--accent-mid); }
+  .signup-note { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+  .stats-bar { max-width: 1100px; margin: 0 auto 32px; padding: 0 24px; display: flex; gap: 32px; }
+  .stat { display: flex; flex-direction: column; }
+  .stat-num { font-size: 22px; font-weight: 600; color: var(--text-primary); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .divider { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; border-bottom: 1px solid var(--border); }
+  .loading-bar { max-width: 1100px; margin: 0 auto 20px; padding: 0 24px; }
+  .loading-msg { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg { max-width: 1100px; margin: 0 auto 20px; padding: 16px 24px; background: var(--red-light); border: 1px solid #f5c0c0; border-radius: 10px; font-size: 13px; color: var(--red); display: none; }
+  .error-msg.show { display: block; }
+  .hot-section { max-width: 1100px; margin: 0 auto 36px; padding: 0 24px; }
+  .hot-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .hot-title-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .hot-icon { font-size: 22px; }
+  .hot-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-primary); }
+  .hot-subtitle { font-size: 13px; color: var(--text-muted); }
+  .hot-pill { font-size: 11px; font-weight: 600; background: var(--red); color: white; padding: 4px 12px; border-radius: 100px; white-space: nowrap; }
+  .hot-strip { background: linear-gradient(135deg, #fff5f5 0%, #fff8f0 100%); border: 1px solid #f5d0c8; border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+  .hot-strip::before { content: ''; position: absolute; top: -30px; right: -30px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(201,64,64,0.07) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+  .hot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .hot-card { background: var(--surface); border: 1px solid #f0c8c0; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative; display: flex; flex-direction: column; text-decoration: none; }
+  .hot-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(201,64,64,0.13); }
+  .hot-card-img { width: 100%; height: 120px; background: #fdf5f4; display: flex; align-items: center; justify-content: center; font-size: 36px; overflow: hidden; }
+  .hot-card-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+  .hot-card-body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .hot-card-badge { position: absolute; top: 10px; right: 10px; background: var(--red); color: white; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+  .hot-card-title { font-size: 12px; font-weight: 600; line-height: 1.35; color: var(--text-primary); padding-right: 8px; }
+  .hot-card-prices { display: flex; align-items: baseline; gap: 6px; }
+  .hot-price-now { font-size: 16px; font-weight: 700; color: var(--red); }
+  .hot-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
+  .hot-btn { display: block; width: 100%; padding: 8px; text-align: center; background: var(--red); color: white; border: none; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-top: auto; }
+  .hot-btn:hover { background: var(--red-mid); }
+  .filters-wrap { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; }
+  .filter-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: block; }
+  .filters-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .filters-scroll::-webkit-scrollbar { display: none; }
+  .filter-btn { flex-shrink: 0; padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .deals-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+  .section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+  .deal-count { font-size: 13px; color: var(--text-muted); }
+  .deals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; }
+  .deal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); transition: transform 0.18s, box-shadow 0.18s; cursor: pointer; display: flex; flex-direction: column; text-decoration: none; }
+  .deal-card:hover { transform: translateY(-3px); box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
+  .card-img { width: 100%; height: 150px; background: #f5f3f0; display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden; }
+  .card-img img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+  .card-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
+  .card-category { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); background: var(--accent-light); padding: 3px 9px; border-radius: 100px; }
+  .card-badge-hot { font-size: 11px; font-weight: 600; color: var(--red); background: var(--red-light); padding: 3px 9px; border-radius: 100px; }
+  .card-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin-bottom: 6px; }
+  .card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 14px; flex: 1; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
+  .price-block { display: flex; align-items: baseline; gap: 7px; }
+  .price-now { font-size: 20px; font-weight: 600; color: var(--text-primary); }
+  .price-was { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
+  .discount-badge { font-size: 12px; font-weight: 600; background: #fff3d4; color: #8a5c00; padding: 4px 10px; border-radius: 100px; }
+  .coupon-row { margin-top: 8px; }
+  .coupon-badge { font-size: 11px; font-weight: 600; background: var(--blue-light); color: var(--blue-text); padding: 3px 9px; border-radius: 100px; display: inline-flex; align-items: center; gap: 3px; }
+  .btn-deal { display: block; margin-top: 12px; padding: 9px; text-align: center; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; transition: background 0.15s; }
+  .btn-deal:hover { background: var(--accent-mid); }
+  #back-to-top { position: fixed; bottom: 28px; right: 24px; width: 48px; height: 48px; background: var(--accent); color: white; border: none; border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: 0 4px 16px rgba(42,96,65,0.35); display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(16px); transition: opacity 0.25s, transform 0.25s, background 0.15s; pointer-events: none; z-index: 200; }
+  #back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  #back-to-top:hover { background: var(--accent-mid); }
+  footer { background: var(--surface); border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
+  footer p { font-size: 13px; color: var(--text-muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  .disclaimer { max-width: 600px; margin: 8px auto 0; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; gap: 24px; padding: 28px 16px 20px; }
+    .stats-bar { gap: 0; padding: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .stat { flex: 1; padding: 12px 0; text-align: center; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .divider { display: none; }
+    .filters-wrap, .hot-section, .deals-section, .loading-bar, .error-msg { padding-left: 16px; padding-right: 16px; }
+    .hot-grid { grid-template-columns: 1fr 1fr; }
+    .deals-grid { grid-template-columns: 1fr; gap: 10px; }
+    .deal-card { flex-direction: row; height: 100px; }
+    .card-img { width: 100px; min-width: 100px; height: 100px; border-radius: 0; }
+    .card-body { padding: 10px 12px; justify-content: space-between; }
+    .card-title { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0; }
+    .card-desc { display: none; }
+    .card-footer { border-top: none; padding-top: 0; }
+    .price-now { font-size: 15px; }
+    .coupon-row { display: none; }
+    .btn-deal { display: none; }
+    #back-to-top { bottom: 20px; right: 16px; width: 44px; height: 44px; font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<button id="back-to-top" onclick="scrollToTop()" aria-label="Back to top">↑</button>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Deal<span>Drop</span></div>
+    <div class="nav-tagline">Fresh deals, daily</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>The best deals,<br>curated for you.</h1>
+    <p>Top Amazon discounts across every category — updated every 4 hours automatically.</p>
+  </div>
+  <div class="signup-box">
+    <h3>Never miss a deal</h3>
+    <p>Get alerts the moment new deals drop.</p>
+    <div class="signup-tabs">
+      <button class="tab-btn active" id="tab-email" onclick="switchTab('email')">📧 Email</button>
+      <button class="tab-btn" id="tab-sms" onclick="switchTab('sms')">💬 Text</button>
+    </div>
+    <div class="signup-field">
+      <input type="email" id="signup-input" placeholder="your@email.com" />
+      <button class="btn-sub" onclick="handleSignup()">Notify me</button>
+    </div>
+    <p class="signup-note" id="signup-msg">No spam, ever. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num" id="stat-total">—</span><span class="stat-label">Active deals</span></div>
+  <div class="stat"><span class="stat-num" id="stat-hot">—</span><span class="stat-label">Hot deals</span></div>
+  <div class="stat"><span class="stat-num" id="stat-coupons">—</span><span class="stat-label">Coupons</span></div>
+  <div class="stat"><span class="stat-num" id="stat-updated">—</span><span class="stat-label">Last updated</span></div>
+</div>
+<div class="divider"></div>
+
+<div class="loading-bar" id="loading-bar">
+  <div class="loading-msg"><div class="spinner"></div> Loading fresh deals...</div>
+</div>
+<div class="error-msg" id="error-msg">
+  Could not load deals. Make sure <strong>deals.json</strong> is in the same folder and the fetch script has been run at least once.
+</div>
+
+<div class="hot-section" id="hot-section" style="display:none;">
+  <div class="hot-header">
+    <div class="hot-title-wrap">
+      <span class="hot-icon">🔥</span>
+      <span class="hot-title">Hot Deals</span>
+      <span class="hot-subtitle">— 50% off or more</span>
+    </div>
+    <span class="hot-pill" id="hot-count-pill"></span>
+  </div>
+  <div class="hot-strip">
+    <div class="hot-grid" id="hot-grid"></div>
+  </div>
+</div>
+
+<div class="filters-wrap" id="filters-wrap" style="display:none;">
+  <span class="filter-label">Browse by Amazon category:</span>
+  <div class="filters-scroll" id="filter-row"></div>
+</div>
+
+<div class="deals-section" id="deals-section" style="display:none;">
+  <div class="section-header">
+    <span class="section-title">All Deals</span>
+    <span class="deal-count" id="count-label"></span>
+  </div>
+  <div class="deals-grid" id="deals-grid"></div>
+</div>
+
+<footer>
+  <p>Made with care by <strong>DealDrop</strong> · <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Privacy</a></p>
+  <p class="disclaimer">As an Amazon Associate I earn from qualifying purchases. Prices sourced live from Amazon. Some deals include clippable coupons on the Amazon product page.</p>
+</footer>
+
+<script>
+const CATEGORIES = [
+  { id:'All',                        label:'All Deals',               emoji:'✦' },
+  { id:'Electronics',                label:'Electronics',             emoji:'💻' },
+  { id:'Home & Kitchen',             label:'Home & Kitchen',          emoji:'🏠' },
+  { id:'Clothing, Shoes & Jewelry',  label:'Clothing & Jewelry',      emoji:'👗' },
+  { id:'Beauty & Personal Care',     label:'Beauty & Personal Care',  emoji:'💄' },
+  { id:'Health & Household',         label:'Health & Household',      emoji:'💊' },
+  { id:'Toys & Games',               label:'Toys & Games',            emoji:'🧸' },
+  { id:'Sports & Outdoors',          label:'Sports & Outdoors',       emoji:'⚽' },
+  { id:'Automotive',                 label:'Automotive',              emoji:'🚗' },
+  { id:'Pet Supplies',               label:'Pet Supplies',            emoji:'🐾' },
+  { id:'Baby',                       label:'Baby',                    emoji:'🍼' },
+  { id:'Garden & Outdoor',           label:'Garden & Outdoor',        emoji:'🌱' },
+  { id:'Office Products',            label:'Office Products',         emoji:'📎' },
+  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',emoji:'🔧' },
+  { id:'Kitchen & Dining',           label:'Kitchen & Dining',        emoji:'🍳' },
+  { id:'Video Games',                label:'Video Games',             emoji:'🎮' },
+  { id:'Books',                      label:'Books',                   emoji:'📚' },
+  { id:'Musical Instruments',        label:'Musical Instruments',     emoji:'🎸' },
+  { id:'Grocery & Gourmet Food',     label:'Grocery & Food',          emoji:'🛒' },
+  { id:'Luggage & Travel',           label:'Luggage & Travel',        emoji:'🧳' },
+];
+
+const filterRow = document.getElementById('filter-row');
+CATEGORIES.forEach(cat => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (cat.id === 'All' ? ' active' : '');
+  btn.textContent = cat.emoji + ' ' + cat.label;
+  btn.dataset.cat = cat.id;
+  btn.onclick = () => filterDeals(cat.id, btn);
+  filterRow.appendChild(btn);
+});
+
+let allDeals = [];
+
+async function loadDeals() {
+  try {
+    const res = await fetch('deals.json?t=' + Date.now());
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    allDeals = data.deals || [];
+    document.getElementById('stat-total').textContent   = data.totalDeals  || allDeals.length;
+    document.getElementById('stat-hot').textContent     = data.hotDeals    || allDeals.filter(d => d.pct >= 50).length;
+    document.getElementById('stat-coupons').textContent = data.couponDeals || allDeals.filter(d => d.hasCoupon).length;
+    if (data.updatedAt) {
+      const mins = Math.round((Date.now() - new Date(data.updatedAt)) / 60000);
+      document.getElementById('stat-updated').textContent = mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
+    }
+    document.getElementById('loading-bar').style.display  = 'none';
+    document.getElementById('hot-section').style.display  = '';
+    document.getElementById('filters-wrap').style.display = '';
+    document.getElementById('deals-section').style.display= '';
+    renderHotDeals();
+    renderDeals('All');
+  } catch(e) {
+    document.getElementById('loading-bar').style.display = 'none';
+    document.getElementById('error-msg').classList.add('show');
+  }
+}
+
+function img(src, emoji, size) {
+  const pad = size === 'hot' ? '8px' : '12px';
+  const fs  = size === 'hot' ? '34px' : '44px';
+  if (src) return `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:contain;padding:${pad};" onerror="this.parentElement.innerHTML='<span style=\\'font-size:${fs}\\'>${emoji||'🛒'}</span>'"/>`;
+  return `<span style="font-size:${fs}">${emoji||'🛒'}</span>`;
+}
+
+function renderHotDeals() {
+  const hot = allDeals.filter(d => d.pct >= 50 || d.hot);
+  document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
+  document.getElementById('hot-grid').innerHTML = hot.map(d => `
+    <a class="hot-card" href="${esc(d.link||'#')}" target="_blank" rel="noopener sponsored">
+      <div class="hot-card-img">${img(d.image, d.emoji, 'hot')}</div>
+      <span class="hot-card-badge">${d.pct}% off</span>
+      <div class="hot-card-body">
+        <div class="hot-card-title">${esc(d.title)}</div>
+        <div class="hot-card-prices">
+          <span class="hot-price-now">${esc(d.price||'See price')}</span>
+          ${d.price ? `<span class="hot-price-was">${esc(d.was||'')}</span>` : ''}
+        </div>
+        <button class="hot-btn">Grab Deal →</button>
+      </div>
+    </a>`).join('');
+}
+
+function renderDeals(cat) {
+  const filtered = cat === 'All' ? allDeals : allDeals.filter(d => d.cat === cat);
+  document.getElementById('count-label').textContent = filtered.length + ' deal' + (filtered.length !== 1 ? 's' : '');
+  document.getElementById('deals-grid').innerHTML = filtered.length === 0
+    ? `<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">No deals in this category right now — check back soon!</div>`
+    : filtered.map(d => `
+      <a class="deal-card" href="${esc(d.link||'#')}" target="_blank" rel="noopener sponsored">
+        <div class="card-img">${img(d.image, d.emoji, 'card')}</div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-category">${esc(d.cat)}</span>
+            ${(d.pct>=50||d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : ''}
+          </div>
+          <div class="card-title">${esc(d.title)}</div>
+          <div class="card-desc">${esc(d.desc||'')}</div>
+          <div class="card-footer">
+            <div class="price-block">
+              <span class="price-now">${esc(d.price||'See price on Amazon')}</span>
+              ${d.price && d.was ? `<span class="price-was">${esc(d.was)}</span>` : ''}
+            </div>
+            <span class="discount-badge">${esc(d.discount)}</span>
+          </div>
+          ${d.hasCoupon ? `<div class="coupon-row"><span class="coupon-badge">🏷️ ${esc(d.couponDisplay)}</span></div>` : ''}
+          <button class="btn-deal">See Deal on Amazon →</button>
+        </div>
+      </a>`).join('');
+}
+
+function filterDeals(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderDeals(cat);
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-email').classList.toggle('active', tab==='email');
+  document.getElementById('tab-sms').classList.toggle('active',   tab==='sms');
+  const input = document.getElementById('signup-input');
+  input.type        = tab === 'email' ? 'email' : 'tel';
+  input.placeholder = tab === 'email' ? 'your@email.com' : '(555) 000-0000';
+  document.getElementById('signup-msg').textContent = tab === 'email'
+    ? 'No spam, ever. Unsubscribe anytime.'
+    : 'Standard msg rates may apply. Text STOP to unsubscribe.';
+}
+
+function handleSignup() {
+  const val = document.getElementById('signup-input').value.trim();
+  if (!val) return;
+  const msg = document.getElementById('signup-msg');
+  msg.textContent = "✓ You're in! Watch for your first deal alert.";
+  msg.style.color = '#2a6041';
+  document.getElementById('signup-input').value = '';
+}
+
+const btt = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400), { passive: true });
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+setInterval(loadDeals, 30 * 60 * 1000);
+loadDeals();
+</script>
+</body>
+</html>
