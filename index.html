@@ -71,11 +71,10 @@
   .hot-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
   .hot-btn { display: block; width: 100%; padding: 8px; text-align: center; background: var(--red); color: white; border: none; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-top: auto; }
   .hot-btn:hover { background: var(--red-mid); }
-  /* ── OPTION 1: WRAP PILLS ── */
-  .filters-wrap { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; }
+  .filters-wrap { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; overflow: visible; }
   .filter-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: block; }
-  .filters-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .filter-btn { flex-shrink: 0; padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filters-row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+  .filter-btn { padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
   .deals-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; }
