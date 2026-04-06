@@ -81,10 +81,9 @@ CATEGORY_EMOJI = {
     "Luggage & Travel":          "🧳",
 }
 
-# ─── HELPERS ──────────────────────────────────────────────────────────────────
+# ─── KEEPA DEAL REQUEST ───────────────────────────────────────────────────────
 
 def keepa_deal_request(deal_params):
-    """Call Keepa deal endpoint — POST with JSON body."""
     url     = f"{KEEPA_BASE}/deal"
     params  = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
@@ -97,25 +96,26 @@ def keepa_deal_request(deal_params):
     r.raise_for_status()
     return r.json()
 
+# ─── KEEPA PRODUCT REQUEST ────────────────────────────────────────────────────
+
 def keepa_product_request(asins):
-    """
-    Call Keepa product endpoint — GET with minimal params.
-    Removed history=0 which was causing the 400 error.
-    """
-    url    = f"{KEEPA_BASE}/product"
-    params = {
-        "key":      KEEPA_API_KEY,
-        "asin":     ",".join(asins),
-        "domainId": 1,
-        "stats":    90,
-    }
-    print(f"    GET product for {len(asins)} ASINs")
-    r = requests.get(url, params=params, timeout=60)
-    print(f"    Status: {r.status_code}")
-    if r.status_code != 200:
-        print(f"    Response: {r.text[:300]}")
-    r.raise_for_status()
-    return r.json()
+    url = f"{KEEPA_BASE}/product"
+    param_sets = [
+        {"key": KEEPA_API_KEY, "asin": ",".join(asins)},
+        {"key": KEEPA_API_KEY, "asin": ",".join(asins), "domainId": 1},
+    ]
+    for i, params in enumerate(param_sets):
+        print(f"    Product attempt {i+1} for {len(asins)} ASINs")
+        try:
+            r = requests.get(url, params=params, timeout=60)
+            print(f"    Status: {r.status_code}")
+            if r.status_code == 200:
+                return r.json()
+            else:
+                print(f"    Response: {r.text[:300]}")
+        except Exception as e:
+            print(f"    Request error: {e}")
+    return {"products": []}
 
 def get_category(product):
     root = product.get("rootCategory")
@@ -161,7 +161,6 @@ def parse_coupon(product):
 # ─── STEP 1: KEEPA — FIND DEALS ───────────────────────────────────────────────
 
 def fetch_keepa_asins():
-    """Use Keepa Deal finder to get products currently on deal."""
     print("\n  [Keepa] Fetching deals...")
     body = {
         "domainId":     1,
@@ -178,31 +177,34 @@ def fetch_keepa_asins():
         print(f"  [Keepa] Got {len(deal_asins)} candidates")
     except Exception as e:
         print(f"  [Keepa] Deal request failed: {e}")
-
     all_asins = list(dict.fromkeys(deal_asins))
     print(f"  [Keepa] {len(all_asins)} unique ASINs")
     return all_asins
 
 def fetch_keepa_product_details(asins):
-    """Get product details from Keepa."""
     if not asins:
         return []
     print(f"  [Keepa] Fetching product details ({len(asins)} ASINs)...")
     all_products = []
-    for i in range(0, len(asins), 10):
-        batch = asins[i:i+10]
+    for i, asin in enumerate(asins):
         try:
-            data     = keepa_product_request(batch)
+            data     = keepa_product_request([asin])
             products = data.get("products", [])
-            all_products.extend(products)
-            print(f"    Batch {i//10 + 1}: {len(products)} products")
-            time.sleep(2)
+            if products:
+                all_products.extend(products)
+                if i == 0:
+                    print(f"    First product keys: {list(products[0].keys())[:10]}")
+            if i % 10 == 0:
+                print(f"    Progress: {i+1}/{len(asins)} ({len(all_products)} successful)")
+            time.sleep(0.5)
         except Exception as e:
-            print(f"  [Keepa] Batch error: {e}")
+            print(f"  [Keepa] Error on {asin}: {e}")
+        if len(all_products) >= MAX_DEALS + 10:
+            break
     print(f"  [Keepa] Total: {len(all_products)} products")
     return all_products
 
-# ─── STEP 2: AMAZON PA API — LIVE PRICES ─────────────────────────────────────
+# ─── STEP 2: AMAZON PA API ────────────────────────────────────────────────────
 
 def sign_aws(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
@@ -215,7 +217,6 @@ def get_aws_signing_key(secret, date_stamp, region, service):
     return k
 
 def fetch_amazon_live_data(asin_batch):
-    """Fetch live prices and images from Amazon PA API."""
     if not AMAZON_ACCESS_KEY:
         print("  [Amazon PA API] Not configured — skipping.")
         return {}
