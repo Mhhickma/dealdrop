@@ -22,7 +22,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-       run: pip install requests keepa numpy
+        run: pip install requests keepa numpy
 
       - name: Run deal fetcher
         env:
@@ -41,8 +41,6 @@ jobs:
 
       - name: Run notifier
         env:
-          KEEPA_API_KEY:       ${{ secrets.KEEPA_API_KEY }}
-          AFFILIATE_TAG:       ${{ secrets.AFFILIATE_TAG }}
           MAILCHIMP_API_KEY:   ${{ secrets.MAILCHIMP_API_KEY }}
           MAILCHIMP_SERVER:    ${{ secrets.MAILCHIMP_SERVER }}
           MAILCHIMP_LIST_ID:   ${{ secrets.MAILCHIMP_LIST_ID }}
