@@ -13,7 +13,7 @@ KEEPA_API_KEY      = os.environ.get("KEEPA_API_KEY", "")
 AMAZON_PARTNER_TAG = os.environ.get("AFFILIATE_TAG", "")
 OUTPUT_FILE        = "deals.json"
 MAX_DEALS          = 50
-MIN_DISCOUNT_PCT   = 20
+MIN_DISCOUNT_PCT   = 5
 HOT_DEAL_PCT       = 50
 DOMAIN_ID          = "1"
 
@@ -78,7 +78,6 @@ def get_category(product):
     return "Electronics"
 
 def get_price_at_time(history, minutes_ago):
-    """Get price from X minutes ago — same logic as your Google Sheet script."""
     if not history or len(history) < 2:
         return -1
     last_time = history[-2]
@@ -102,13 +101,8 @@ def save_empty():
     print("  Saved empty deals.json")
 
 def fetch_products(asins):
-    """
-    Fetch product data using exact same URL format as your Google Sheets script.
-    stats=1&history=1&days=2
-    """
     chunk_size = 20
     all_products = []
-
     for i in range(0, len(asins), chunk_size):
         chunk = asins[i:i+chunk_size]
         url = (
@@ -134,13 +128,9 @@ def fetch_products(asins):
             time.sleep(1)
         except Exception as e:
             print(f"    Request failed: {e}")
-
     return all_products
 
 def fetch_deal_asins():
-    """
-    Use Keepa deal endpoint with POST JSON body (already working).
-    """
     print("  Fetching deals from Keepa...")
     url     = "https://api.keepa.com/deal"
     params  = {"key": KEEPA_API_KEY}
@@ -171,14 +161,12 @@ def fetch_deal_asins():
 def build_deals_json():
     print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop...\n")
 
-    # Step 1: Get deal ASINs
     deal_asins = fetch_deal_asins()
     if not deal_asins:
         print("  No deal ASINs. Saving empty.")
         save_empty()
         return
 
-    # Step 2: Fetch product details using same format as Google Sheets script
     print(f"\n  Fetching details for {min(len(deal_asins), MAX_DEALS)} products...")
     products = fetch_products(deal_asins[:MAX_DEALS])
     print(f"  Total products fetched: {len(products)}")
@@ -188,7 +176,6 @@ def build_deals_json():
         save_empty()
         return
 
-    # Step 3: Format deals using same price logic as Google Sheets script
     formatted = []
     deal_id   = 1
 
@@ -199,12 +186,10 @@ def build_deals_json():
             if not title or len(title) < 5:
                 continue
 
-            # Same price logic as your Google Sheets script
             current_stats = p.get("stats", {}).get("current", [])
             current_price = -1
             price_type    = -1
 
-            # Check price types 18, 1, 0 in order (same as your script)
             if len(current_stats) > 18 and current_stats[18] > 0:
                 current_price = current_stats[18]; price_type = 18
             elif len(current_stats) > 1 and current_stats[1] > 0:
@@ -212,7 +197,6 @@ def build_deals_json():
             elif len(current_stats) > 0 and current_stats[0] > 0:
                 current_price = current_stats[0];  price_type = 0
 
-            # Get yesterday's price
             yesterday_price = -1
             csv_data        = p.get("csv", [])
             if price_type != -1 and csv_data and len(csv_data) > price_type and csv_data[price_type]:
@@ -220,7 +204,6 @@ def build_deals_json():
             if yesterday_price == -1:
                 yesterday_price = current_price
 
-            # Calculate drop
             pct = 0
             if current_price > 0 and yesterday_price > 0:
                 drop = (yesterday_price - current_price) / yesterday_price
@@ -230,7 +213,6 @@ def build_deals_json():
             if pct < MIN_DISCOUNT_PCT:
                 continue
 
-            # Image
             image_url = ""
             if p.get("imagesCSV"):
                 image_url = "https://images-na.ssl-images-amazon.com/images/I/" + p["imagesCSV"].split(",")[0]
