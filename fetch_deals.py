@@ -84,17 +84,12 @@ CATEGORY_EMOJI = {
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 def keepa_deal_request(deal_params):
-    """
-    Call Keepa deal endpoint — POST with JSON body.
-    priceTypes must be an array e.g. [0] not 0.
-    """
+    """Call Keepa deal endpoint — POST with JSON body."""
     url     = f"{KEEPA_BASE}/deal"
     params  = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
-
     print(f"    POST {url}")
     print(f"    Body: {json.dumps(deal_params)}")
-
     r = requests.post(url, params=params, json=deal_params, headers=headers, timeout=60)
     print(f"    Status: {r.status_code}")
     if r.status_code != 200:
@@ -103,17 +98,20 @@ def keepa_deal_request(deal_params):
     return r.json()
 
 def keepa_product_request(asins):
-    """Call Keepa product endpoint — GET with query params."""
+    """
+    Call Keepa product endpoint — GET with minimal params.
+    Removed history=0 which was causing the 400 error.
+    """
     url    = f"{KEEPA_BASE}/product"
     params = {
         "key":      KEEPA_API_KEY,
         "asin":     ",".join(asins),
         "domainId": 1,
         "stats":    90,
-        "history":  0,
     }
+    print(f"    GET product for {len(asins)} ASINs")
     r = requests.get(url, params=params, timeout=60)
-    print(f"    Product request status: {r.status_code}")
+    print(f"    Status: {r.status_code}")
     if r.status_code != 200:
         print(f"    Response: {r.text[:300]}")
     r.raise_for_status()
@@ -163,68 +161,42 @@ def parse_coupon(product):
 # ─── STEP 1: KEEPA — FIND DEALS ───────────────────────────────────────────────
 
 def fetch_keepa_asins():
-    """
-    Use Keepa Deal finder with correct format.
-    priceTypes = array, domainId = integer, all other fields as per Keepa docs.
-    """
+    """Use Keepa Deal finder to get products currently on deal."""
     print("\n  [Keepa] Fetching deals...")
-
-    # Try progressively simpler requests until one works
-    attempts = [
-        # Full request with priceTypes as array
-        {
-            "domainId":     1,
-            "priceTypes":   [0],
-            "deltaPercent": MIN_DISCOUNT_PCT,
-            "interval":     10080,
-            "page":         0,
-        },
-        # Without interval
-        {
-            "domainId":     1,
-            "priceTypes":   [0],
-            "deltaPercent": MIN_DISCOUNT_PCT,
-            "page":         0,
-        },
-        # Absolute minimum
-        {
-            "domainId": 1,
-            "page":     0,
-        },
-    ]
-
+    body = {
+        "domainId":     1,
+        "priceTypes":   [0],
+        "deltaPercent": MIN_DISCOUNT_PCT,
+        "interval":     10080,
+        "page":         0,
+    }
     deal_asins = []
-    for i, body in enumerate(attempts):
-        try:
-            print(f"    Attempt {i+1}...")
-            data       = keepa_deal_request(body)
-            deals_raw  = data.get("deals", {}).get("dr", [])
-            deal_asins = [d.get("asin") for d in deals_raw if d.get("asin")]
-            print(f"  [Keepa] Got {len(deal_asins)} candidates")
-            if deal_asins or i == len(attempts) - 1:
-                break
-        except Exception as e:
-            print(f"    Attempt {i+1} failed: {e}")
-            time.sleep(2)
+    try:
+        data       = keepa_deal_request(body)
+        deals_raw  = data.get("deals", {}).get("dr", [])
+        deal_asins = [d.get("asin") for d in deals_raw if d.get("asin")]
+        print(f"  [Keepa] Got {len(deal_asins)} candidates")
+    except Exception as e:
+        print(f"  [Keepa] Deal request failed: {e}")
 
     all_asins = list(dict.fromkeys(deal_asins))
     print(f"  [Keepa] {len(all_asins)} unique ASINs")
     return all_asins
 
 def fetch_keepa_product_details(asins):
-    """Get full product details from Keepa."""
+    """Get product details from Keepa."""
     if not asins:
         return []
     print(f"  [Keepa] Fetching product details ({len(asins)} ASINs)...")
     all_products = []
-    for i in range(0, len(asins), 20):
-        batch = asins[i:i+20]
+    for i in range(0, len(asins), 10):
+        batch = asins[i:i+10]
         try:
             data     = keepa_product_request(batch)
             products = data.get("products", [])
             all_products.extend(products)
-            print(f"    Batch {i//20 + 1}: {len(products)} products")
-            time.sleep(1)
+            print(f"    Batch {i//10 + 1}: {len(products)} products")
+            time.sleep(2)
         except Exception as e:
             print(f"  [Keepa] Batch error: {e}")
     print(f"  [Keepa] Total: {len(all_products)} products")
