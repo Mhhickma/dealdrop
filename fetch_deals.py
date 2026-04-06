@@ -18,28 +18,39 @@ HOT_DEAL_PCT       = 50
 DOMAIN_ID          = "1"
 
 CATEGORY_NAMES = {
-    281052:      "Electronics",
-    1055398:     "Home & Kitchen",
-    7141123011:  "Clothing, Shoes & Jewelry",
-    3760901:     "Luggage & Travel",
-    3375251:     "Sports & Outdoors",
-    165793011:   "Toys & Games",
-    2619525011:  "Tools & Home Improvement",
-    51574011:    "Pet Supplies",
-    165796011:   "Baby",
-    172282:      "Electronics",
-    1064954:     "Health & Household",
-    3760911:     "Beauty & Personal Care",
-    979455011:   "Garden & Outdoor",
-    1285128:     "Office Products",
-    468642:      "Video Games",
-    283155:      "Books",
-    16310101:    "Grocery & Gourmet Food",
-    9482648011:  "Kitchen & Dining",
+    281052:        "Electronics",
+    1055398:       "Home & Kitchen",
+    7141123011:    "Clothing, Shoes & Jewelry",
+    3760901:       "Luggage & Travel",
+    3375251:       "Sports & Outdoors",
+    165793011:     "Toys & Games",
+    2619525011:    "Tools & Home Improvement",
+    51574011:      "Pet Supplies",
+    165796011:     "Baby",
+    172282:        "Electronics",
+    1064954:       "Health & Household",
+    3760911:       "Beauty & Personal Care",
+    2238192011:    "Musical Instruments",
+    979455011:     "Garden & Outdoor",
+    1285128:       "Office Products",
+    468642:        "Video Games",
+    283155:        "Books",
+    16310101:      "Grocery & Gourmet Food",
+    9482648011:    "Kitchen & Dining",
+    228013:        "Industrial & Scientific",
+    491244:        "Automotive",
+    2619533011:    "Automotive",
+    1064012:       "Sports & Outdoors",
+    3737671:       "Baby",
+    2350149011:    "Musical Instruments",
+    11091801:      "Grocery & Gourmet Food",
+    130:           "Computers",
+    541966:        "Electronics",
 }
 
 CATEGORY_EMOJI = {
     "Electronics":               "💻",
+    "Computers":                 "💻",
     "Home & Kitchen":            "🏠",
     "Clothing, Shoes & Jewelry": "👗",
     "Beauty & Personal Care":    "💄",
@@ -55,27 +66,54 @@ CATEGORY_EMOJI = {
     "Kitchen & Dining":          "🍳",
     "Video Games":               "🎮",
     "Books":                     "📚",
+    "Musical Instruments":       "🎸",
     "Grocery & Gourmet Food":    "🛒",
     "Luggage & Travel":          "🧳",
+    "Industrial & Scientific":   "🔩",
 }
 
+# Keyword-based category fallback
+KEYWORD_CATEGORIES = [
+    (["hydraulic","press","lathe","drill press","bandsaw","grinder","welder","welding","compressor","generator","chain saw","chainsaw","circular saw","table saw","miter saw","jigsaw","router","sander","planer","jointer","nailer","nail gun","staple gun","impact driver","impact wrench","torque wrench","socket set","wrench set","tool set","tool box","toolbox","workbench","clamp","vise","anvil","forge","metalwork","industrial","shop press"], "Tools & Home Improvement"),
+    (["car","truck","vehicle","auto","motorcycle","tire","brake","oil filter","wiper blade","floor mat","seat cover","dash cam","jump starter","battery charger","tow"], "Automotive"),
+    (["laptop","computer","pc","desktop","monitor","keyboard","mouse","hard drive","ssd","ram","cpu","gpu","motherboard","router","modem","printer","scanner","webcam","microphone","headset","earbuds","airpods","speaker","tablet","ipad","kindle"], "Electronics"),
+    (["phone","smartphone","iphone","android","charger","cable","power bank","case","screen protector"], "Electronics"),
+    (["tv","television","projector","streaming","fire stick","roku","chromecast","remote","hdmi"], "Electronics"),
+    (["camera","lens","tripod","drone","gopro","photography","video camera"], "Electronics"),
+    (["shirt","pants","dress","jacket","coat","sweater","hoodie","shorts","jeans","leggings","skirt","shoes","boots","sneakers","sandals","heels","handbag","purse","wallet","belt","hat","cap","gloves","scarf","sock","underwear","bra","swimsuit","jewelry","necklace","bracelet","ring","earring","watch"], "Clothing, Shoes & Jewelry"),
+    (["sofa","couch","bed","mattress","pillow","blanket","sheet","curtain","rug","lamp","chair","table","desk","shelf","bookcase","dresser","nightstand","mirror","frame","vase","candle"], "Home & Kitchen"),
+    (["blender","mixer","toaster","coffee maker","keurig","air fryer","instant pot","slow cooker","rice cooker","microwave","juicer","food processor","stand mixer","waffle","griddle","pan","pot","knife","cutting board","bakeware","cookware"], "Kitchen & Dining"),
+    (["vacuum","mop","broom","cleaning","detergent","laundry","dishwasher","trash","storage","organizer","hanger"], "Home & Kitchen"),
+    (["vitamin","supplement","protein","probiotic","fish oil","collagen","melatonin","zinc","magnesium","medicine","first aid","bandage","thermometer","blood pressure","glucose","hearing aid","contact lens","toothbrush","dental","razor","shaver"], "Health & Household"),
+    (["shampoo","conditioner","moisturizer","serum","foundation","mascara","lipstick","perfume","cologne","nail polish","hair dryer","straightener","curling iron","makeup","skincare","sunscreen","lotion","face wash"], "Beauty & Personal Care"),
+    (["lego","action figure","doll","board game","puzzle","play","toy","remote control car","rc car","nerf","pokemon","hot wheels","barbie","playset"], "Toys & Games"),
+    (["dog","cat","fish","bird","hamster","pet","collar","leash","crate","aquarium","bird cage","pet food","treat","litter","flea"], "Pet Supplies"),
+    (["diaper","baby","infant","toddler","stroller","car seat","crib","pacifier","bottle","formula","baby monitor","high chair"], "Baby"),
+    (["guitar","piano","keyboard","drum","violin","ukulele","bass","microphone","amp","amplifier","music stand","instrument"], "Musical Instruments"),
+    (["tent","sleeping bag","hiking","camping","backpack","climbing","kayak","canoe","fishing","hunting","archery","golf","tennis","basketball","football","soccer","baseball","yoga mat","dumbbell","barbell","weight","treadmill","bike","bicycle","scooter","ski","snowboard"], "Sports & Outdoors"),
+    (["seed","plant","soil","fertilizer","garden","hose","sprinkler","lawn mower","trimmer","hedge","rake","shovel","wheelbarrow","planter","pot","outdoor furniture","patio","grill","bbq"], "Garden & Outdoor"),
+    (["notebook","pen","pencil","stapler","paper","folder","binder","desk organizer","calculator","whiteboard","printer ink","toner","office chair","filing"], "Office Products"),
+    (["suitcase","luggage","travel bag","backpack","duffel","carry on","passport","travel pillow","packing cube"], "Luggage & Travel"),
+    (["snack","coffee","tea","protein bar","candy","chocolate","nuts","cereal","pasta","sauce","spice","condiment","drink","juice","soda","water bottle","food"], "Grocery & Gourmet Food"),
+    (["ps5","xbox","nintendo","switch","gaming","controller","headset","game"], "Video Games"),
+]
+
 def get_category(product):
+    # First try Keepa's category IDs
     root = product.get("rootCategory")
     if root and root in CATEGORY_NAMES:
         return CATEGORY_NAMES[root]
     for cat_id in (product.get("categories") or []):
         if cat_id in CATEGORY_NAMES:
             return CATEGORY_NAMES[cat_id]
+
+    # Fall back to keyword matching on title
     title = (product.get("title") or "").lower()
-    if any(w in title for w in ["laptop","phone","tablet","camera","headphone","speaker","monitor","tv"]):
-        return "Electronics"
-    if any(w in title for w in ["shirt","shoe","dress","jacket","pants","bag","watch"]):
-        return "Clothing, Shoes & Jewelry"
-    if any(w in title for w in ["blender","vacuum","mattress","pillow","cookware"]):
-        return "Home & Kitchen"
-    if any(w in title for w in ["protein","vitamin","supplement","fitness","yoga"]):
-        return "Health & Household"
-    return "Electronics"
+    for keywords, category in KEYWORD_CATEGORIES:
+        if any(w in title for w in keywords):
+            return category
+
+    return "Home & Kitchen"
 
 def get_price_at_time(history, minutes_ago):
     if not history or len(history) < 2:
