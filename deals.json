@@ -1,29 +1,29 @@
 {
-  "updatedAt": "2026-04-06T01:02:42.093721Z",
+  "updatedAt": "2026-04-06T08:55:11.186186Z",
   "totalDeals": 1,
-  "hotDeals": 0,
+  "hotDeals": 1,
   "couponDeals": 0,
   "deals": [
     {
       "id": 1,
-      "asin": "0735343268",
-      "cat": "Toys & Games",
-      "emoji": "\ud83e\uddf8",
-      "title": "Galison Michael Storrings 500 Piece Jigsaw Puzzle for Families, Summer at The Am...",
-      "desc": "21% off yesterday's price",
-      "price": "$15.39",
-      "was": "$19.38",
+      "asin": "B0936GH86J",
+      "cat": "Grocery & Gourmet Food",
+      "emoji": "\ud83d\uded2",
+      "title": "Starbucks Ground Coffee, Dark Roast Hot or Iced Coffee, Italian Roast, Six 18 oz...",
+      "desc": "53% off yesterday's price",
+      "price": "$57.78",
+      "was": "$122.31",
       "hasLivePrice": true,
-      "pct": 21,
-      "effectivePct": 21,
-      "hot": false,
-      "discount": "21% off",
+      "pct": 53,
+      "effectivePct": 53,
+      "hot": true,
+      "discount": "53% off",
       "hasCoupon": false,
       "couponDisplay": null,
-      "image": "https://images-na.ssl-images-amazon.com/images/I/91SwEU6uHWL.jpg",
+      "image": "https://images-na.ssl-images-amazon.com/images/I/71srKQCzWrL.jpg",
       "prime": false,
-      "link": "https://www.amazon.com/dp/0735343268?tag=sawdustsavings-20",
-      "updatedAt": "2026-04-06T01:02:42.093640Z"
+      "link": "https://www.amazon.com/dp/B0936GH86J?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-06T08:55:11.186048Z"
     }
   ]
 }
