@@ -85,11 +85,11 @@ CATEGORY_EMOJI = {
 
 def keepa_deal_request(deal_params):
     """
-    Call Keepa's deal endpoint using POST with JSON body.
-    The deal endpoint requires parameters as a JSON body, not query params.
+    Call Keepa deal endpoint — POST with JSON body.
+    priceTypes must be an array e.g. [0] not 0.
     """
-    url = f"{KEEPA_BASE}/deal"
-    params = {"key": KEEPA_API_KEY}
+    url     = f"{KEEPA_BASE}/deal"
+    params  = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
 
     print(f"    POST {url}")
@@ -103,11 +103,8 @@ def keepa_deal_request(deal_params):
     return r.json()
 
 def keepa_product_request(asins):
-    """
-    Call Keepa's product endpoint using GET with query params.
-    The product endpoint uses standard GET params.
-    """
-    url = f"{KEEPA_BASE}/product"
+    """Call Keepa product endpoint — GET with query params."""
+    url    = f"{KEEPA_BASE}/product"
     params = {
         "key":      KEEPA_API_KEY,
         "asin":     ",".join(asins),
@@ -130,7 +127,7 @@ def get_category(product):
         if cat_id in CATEGORY_NAMES:
             return CATEGORY_NAMES[cat_id]
     title = (product.get("title") or "").lower()
-    if any(w in title for w in ["laptop","phone","tablet","camera","headphone","speaker","monitor","tv","computer"]):
+    if any(w in title for w in ["laptop","phone","tablet","camera","headphone","speaker","monitor","tv"]):
         return "Electronics"
     if any(w in title for w in ["shirt","shoe","dress","jacket","pants","bag","watch"]):
         return "Clothing, Shoes & Jewelry"
@@ -167,39 +164,51 @@ def parse_coupon(product):
 
 def fetch_keepa_asins():
     """
-    Use Keepa's Deal finder (POST with JSON body) to get products on deal.
+    Use Keepa Deal finder with correct format.
+    priceTypes = array, domainId = integer, all other fields as per Keepa docs.
     """
-    print("\n  [Keepa] Fetching deals via POST JSON...")
+    print("\n  [Keepa] Fetching deals...")
 
-    deal_request_body = {
-        "domainId":     1,
-        "priceType":    0,
-        "deltaPercent": MIN_DISCOUNT_PCT,
-        "interval":     10080,
-        "page":         0,
-        "minRating":    30,
-    }
+    # Try progressively simpler requests until one works
+    attempts = [
+        # Full request with priceTypes as array
+        {
+            "domainId":     1,
+            "priceTypes":   [0],
+            "deltaPercent": MIN_DISCOUNT_PCT,
+            "interval":     10080,
+            "page":         0,
+        },
+        # Without interval
+        {
+            "domainId":     1,
+            "priceTypes":   [0],
+            "deltaPercent": MIN_DISCOUNT_PCT,
+            "page":         0,
+        },
+        # Absolute minimum
+        {
+            "domainId": 1,
+            "page":     0,
+        },
+    ]
 
     deal_asins = []
-    try:
-        data      = keepa_deal_request(deal_request_body)
-        deals_raw = data.get("deals", {}).get("dr", [])
-        deal_asins = [d.get("asin") for d in deals_raw if d.get("asin")]
-        print(f"  [Keepa] Got {len(deal_asins)} deal candidates")
-    except Exception as e:
-        print(f"  [Keepa] Deal request failed: {e}")
-        print("  [Keepa] Trying without minRating filter...")
+    for i, body in enumerate(attempts):
         try:
-            del deal_request_body["minRating"]
-            data       = keepa_deal_request(deal_request_body)
+            print(f"    Attempt {i+1}...")
+            data       = keepa_deal_request(body)
             deals_raw  = data.get("deals", {}).get("dr", [])
             deal_asins = [d.get("asin") for d in deals_raw if d.get("asin")]
-            print(f"  [Keepa] Got {len(deal_asins)} deal candidates")
-        except Exception as e2:
-            print(f"  [Keepa] Second attempt failed: {e2}")
+            print(f"  [Keepa] Got {len(deal_asins)} candidates")
+            if deal_asins or i == len(attempts) - 1:
+                break
+        except Exception as e:
+            print(f"    Attempt {i+1} failed: {e}")
+            time.sleep(2)
 
     all_asins = list(dict.fromkeys(deal_asins))
-    print(f"  [Keepa] {len(all_asins)} unique ASINs to process")
+    print(f"  [Keepa] {len(all_asins)} unique ASINs")
     return all_asins
 
 def fetch_keepa_product_details(asins):
@@ -238,12 +247,10 @@ def fetch_amazon_live_data(asin_batch):
     if not AMAZON_ACCESS_KEY:
         print("  [Amazon PA API] Not configured — skipping.")
         return {}
-
     service  = "ProductAdvertisingAPI"
     path     = "/paapi5/getitems"
     endpoint = f"https://{AMAZON_HOST}{path}"
-
-    payload = {
+    payload  = {
         "ItemIds":     asin_batch,
         "PartnerTag":  AMAZON_PARTNER_TAG,
         "PartnerType": "Associates",
@@ -257,11 +264,9 @@ def fetch_amazon_live_data(asin_batch):
         ]
     }
     body = json.dumps(payload)
-
     now        = datetime.datetime.utcnow()
     amz_date   = now.strftime("%Y%m%dT%H%M%SZ")
     date_stamp = now.strftime("%Y%m%d")
-
     canonical_headers = (
         f"content-encoding:amz-1.0\n"
         f"content-type:application/json; charset=utf-8\n"
@@ -269,14 +274,11 @@ def fetch_amazon_live_data(asin_batch):
         f"x-amz-date:{amz_date}\n"
         f"x-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems\n"
     )
-    signed_headers = "content-encoding;content-type;host;x-amz-date;x-amz-target"
-    payload_hash   = hashlib.sha256(body.encode("utf-8")).hexdigest()
-    canonical_request = "\n".join([
-        "POST", path, "",
-        canonical_headers, signed_headers, payload_hash,
-    ])
-    credential_scope = f"{date_stamp}/{AMAZON_REGION}/{service}/aws4_request"
-    string_to_sign   = "\n".join([
+    signed_headers    = "content-encoding;content-type;host;x-amz-date;x-amz-target"
+    payload_hash      = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    canonical_request = "\n".join(["POST", path, "", canonical_headers, signed_headers, payload_hash])
+    credential_scope  = f"{date_stamp}/{AMAZON_REGION}/{service}/aws4_request"
+    string_to_sign    = "\n".join([
         "AWS4-HMAC-SHA256", amz_date, credential_scope,
         hashlib.sha256(canonical_request.encode("utf-8")).hexdigest(),
     ])
@@ -318,7 +320,7 @@ def fetch_amazon_live_data(asin_batch):
         print(f"  [Amazon PA API] ERROR: {e}")
         return {}
 
-# ─── STEP 3: MERGE AND BUILD deals.json ──────────────────────────────────────
+# ─── STEP 3: BUILD deals.json ─────────────────────────────────────────────────
 
 def build_deals_json():
     print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop deal fetch...\n")
@@ -326,7 +328,7 @@ def build_deals_json():
     all_asins = fetch_keepa_asins()
 
     if not all_asins:
-        print("\n  No ASINs returned from Keepa. Saving empty deals.json.")
+        print("\n  No ASINs returned. Saving empty deals.json.")
         output = {
             "updatedAt":   datetime.datetime.utcnow().isoformat() + "Z",
             "totalDeals":  0, "hotDeals": 0, "couponDeals": 0, "deals": [],
@@ -344,89 +346,69 @@ def build_deals_json():
             stats   = p.get("stats", {})
             cur_raw = stats.get("current", [])
             avg_raw = stats.get("avg90",   [])
-
             def to_d(v): return v / 100.0 if v and v > 0 else None
-
-            current = to_d(cur_raw[0] if cur_raw and len(cur_raw) > 0 and cur_raw[0] and cur_raw[0] > 0 else None)
-            avg90   = to_d(avg_raw[0] if avg_raw and len(avg_raw) > 0 and avg_raw[0] and avg_raw[0] > 0 else None)
+            current = to_d(cur_raw[0] if cur_raw and cur_raw[0] and cur_raw[0] > 0 else None)
+            avg90   = to_d(avg_raw[0] if avg_raw and avg_raw[0] and avg_raw[0] > 0 else None)
             coupon  = parse_coupon(p)
-
-            pct = 0
+            pct     = 0
             if current and avg90 and avg90 > 0 and current < avg90:
                 pct = round((1 - current / avg90) * 100)
-
             if pct < MIN_DISCOUNT_PCT and coupon is None:
                 continue
-
             keepa_deals[asin] = {
-                "asin":           asin,
-                "category":       get_category(p),
-                "pct":            pct,
-                "coupon":         coupon,
+                "asin": asin, "category": get_category(p),
+                "pct": pct, "coupon": coupon,
                 "title_fallback": (p.get("title") or "")[:80],
             }
         except Exception as e:
-            print(f"  Skipping product: {e}")
+            print(f"  Skipping: {e}")
 
     qualifying_asins = list(keepa_deals.keys())
-    print(f"\n  {len(qualifying_asins)} qualifying deals after filtering")
+    print(f"\n  {len(qualifying_asins)} qualifying deals")
 
     amazon_data = {}
     for i in range(0, len(qualifying_asins), 10):
-        batch  = qualifying_asins[i:i+10]
-        result = fetch_amazon_live_data(batch)
+        result = fetch_amazon_live_data(qualifying_asins[i:i+10])
         amazon_data.update(result)
         time.sleep(1)
 
     formatted = []
     deal_id   = 1
-
     for asin in qualifying_asins:
         try:
             k = keepa_deals[asin]
             a = amazon_data.get(asin, {})
-
-            title  = a.get("title") or k["title_fallback"]
+            title = a.get("title") or k["title_fallback"]
             if not title or len(title) < 5:
                 continue
-
-            price   = a.get("price_display", "")
-            image   = a.get("image",         "")
-            prime   = a.get("prime",         False)
-            coupon  = k["coupon"]
-            pct     = k["pct"]
-            cat     = k["category"]
-
+            price  = a.get("price_display", "")
+            image  = a.get("image", "")
+            prime  = a.get("prime", False)
+            coupon = k["coupon"]
+            pct    = k["pct"]
+            cat    = k["category"]
             effective_pct = pct
             if coupon and coupon["kind"] == "percent":
                 effective_pct = min(99, pct + coupon["value"])
-
             parts = []
             if pct >= MIN_DISCOUNT_PCT: parts.append(f"{pct}% off recent price")
             if coupon:                  parts.append(coupon["display"])
             if prime:                   parts.append("Prime eligible")
-            desc = " · ".join(parts)
-
             formatted.append({
-                "id":            deal_id,
-                "asin":          asin,
-                "cat":           cat,
-                "emoji":         CATEGORY_EMOJI.get(cat, "🛒"),
-                "title":         title[:80] + ("..." if len(title) > 80 else ""),
-                "desc":          desc,
-                "price":         price,
-                "was":           "",
-                "hasLivePrice":  bool(price),
-                "pct":           pct,
-                "effectivePct":  effective_pct,
-                "hot":           effective_pct >= HOT_DEAL_PCT,
-                "discount":      f"{pct}% off",
-                "hasCoupon":     coupon is not None,
+                "id": deal_id, "asin": asin, "cat": cat,
+                "emoji": CATEGORY_EMOJI.get(cat, "🛒"),
+                "title": title[:80] + ("..." if len(title) > 80 else ""),
+                "desc": " · ".join(parts),
+                "price": price, "was": "",
+                "hasLivePrice": bool(price),
+                "pct": pct, "effectivePct": effective_pct,
+                "hot": effective_pct >= HOT_DEAL_PCT,
+                "discount": f"{pct}% off",
+                "hasCoupon": coupon is not None,
                 "couponDisplay": coupon["display"] if coupon else None,
-                "image":         image,
-                "prime":         prime,
-                "link":          f"https://www.amazon.com/dp/{asin}?tag={AMAZON_PARTNER_TAG}",
-                "updatedAt":     datetime.datetime.utcnow().isoformat() + "Z",
+                "image": image, "prime": prime,
+                "link": f"https://www.amazon.com/dp/{asin}?tag={AMAZON_PARTNER_TAG}",
+                "updatedAt": datetime.datetime.utcnow().isoformat() + "Z",
             })
             deal_id += 1
         except Exception as e:
@@ -435,23 +417,19 @@ def build_deals_json():
     formatted.sort(key=lambda d: (not d["hot"], -d["effectivePct"]))
     formatted = formatted[:MAX_DEALS]
 
-    hot_count    = sum(1 for d in formatted if d["hot"])
-    coupon_count = sum(1 for d in formatted if d["hasCoupon"])
-
     output = {
         "updatedAt":   datetime.datetime.utcnow().isoformat() + "Z",
         "totalDeals":  len(formatted),
-        "hotDeals":    hot_count,
-        "couponDeals": coupon_count,
+        "hotDeals":    sum(1 for d in formatted if d["hot"]),
+        "couponDeals": sum(1 for d in formatted if d["hasCoupon"]),
         "deals":       formatted,
     }
-
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
 
     print(f"\n✓ Saved {len(formatted)} deals to {OUTPUT_FILE}")
-    print(f"  Hot deals:    {hot_count}")
-    print(f"  Coupon deals: {coupon_count}")
+    print(f"  Hot deals:    {output['hotDeals']}")
+    print(f"  Coupon deals: {output['couponDeals']}")
     print(f"  Updated:      {output['updatedAt']}")
 
 
