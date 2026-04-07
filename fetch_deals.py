@@ -1,6 +1,6 @@
 """
 DealDrop — fetch_deals.py
-Hourly runs, 8 pages of deals, 300 products scanned per run.
+24-hour deal memory — keeps deals for 24 hours then removes them.
 """
 
 import json
@@ -12,11 +12,13 @@ import requests
 KEEPA_API_KEY      = os.environ.get("KEEPA_API_KEY", "")
 AMAZON_PARTNER_TAG = os.environ.get("AFFILIATE_TAG", "")
 OUTPUT_FILE        = "deals.json"
+MEMORY_FILE        = "deals_memory.json"
 MAX_DEALS          = 300
 MIN_DISCOUNT_PCT   = 10
 HOT_DEAL_PCT       = 50
 DOMAIN_ID          = "1"
 DEALS_TO_SHOW      = 50
+DEAL_TTL_HOURS     = 24
 
 CATEGORY_NAMES = {
     281052:      "Electronics",
@@ -139,51 +141,78 @@ def get_price_at_time(history, minutes_ago):
         i -= 2
     return history[1]
 
-def save_empty():
-    output = {
-        "updatedAt":   datetime.datetime.utcnow().isoformat() + "Z",
-        "totalDeals":  0, "hotDeals": 0, "couponDeals": 0, "deals": [],
-    }
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(output, f, indent=2)
-    print("  Saved empty deals.json")
+# ─── 24-HOUR DEAL MEMORY ─────────────────────────────────────────────────────
 
-def fetch_products(asins):
-    chunk_size = 20
-    all_products = []
-    for i in range(0, len(asins), chunk_size):
-        chunk = asins[i:i+chunk_size]
-        url = (
-            f"https://api.keepa.com/product"
-            f"?key={KEEPA_API_KEY}"
-            f"&domain={DOMAIN_ID}"
-            f"&asin={','.join(chunk)}"
-            f"&stats=1"
-            f"&history=1"
-            f"&days=2"
-        )
-        print(f"    Fetching {len(chunk)} products...")
-        try:
-            r = requests.get(url, timeout=30)
-            print(f"    Status: {r.status_code}")
-            if r.status_code == 200:
-                data = r.json()
-                products = data.get("products", [])
-                all_products.extend(products)
-                print(f"    Got {len(products)} products")
-            else:
-                print(f"    Error: {r.text[:200]}")
-            time.sleep(1)
-        except Exception as e:
-            print(f"    Request failed: {e}")
-    return all_products
+def load_memory():
+    """Load existing deals from memory file."""
+    try:
+        with open(MEMORY_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+def save_memory(memory):
+    """Save deal memory to file."""
+    with open(MEMORY_FILE, "w") as f:
+        json.dump(memory, f, indent=2)
+
+def is_expired(first_seen_str):
+    """Check if a deal is older than 24 hours."""
+    try:
+        first_seen = datetime.datetime.fromisoformat(first_seen_str.replace("Z", ""))
+        age_hours = (datetime.datetime.utcnow() - first_seen).total_seconds() / 3600
+        return age_hours >= DEAL_TTL_HOURS
+    except Exception:
+        return True
+
+def merge_with_memory(new_deals):
+    """
+    Merge new deals with memory:
+    - Add new deals with firstSeen timestamp
+    - Keep existing deals that are under 24 hours old
+    - Remove deals older than 24 hours
+    - Update price/discount if deal is refreshed
+    """
+    memory = load_memory()
+    now    = datetime.datetime.utcnow().isoformat() + "Z"
+
+    # Remove expired deals from memory
+    expired_count = 0
+    for asin in list(memory.keys()):
+        if is_expired(memory[asin].get("firstSeen", now)):
+            del memory[asin]
+            expired_count += 1
+
+    if expired_count > 0:
+        print(f"  Removed {expired_count} expired deals from memory")
+
+    # Add/update new deals
+    new_count = 0
+    for deal in new_deals:
+        asin = deal["asin"]
+        if asin not in memory:
+            deal["firstSeen"] = now
+            memory[asin] = deal
+            new_count += 1
+        else:
+            # Update price and discount but keep original firstSeen
+            first_seen = memory[asin]["firstSeen"]
+            memory[asin] = deal
+            memory[asin]["firstSeen"] = first_seen
+
+    print(f"  Added {new_count} new deals to memory")
+    print(f"  Total deals in memory: {len(memory)}")
+
+    save_memory(memory)
+    return list(memory.values())
+
+# ─── KEEPA DEAL FINDER ───────────────────────────────────────────────────────
 
 def fetch_deal_asins():
     print("  Fetching deals from Keepa — 8 pages...")
     url     = "https://api.keepa.com/deal"
     params  = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
-
     all_asins = []
 
     for page in range(8):
@@ -203,7 +232,6 @@ def fetch_deal_asins():
                 asins = [d.get("asin") for d in deals if d.get("asin")]
                 print(f"    Page {page}: {len(asins)} ASINs")
                 all_asins.extend(asins)
-                # Stop early if Keepa returns fewer than 150 — no more pages
                 if len(asins) < 100:
                     print(f"    Only {len(asins)} results — no more pages")
                     break
@@ -215,7 +243,6 @@ def fetch_deal_asins():
             break
         time.sleep(1)
 
-    # Deduplicate while preserving order
     seen   = set()
     unique = []
     for a in all_asins:
@@ -226,26 +253,54 @@ def fetch_deal_asins():
     print(f"  Total unique ASINs: {len(unique)}")
     return unique
 
+def fetch_products(asins):
+    chunk_size   = 20
+    all_products = []
+    for i in range(0, len(asins), chunk_size):
+        chunk = asins[i:i+chunk_size]
+        url = (
+            f"https://api.keepa.com/product"
+            f"?key={KEEPA_API_KEY}"
+            f"&domain={DOMAIN_ID}"
+            f"&asin={','.join(chunk)}"
+            f"&stats=1"
+            f"&history=1"
+            f"&days=2"
+        )
+        print(f"    Fetching {len(chunk)} products...")
+        try:
+            r = requests.get(url, timeout=30)
+            print(f"    Status: {r.status_code}")
+            if r.status_code == 200:
+                data     = r.json()
+                products = data.get("products", [])
+                all_products.extend(products)
+                print(f"    Got {len(products)} products")
+            else:
+                print(f"    Error: {r.text[:200]}")
+            time.sleep(1)
+        except Exception as e:
+            print(f"    Request failed: {e}")
+    return all_products
+
+# ─── BUILD deals.json ─────────────────────────────────────────────────────────
+
 def build_deals_json():
     print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop...\n")
 
     deal_asins = fetch_deal_asins()
     if not deal_asins:
-        print("  No deal ASINs. Saving empty.")
-        save_empty()
-        return
+        print("  No deal ASINs.")
 
     fetch_count = min(len(deal_asins), MAX_DEALS)
-    print(f"\n  Fetching details for {fetch_count} products...")
-    products = fetch_products(deal_asins[:fetch_count])
-    print(f"  Total products fetched: {len(products)}")
+    products    = []
+    if fetch_count > 0:
+        print(f"\n  Fetching details for {fetch_count} products...")
+        products = fetch_products(deal_asins[:fetch_count])
+        print(f"  Total products fetched: {len(products)}")
 
-    if not products:
-        print("  No products returned. Saving empty.")
-        save_empty()
-        return
-
-    formatted = []
+    # Format new deals
+    new_deals = []
     deal_id   = 1
 
     for p in products:
@@ -292,7 +347,7 @@ def build_deals_json():
             price_display = f"${current_price/100:.2f}"   if current_price   > 0 else ""
             was_display   = f"${yesterday_price/100:.2f}" if yesterday_price > 0 else ""
 
-            formatted.append({
+            new_deals.append({
                 "id":            deal_id,
                 "asin":          asin,
                 "cat":           cat,
@@ -318,20 +373,30 @@ def build_deals_json():
         except Exception as e:
             print(f"  Skipping {p.get('asin','?')}: {e}")
 
-    formatted.sort(key=lambda d: -d["effectivePct"])
-    formatted = formatted[:DEALS_TO_SHOW]
+    print(f"\n  {len(new_deals)} new deals found this run")
+
+    # Merge with 24-hour memory
+    all_deals = merge_with_memory(new_deals)
+
+    # Sort by discount and take top DEALS_TO_SHOW
+    all_deals.sort(key=lambda d: -d.get("effectivePct", 0))
+    all_deals = all_deals[:DEALS_TO_SHOW]
+
+    # Re-number IDs
+    for i, d in enumerate(all_deals):
+        d["id"] = i + 1
 
     output = {
         "updatedAt":   datetime.datetime.utcnow().isoformat() + "Z",
-        "totalDeals":  len(formatted),
-        "hotDeals":    sum(1 for d in formatted if d["hot"]),
+        "totalDeals":  len(all_deals),
+        "hotDeals":    sum(1 for d in all_deals if d.get("hot")),
         "couponDeals": 0,
-        "deals":       formatted,
+        "deals":       all_deals,
     }
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
 
-    print(f"\n✓ Saved {len(formatted)} deals to {OUTPUT_FILE}")
+    print(f"\n✓ Saved {len(all_deals)} deals to {OUTPUT_FILE}")
     print(f"  Hot deals: {output['hotDeals']}")
     print(f"  Updated:   {output['updatedAt']}")
 
