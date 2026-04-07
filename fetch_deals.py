@@ -1,6 +1,6 @@
 """
 DealDrop — fetch_deals.py
-Uses same Keepa API call format as your working Google Sheets script.
+Hourly runs, 8 pages of deals, 300 products scanned per run.
 """
 
 import json
@@ -12,10 +12,11 @@ import requests
 KEEPA_API_KEY      = os.environ.get("KEEPA_API_KEY", "")
 AMAZON_PARTNER_TAG = os.environ.get("AFFILIATE_TAG", "")
 OUTPUT_FILE        = "deals.json"
-MAX_DEALS          = 50
+MAX_DEALS          = 300
 MIN_DISCOUNT_PCT   = 10
 HOT_DEAL_PCT       = 50
 DOMAIN_ID          = "1"
+DEALS_TO_SHOW      = 50
 
 CATEGORY_NAMES = {
     281052:      "Electronics",
@@ -178,156 +179,4 @@ def fetch_products(asins):
     return all_products
 
 def fetch_deal_asins():
-    print("  Fetching deals from Keepa...")
-    url     = "https://api.keepa.com/deal"
-    params  = {"key": KEEPA_API_KEY}
-    headers = {"Content-Type": "application/json"}
-
-    all_asins = []
-
-    # Fetch 2 pages — page 0 and page 1 = up to 300 candidates
-    for page in range(2):
-        # priceTypes [0,1,18] = Amazon + Marketplace New + Buy Box
-        body = {
-            "domainId":     1,
-            "priceTypes":   [0, 1, 18],
-            "deltaPercent": MIN_DISCOUNT_PCT,
-            "interval":     10080,
-            "page":         page,
-        }
-        try:
-            r = requests.post(url, params=params, json=body, headers=headers, timeout=30)
-            print(f"    Page {page} status: {r.status_code}")
-            if r.status_code == 200:
-                data   = r.json()
-                deals  = data.get("deals", {}).get("dr", [])
-                asins  = [d.get("asin") for d in deals if d.get("asin")]
-                print(f"    Page {page}: {len(asins)} ASINs")
-                all_asins.extend(asins)
-            else:
-                print(f"    Error: {r.text[:200]}")
-        except Exception as e:
-            print(f"    Page {page} failed: {e}")
-        time.sleep(1)
-
-    # Deduplicate
-    seen = set()
-    unique = []
-    for a in all_asins:
-        if a not in seen:
-            seen.add(a)
-            unique.append(a)
-
-    print(f"  Total unique ASINs: {len(unique)}")
-    return unique
-
-def build_deals_json():
-    print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop...\n")
-
-    deal_asins = fetch_deal_asins()
-    if not deal_asins:
-        print("  No deal ASINs. Saving empty.")
-        save_empty()
-        return
-
-    print(f"\n  Fetching details for {min(len(deal_asins), MAX_DEALS)} products...")
-    products = fetch_products(deal_asins[:MAX_DEALS])
-    print(f"  Total products fetched: {len(products)}")
-
-    if not products:
-        print("  No products returned. Saving empty.")
-        save_empty()
-        return
-
-    formatted = []
-    deal_id   = 1
-
-    for p in products:
-        try:
-            asin  = p.get("asin", "")
-            title = p.get("title", "")
-            if not title or len(title) < 5:
-                continue
-
-            current_stats = p.get("stats", {}).get("current", [])
-            current_price = -1
-            price_type    = -1
-
-            if len(current_stats) > 18 and current_stats[18] > 0:
-                current_price = current_stats[18]; price_type = 18
-            elif len(current_stats) > 1 and current_stats[1] > 0:
-                current_price = current_stats[1];  price_type = 1
-            elif len(current_stats) > 0 and current_stats[0] > 0:
-                current_price = current_stats[0];  price_type = 0
-
-            yesterday_price = -1
-            csv_data        = p.get("csv", [])
-            if price_type != -1 and csv_data and len(csv_data) > price_type and csv_data[price_type]:
-                yesterday_price = get_price_at_time(csv_data[price_type], 24 * 60)
-            if yesterday_price == -1:
-                yesterday_price = current_price
-
-            pct = 0
-            if current_price > 0 and yesterday_price > 0:
-                drop = (yesterday_price - current_price) / yesterday_price
-                if drop > 0:
-                    pct = round(drop * 100)
-
-            if pct < MIN_DISCOUNT_PCT:
-                continue
-
-            image_url = ""
-            if p.get("imagesCSV"):
-                image_url = "https://images-na.ssl-images-amazon.com/images/I/" + p["imagesCSV"].split(",")[0]
-
-            cat   = get_category(p)
-            emoji = CATEGORY_EMOJI.get(cat, "🛒")
-
-            price_display = f"${current_price/100:.2f}"   if current_price   > 0 else ""
-            was_display   = f"${yesterday_price/100:.2f}" if yesterday_price > 0 else ""
-
-            formatted.append({
-                "id":            deal_id,
-                "asin":          asin,
-                "cat":           cat,
-                "emoji":         emoji,
-                "title":         title[:80] + ("..." if len(title) > 80 else ""),
-                "desc":          f"{pct}% off yesterday's price",
-                "price":         price_display,
-                "was":           was_display,
-                "hasLivePrice":  bool(price_display),
-                "pct":           pct,
-                "effectivePct":  pct,
-                "hot":           pct >= HOT_DEAL_PCT,
-                "discount":      f"{pct}% off",
-                "hasCoupon":     False,
-                "couponDisplay": None,
-                "image":         image_url,
-                "prime":         False,
-                "link":          f"https://www.amazon.com/dp/{asin}?tag={AMAZON_PARTNER_TAG}",
-                "updatedAt":     datetime.datetime.utcnow().isoformat() + "Z",
-            })
-            deal_id += 1
-
-        except Exception as e:
-            print(f"  Skipping {p.get('asin','?')}: {e}")
-
-    formatted.sort(key=lambda d: -d["effectivePct"])
-    formatted = formatted[:MAX_DEALS]
-
-    output = {
-        "updatedAt":   datetime.datetime.utcnow().isoformat() + "Z",
-        "totalDeals":  len(formatted),
-        "hotDeals":    sum(1 for d in formatted if d["hot"]),
-        "couponDeals": 0,
-        "deals":       formatted,
-    }
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(output, f, indent=2)
-
-    print(f"\n✓ Saved {len(formatted)} deals to {OUTPUT_FILE}")
-    print(f"  Hot deals: {output['hotDeals']}")
-    print(f"  Updated:   {output['updatedAt']}")
-
-if __name__ == "__main__":
-    build_deals_json()
+    print("  Fetching deals from
