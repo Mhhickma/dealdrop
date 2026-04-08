@@ -5,8 +5,10 @@ Two-API pipeline:
   1. Keepa API     — finds deals using price history + coupon detection
   2. Amazon PA API — fetches live prices, images, titles for display
 
-Fix applied:
-- Keepa product endpoint now uses `domain`, not `domainId`
+This version:
+- Uses a broader Keepa deal search
+- Pulls pages 0, 1, and 2 from Keepa
+- Uses domain on the Keepa product endpoint
 - Keeps zero-overwrite protection so bad runs do not wipe deals.json
 """
 
@@ -39,6 +41,11 @@ MIN_COUPON_PCT     = 5
 DEAL_TTL_HOURS     = 24
 
 KEEPA_BASE         = "https://api.keepa.com"
+
+# Broader Keepa request settings
+KEEPA_DEAL_DELTA_PERCENT = 8
+KEEPA_DEAL_INTERVAL      = 4320
+KEEPA_DEAL_PAGES         = 3
 
 # ─── CATEGORY MAPPING ─────────────────────────────────────────────────────────
 
@@ -117,7 +124,6 @@ def prune_memory(memory):
 # ─── KEEPA DEAL REQUEST ───────────────────────────────────────────────────────
 
 def keepa_deal_request(deal_params):
-    """Call Keepa deal endpoint — POST with JSON body."""
     url     = f"{KEEPA_BASE}/deal"
     params  = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
@@ -131,10 +137,6 @@ def keepa_deal_request(deal_params):
 # ─── KEEPA PRODUCT REQUEST ────────────────────────────────────────────────────
 
 def keepa_product_request(asins):
-    """
-    Correct Keepa product request.
-    Uses domain (not domainId).
-    """
     url = f"{KEEPA_BASE}/product"
     params = {
         "key": KEEPA_API_KEY,
@@ -214,26 +216,31 @@ def parse_coupon(product):
 def fetch_keepa_asins():
     print("\n[Keepa] Fetching deal ASINs...")
 
-    body = {
-        "domainId":     1,
-        "priceTypes":   [0],
-        "deltaPercent": MIN_DISCOUNT_PCT,
-        "interval":     10080,
-        "page":         0,
-    }
+    all_candidates = []
 
-    deal_asins = []
-    try:
-        data       = keepa_deal_request(body)
-        deals_raw  = data.get("deals", {}).get("dr", [])
-        deal_asins = [str(d.get("asin")).strip().upper() for d in deals_raw if d.get("asin")]
-        print(f"[Keepa] Got {len(deal_asins)} candidates")
-    except Exception as e:
-        print(f"[Keepa] Deal request failed: {e}")
+    for page in range(KEEPA_DEAL_PAGES):
+        body = {
+            "domainId": 1,
+            "priceTypes": [0],
+            "deltaPercent": KEEPA_DEAL_DELTA_PERCENT,
+            "interval": KEEPA_DEAL_INTERVAL,
+            "page": page,
+        }
 
-    all_asins = list(dict.fromkeys(deal_asins))
+        try:
+            data = keepa_deal_request(body)
+            deals_raw = data.get("deals", {}).get("dr", [])
+            page_asins = [str(d.get("asin")).strip().upper() for d in deals_raw if d.get("asin")]
+            print(f"[Keepa] Page {page}: {len(page_asins)} candidates")
+            all_candidates.extend(page_asins)
+            time.sleep(0.4)
+        except Exception as e:
+            print(f"[Keepa] Deal request failed on page {page}: {e}")
+
+    all_asins = list(dict.fromkeys(all_candidates))
+    print(f"[Keepa] Got {len(all_candidates)} total candidates across pages")
     print(f"[Keepa] {len(all_asins)} unique ASINs")
-    return all_asins[:MAX_DEALS + 20]
+    return all_asins[:MAX_DEALS + 40]
 
 def fetch_keepa_product_details(asins):
     if not asins:
@@ -253,7 +260,7 @@ def fetch_keepa_product_details(asins):
         except Exception as e:
             print(f"[Keepa] Error on batch {batch}: {e}")
 
-        if len(all_products) >= MAX_DEALS + 20:
+        if len(all_products) >= MAX_DEALS + 40:
             break
 
     print(f"[Keepa] Total: {len(all_products)} products")
