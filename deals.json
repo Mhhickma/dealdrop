@@ -1,11 +1,55 @@
 {
-  "updatedAt": "2026-04-08T10:43:59.747746Z",
-  "totalDeals": 38,
+  "updatedAt": "2026-04-08T11:02:15.340265Z",
+  "totalDeals": 50,
   "hotDeals": 0,
   "couponDeals": 0,
   "deals": [
     {
       "id": 1,
+      "asin": "B0D9WRZ9TR",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Gerber Baby Neutral Holiday Family Pajamas, Green, 12 Months",
+      "desc": "24% off yesterday's price",
+      "price": "$10.40",
+      "was": "$13.75",
+      "hasLivePrice": true,
+      "pct": 24,
+      "effectivePct": 24,
+      "hot": false,
+      "discount": "24% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/51QXAdKpAtL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0D9WRZ9TR?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679690Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 2,
+      "asin": "B01IQWQ6ZQ",
+      "cat": "Sports & Outdoors",
+      "emoji": "\u26bd",
+      "title": "Classic Accessories Stellex Trailerable Outboard Motor Cover, 50-115 H.P. Motors",
+      "desc": "21% off yesterday's price",
+      "price": "$25.22",
+      "was": "$31.75",
+      "hasLivePrice": true,
+      "pct": 21,
+      "effectivePct": 21,
+      "hot": false,
+      "discount": "21% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/313BUk32JNL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B01IQWQ6ZQ?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679535Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 3,
       "asin": "B0007QMMVM",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -27,7 +71,51 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 2,
+      "id": 4,
+      "asin": "B000MX934E",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Bali Women's Satin Tracings Minimizer Underwire Bra, Rosewood, 40D",
+      "desc": "20% off yesterday's price",
+      "price": "$20.79",
+      "was": "$25.99",
+      "hasLivePrice": true,
+      "pct": 20,
+      "effectivePct": 20,
+      "hot": false,
+      "discount": "20% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/41iw0R8VUwL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B000MX934E?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679517Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 5,
+      "asin": "B0156364MI",
+      "cat": "Luggage & Travel",
+      "emoji": "\ud83e\uddf3",
+      "title": "Sof Sole mens Neutral Arch Unisex FIT Support Insoles, Grey, Women s 11-12 Men 9...",
+      "desc": "20% off yesterday's price",
+      "price": "$43.99",
+      "was": "$54.99",
+      "hasLivePrice": true,
+      "pct": 20,
+      "effectivePct": 20,
+      "hot": false,
+      "discount": "20% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/41+mYLWY2ZL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0156364MI?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679749Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 6,
       "asin": "B08KBZMR7Z",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -49,7 +137,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 3,
+      "id": 7,
       "asin": "B0BS1N86RD",
       "cat": "Music",
       "emoji": "\ud83c\udfb5",
@@ -71,7 +159,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 4,
+      "id": 8,
       "asin": "B0CL4MKS5V",
       "cat": "Automotive",
       "emoji": "\ud83d\ude97",
@@ -93,7 +181,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 5,
+      "id": 9,
       "asin": "B0D9BVZHV6",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -115,7 +203,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 6,
+      "id": 10,
       "asin": "B01DG4NCD8",
       "cat": "Musical Instruments",
       "emoji": "\ud83c\udfb8",
@@ -137,7 +225,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 7,
+      "id": 11,
       "asin": "B09ZK4YH8P",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -159,7 +247,29 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 8,
+      "id": 12,
+      "asin": "B075SMT5WN",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Warner's Women's No Pinching No Problems Hi Cut Brief Panty, Cool Animal Print, ...",
+      "desc": "17% off yesterday's price",
+      "price": "$10.00",
+      "was": "$12.00",
+      "hasLivePrice": true,
+      "pct": 17,
+      "effectivePct": 17,
+      "hot": false,
+      "discount": "17% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/412Hh+rHgmL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B075SMT5WN?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679732Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 13,
       "asin": "B0FHPMS7VC",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -181,7 +291,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 9,
+      "id": 14,
       "asin": "B0BX9BQZ4D",
       "cat": "Tools & Home Improvement",
       "emoji": "\ud83d\udd27",
@@ -203,7 +313,7 @@
       "firstSeen": "2026-04-08T10:05:39.263881Z"
     },
     {
-      "id": 10,
+      "id": 15,
       "asin": "B0FNNT4BXC",
       "cat": "Health & Household",
       "emoji": "\ud83d\udc8a",
@@ -225,7 +335,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 11,
+      "id": 16,
       "asin": "B0CSGWPQFD",
       "cat": "Electronics",
       "emoji": "\ud83d\udcbb",
@@ -247,7 +357,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 12,
+      "id": 17,
       "asin": "B01MR6PTU2",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -269,7 +379,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 13,
+      "id": 18,
       "asin": "B01NATYHQ3",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -291,7 +401,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 14,
+      "id": 19,
       "asin": "B0FQCRWXWB",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -313,7 +423,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 15,
+      "id": 20,
       "asin": "B07VQC8T1S",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -335,7 +445,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 16,
+      "id": 21,
       "asin": "B0BJK1JB9C",
       "cat": "Grocery & Gourmet Food",
       "emoji": "\ud83d\uded2",
@@ -357,7 +467,7 @@
       "firstSeen": "2026-04-08T10:05:39.263881Z"
     },
     {
-      "id": 17,
+      "id": 22,
       "asin": "B000KA2U62",
       "cat": "Sports & Outdoors",
       "emoji": "\u26bd",
@@ -379,7 +489,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 18,
+      "id": 23,
       "asin": "B008UQ8QJI",
       "cat": "Luggage & Travel",
       "emoji": "\ud83e\uddf3",
@@ -401,7 +511,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 19,
+      "id": 24,
       "asin": "B00E9QXO5O",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -423,7 +533,29 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 20,
+      "id": 25,
+      "asin": "B09K92Z818",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Kanu Surf Beach Girl Banded Tankini",
+      "desc": "15% off yesterday's price",
+      "price": "$17.03",
+      "was": "$19.99",
+      "hasLivePrice": true,
+      "pct": 15,
+      "effectivePct": 15,
+      "hot": false,
+      "discount": "15% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/31OEUnZI94L._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B09K92Z818?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679525Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 26,
       "asin": "B09N9SLSL8",
       "cat": "Video Games",
       "emoji": "\ud83c\udfae",
@@ -445,7 +577,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 21,
+      "id": 27,
       "asin": "B0D2PN8GK3",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -467,7 +599,29 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 22,
+      "id": 28,
+      "asin": "B09XFF9M19",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "The Children's Place baby girls Family Matching Christmas Holiday Sets, Snug Fit...",
+      "desc": "14% off yesterday's price",
+      "price": "$11.01",
+      "was": "$12.80",
+      "hasLivePrice": true,
+      "pct": 14,
+      "effectivePct": 14,
+      "hot": false,
+      "discount": "14% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/417Iy9QQiGL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B09XFF9M19?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679421Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 29,
       "asin": "B0CHN4RJ48",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -489,7 +643,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 23,
+      "id": 30,
       "asin": "B00T47HGZW",
       "cat": "Tools & Home Improvement",
       "emoji": "\ud83d\udd27",
@@ -511,7 +665,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 24,
+      "id": 31,
       "asin": "B09WJF33SZ",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -533,7 +687,7 @@
       "firstSeen": "2026-04-08T10:05:39.263881Z"
     },
     {
-      "id": 25,
+      "id": 32,
       "asin": "B09FN2HC1M",
       "cat": "Sports & Outdoors",
       "emoji": "\u26bd",
@@ -555,7 +709,29 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 26,
+      "id": 33,
+      "asin": "B0CMDWVFXV",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Bali Women's Comfort Revolution Modern Seamless Brief Underwear, No-Show Panties...",
+      "desc": "13% off yesterday's price",
+      "price": "$17.35",
+      "was": "$19.98",
+      "hasLivePrice": true,
+      "pct": 13,
+      "effectivePct": 13,
+      "hot": false,
+      "discount": "13% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/41WLY91RghL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0CMDWVFXV?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679657Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 34,
       "asin": "B071DNNBTH",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -577,7 +753,29 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 27,
+      "id": 35,
+      "asin": "B0CN3H375R",
+      "cat": "Automotive",
+      "emoji": "\ud83d\ude97",
+      "title": "MOOG K202128 Suspension Stabilizer Bar Bushing",
+      "desc": "12% off yesterday's price",
+      "price": "$16.49",
+      "was": "$18.75",
+      "hasLivePrice": true,
+      "pct": 12,
+      "effectivePct": 12,
+      "hot": false,
+      "discount": "12% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/315EPVOsfHL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0CN3H375R?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679636Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 36,
       "asin": "B0CMV6MK11",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -599,7 +797,51 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 28,
+      "id": 37,
+      "asin": "B0DWNWX8GQ",
+      "cat": "Home & Kitchen",
+      "emoji": "\ud83c\udfe0",
+      "title": "Meridian Furniture 33073Green-Ott Akira Collection Art Deco Ottoman with Soft Gr...",
+      "desc": "11% off yesterday's price",
+      "price": "$274.92",
+      "was": "$309.22",
+      "hasLivePrice": true,
+      "pct": 11,
+      "effectivePct": 11,
+      "hot": false,
+      "discount": "11% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/41IcAgiGwAL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0DWNWX8GQ?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679629Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 38,
+      "asin": "B0DJG4PKDB",
+      "cat": "Home & Kitchen",
+      "emoji": "\ud83c\udfe0",
+      "title": "Addison Rugs Mayfield AMF637 Paprika 8' x 8' Indoor Premium Machine Washable Rou...",
+      "desc": "11% off yesterday's price",
+      "price": "$240.99",
+      "was": "$272.00",
+      "hasLivePrice": true,
+      "pct": 11,
+      "effectivePct": 11,
+      "hot": false,
+      "discount": "11% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/51eBsMVzBXL._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B0DJG4PKDB?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679799Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
+    },
+    {
+      "id": 39,
       "asin": "B0DPM3YXNB",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -621,7 +863,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 29,
+      "id": 40,
       "asin": "B0DCHQ6J3C",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -643,7 +885,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 30,
+      "id": 41,
       "asin": "B0F9LPNN5W",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -665,7 +907,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 31,
+      "id": 42,
       "asin": "B0FP4Z4FML",
       "cat": "Home & Kitchen",
       "emoji": "\ud83c\udfe0",
@@ -687,7 +929,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 32,
+      "id": 43,
       "asin": "B0FJDPQTQP",
       "cat": "Automotive",
       "emoji": "\ud83d\ude97",
@@ -709,7 +951,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 33,
+      "id": 44,
       "asin": "B0GJZJZ5JR",
       "cat": "Sports & Outdoors",
       "emoji": "\u26bd",
@@ -731,7 +973,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 34,
+      "id": 45,
       "asin": "B0DQVVRBNJ",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -753,7 +995,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 35,
+      "id": 46,
       "asin": "B09XWJW639",
       "cat": "Grocery & Gourmet Food",
       "emoji": "\ud83d\uded2",
@@ -775,7 +1017,7 @@
       "firstSeen": "2026-04-08T10:01:55.172524Z"
     },
     {
-      "id": 36,
+      "id": 47,
       "asin": "B003B08QH0",
       "cat": "Musical Instruments",
       "emoji": "\ud83c\udfb8",
@@ -797,7 +1039,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 37,
+      "id": 48,
       "asin": "B0DNQ5N7S9",
       "cat": "Electronics",
       "emoji": "\ud83d\udcbb",
@@ -819,7 +1061,7 @@
       "firstSeen": "2026-04-08T10:43:59.746730Z"
     },
     {
-      "id": 38,
+      "id": 49,
       "asin": "B01M293OZY",
       "cat": "Clothing, Shoes & Jewelry",
       "emoji": "\ud83d\udc57",
@@ -839,6 +1081,28 @@
       "link": "https://www.amazon.com/dp/B01M293OZY?tag=sawdustsavings-20",
       "updatedAt": "2026-04-08T10:43:57.112382Z",
       "firstSeen": "2026-04-08T10:43:59.746730Z"
+    },
+    {
+      "id": 50,
+      "asin": "B07BJKZT8K",
+      "cat": "Clothing, Shoes & Jewelry",
+      "emoji": "\ud83d\udc57",
+      "title": "Amazon Essentials Men's Regular-Fit Long-Sleeve Flannel Shirt (Available in Big ...",
+      "desc": "10% off yesterday's price",
+      "price": "$12.72",
+      "was": "$14.13",
+      "hasLivePrice": true,
+      "pct": 10,
+      "effectivePct": 10,
+      "hot": false,
+      "discount": "10% off",
+      "hasCoupon": false,
+      "couponDisplay": null,
+      "image": "https://m.media-amazon.com/images/I/510btCHdKNS._SL500_.jpg",
+      "prime": false,
+      "link": "https://www.amazon.com/dp/B07BJKZT8K?tag=sawdustsavings-20",
+      "updatedAt": "2026-04-08T11:02:12.679506Z",
+      "firstSeen": "2026-04-08T11:02:15.339162Z"
     }
   ]
 }
