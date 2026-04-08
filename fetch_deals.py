@@ -25,29 +25,20 @@ AMAZON_REGION = "us-east-1"
 OUTPUT_FILE = "deals.json"
 MEMORY_FILE = "deals_memory.json"
 
-# How many Keepa candidates to try to process total
 MAX_DEALS = 200
-
-# How many deals to actually save to deals.json
 DEALS_TO_SHOW = 200
 
-# Filters
 MIN_DISCOUNT_PCT = 10
 HOT_DEAL_PCT = 50
 MIN_COUPON_DOLLARS = 3
 MIN_COUPON_PERCENT = 5
 
-# Memory / freshness
 DEAL_TTL_HOURS = 24
 
-# Keepa
 KEEPA_BASE = "https://api.keepa.com"
 KEEPA_DEAL_DOMAIN_ID = 1
 
-# Amazon PA batch size
 PA_API_BATCH_SIZE = 10
-
-# Request pacing
 REQUEST_SLEEP_SECONDS = 0.35
 
 
@@ -188,14 +179,15 @@ def keepa_deal_request(body: Dict[str, Any]) -> Dict[str, Any]:
     return resp.json()
 
 
-def keepa_product_request(asins: List[str]) -> Dict[str, Any]:
+def keepa_product_request(asin: str) -> Dict[str, Any]:
+    """
+    Simplest possible product request.
+    The previous multi-ASIN + extra-param requests are what is failing.
+    """
     url = f"{KEEPA_BASE}/product"
     params = {
         "key": KEEPA_API_KEY,
-        "asin": ",".join(asins),
-        "stats": 1,
-        "history": 1,
-        "days": 2,
+        "asin": asin,
     }
 
     resp = requests.get(url, params=params, timeout=60)
@@ -203,9 +195,9 @@ def keepa_product_request(asins: List[str]) -> Dict[str, Any]:
     return resp.json()
 
 
-def is_standard_asin(value: Any) -> bool:
+def is_keepa_product_id(value: Any) -> bool:
     value = str(value).strip().upper()
-    return len(value) == 10 and value[0].isalpha() and value.isalnum()
+    return len(value) == 10 and value.isalnum()
 
 
 def parse_coupon(product: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -282,24 +274,25 @@ def fetch_keepa_product_details(asins: List[str]) -> List[Dict[str, Any]]:
     if not asins:
         return []
 
-    cleaned_asins = [asin for asin in asins if is_standard_asin(asin)]
+    cleaned_asins = [asin for asin in asins if is_keepa_product_id(asin)]
 
     print(f"\n[Keepa] Raw ASIN candidates: {len(asins)}")
-    print(f"[Keepa] Valid standard ASINs: {len(cleaned_asins)}")
+    print(f"[Keepa] 10-char product IDs: {len(cleaned_asins)}")
     print(f"[Keepa] Fetching {len(cleaned_asins)} product details...")
 
     products: List[Dict[str, Any]] = []
 
-    for i in range(0, len(cleaned_asins), 10):
-        batch = cleaned_asins[i:i + 10]
+    for asin in cleaned_asins:
         try:
-            data = keepa_product_request(batch)
+            data = keepa_product_request(asin)
             batch_products = data.get("products", []) or []
-            products.extend(batch_products)
-            print(f"Got {len(batch_products)} products")
+            if batch_products:
+                products.extend(batch_products)
+                print(f"Got {len(batch_products)} products for {asin}")
+            else:
+                print(f"[Keepa] No product returned for {asin}")
         except requests.HTTPError as e:
-            print(f"[Keepa] Batch failed: {batch}")
-            print(f"[Keepa] Error: {e}")
+            print(f"[Keepa] Skipping bad product id {asin}: {e}")
         time.sleep(REQUEST_SLEEP_SECONDS)
 
     print(f"Total products fetched: {len(products)}")
@@ -432,12 +425,23 @@ def build_keepa_deal_map(products: List[Dict[str, Any]]) -> Dict[str, Dict[str, 
 
     for p in products:
         asin = str(p.get("asin", "")).strip().upper()
-        if not asin or not is_standard_asin(asin):
+        if not asin or not is_keepa_product_id(asin):
             continue
 
         stats = p.get("stats", {}) or {}
-        current = cents_to_dollars((stats.get("current") or [None])[0])
-        avg90 = cents_to_dollars((stats.get("avg90") or [None])[0])
+
+        current = None
+        avg90 = None
+
+        try:
+            current_raw = stats.get("current") or []
+            avg90_raw = stats.get("avg90") or []
+            if current_raw:
+                current = cents_to_dollars(current_raw[0])
+            if avg90_raw:
+                avg90 = cents_to_dollars(avg90_raw[0])
+        except Exception:
+            pass
 
         pct = 0
         if current and avg90 and avg90 > 0 and current < avg90:
@@ -577,16 +581,7 @@ def build_deals_json() -> None:
 
     asins = fetch_keepa_asins()
     if not asins:
-        output = {
-            "updatedAt": iso_now(),
-            "totalDeals": 0,
-            "hotDeals": 0,
-            "couponDeals": 0,
-            "deals": [],
-        }
-        save_json_file(OUTPUT_FILE, output)
-        save_memory(memory)
-        print("No ASINs returned. Saved empty deals.json.")
+        print("No ASINs returned from Keepa deal endpoint. Keeping existing deals.json.")
         return
 
     keepa_products = fetch_keepa_product_details(asins)
@@ -612,9 +607,12 @@ def build_deals_json() -> None:
 
     for i in range(0, len(qualifying_asins), PA_API_BATCH_SIZE):
         batch = qualifying_asins[i:i + PA_API_BATCH_SIZE]
-        result = fetch_amazon_live_data(batch)
-        amazon_data.update(result)
-        print(f"Fetched live data for batch {math.floor(i / PA_API_BATCH_SIZE) + 1}")
+        try:
+            result = fetch_amazon_live_data(batch)
+            amazon_data.update(result)
+            print(f"Fetched live data for batch {math.floor(i / PA_API_BATCH_SIZE) + 1}")
+        except Exception as e:
+            print(f"[Amazon PA API] Batch failed for {batch}: {e}")
         time.sleep(REQUEST_SLEEP_SECONDS)
 
     print(f"amazon_data count: {len(amazon_data)}")
@@ -627,6 +625,10 @@ def build_deals_json() -> None:
         formatted = formatted[:DEALS_TO_SHOW]
 
     print(f"Final deals after cap: {len(formatted)}")
+
+    if len(formatted) == 0:
+        print("No formatted deals found. Keeping existing deals.json and not overwriting.")
+        return
 
     memory = update_memory(memory, formatted)
     memory = prune_memory(memory, DEAL_TTL_HOURS)
