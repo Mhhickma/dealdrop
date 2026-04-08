@@ -42,6 +42,7 @@ DEAL_TTL_HOURS = 24
 
 # Keepa
 KEEPA_BASE = "https://api.keepa.com"
+KEEPA_DEAL_DOMAIN_ID = 1
 
 # Amazon PA batch size
 PA_API_BATCH_SIZE = 10
@@ -202,6 +203,11 @@ def keepa_product_request(asins: List[str]) -> Dict[str, Any]:
     return resp.json()
 
 
+def is_standard_asin(value: Any) -> bool:
+    value = str(value).strip().upper()
+    return len(value) == 10 and value[0].isalpha() and value.isalnum()
+
+
 def parse_coupon(product: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     coupon_history = product.get("coupon")
     if not coupon_history or len(coupon_history) < 3:
@@ -251,7 +257,7 @@ def fetch_keepa_asins() -> List[str]:
     print("\n[Keepa] Fetching deal ASINs...")
 
     body = {
-        "domainId": 1,
+        "domainId": KEEPA_DEAL_DOMAIN_ID,
         "priceTypes": [0],
         "deltaPercent": MIN_DISCOUNT_PCT,
         "interval": 10080,
@@ -265,7 +271,7 @@ def fetch_keepa_asins() -> List[str]:
     for item in raw_deals:
         asin = item.get("asin")
         if asin:
-            asins.append(asin)
+            asins.append(str(asin).strip().upper())
 
     unique_asins = list(dict.fromkeys(asins))
     print(f"[Keepa] Got {len(unique_asins)} unique ASINs")
@@ -276,15 +282,24 @@ def fetch_keepa_product_details(asins: List[str]) -> List[Dict[str, Any]]:
     if not asins:
         return []
 
-    print(f"\n[Keepa] Fetching {len(asins)} product details...")
+    cleaned_asins = [asin for asin in asins if is_standard_asin(asin)]
+
+    print(f"\n[Keepa] Raw ASIN candidates: {len(asins)}")
+    print(f"[Keepa] Valid standard ASINs: {len(cleaned_asins)}")
+    print(f"[Keepa] Fetching {len(cleaned_asins)} product details...")
+
     products: List[Dict[str, Any]] = []
 
-    for i in range(0, len(asins), 10):
-        batch = asins[i:i + 10]
-        data = keepa_product_request(batch)
-        batch_products = data.get("products", []) or []
-        products.extend(batch_products)
-        print(f"Got {len(batch_products)} products")
+    for i in range(0, len(cleaned_asins), 10):
+        batch = cleaned_asins[i:i + 10]
+        try:
+            data = keepa_product_request(batch)
+            batch_products = data.get("products", []) or []
+            products.extend(batch_products)
+            print(f"Got {len(batch_products)} products")
+        except requests.HTTPError as e:
+            print(f"[Keepa] Batch failed: {batch}")
+            print(f"[Keepa] Error: {e}")
         time.sleep(REQUEST_SLEEP_SECONDS)
 
     print(f"Total products fetched: {len(products)}")
@@ -416,8 +431,8 @@ def build_keepa_deal_map(products: List[Dict[str, Any]]) -> Dict[str, Dict[str, 
     keepa_deals: Dict[str, Dict[str, Any]] = {}
 
     for p in products:
-        asin = p.get("asin")
-        if not asin:
+        asin = str(p.get("asin", "")).strip().upper()
+        if not asin or not is_standard_asin(asin):
             continue
 
         stats = p.get("stats", {}) or {}
