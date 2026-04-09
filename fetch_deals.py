@@ -1,12 +1,10 @@
 """
 DealDrop — fetch_deals.py
-LOW TOKEN TEST VERSION
+Creators API transition version
 
-Purpose:
-- Keep Keepa for deal discovery
-- Use far fewer Keepa tokens while testing
-- Keep Amazon enrichment behind one provider interface
-- Leave room for Creators API next
+- Keepa finds candidate deals
+- Amazon enrichment can use Creators API or PA API
+- Default provider is Creators API
 """
 
 import json
@@ -17,22 +15,33 @@ import hashlib
 import datetime
 import requests
 
+# Creators API SDK
+from creatorsapi_python_sdk.api_client import ApiClient
+from creatorsapi_python_sdk.api.default_api import DefaultApi
+from creatorsapi_python_sdk.models.get_items_request_content import GetItemsRequestContent
+
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 
-KEEPA_API_KEY      = os.environ.get("KEEPA_API_KEY", "")
-AMAZON_ACCESS_KEY  = os.environ.get("AMAZON_ACCESS_KEY", "")
-AMAZON_SECRET_KEY  = os.environ.get("AMAZON_SECRET_KEY", "")
-AMAZON_PARTNER_TAG = os.environ.get("AFFILIATE_TAG", "")
-AMAZON_HOST        = "webservices.amazon.com"
-AMAZON_REGION      = "us-east-1"
+KEEPA_API_KEY       = os.environ.get("KEEPA_API_KEY", "")
+AMAZON_ACCESS_KEY   = os.environ.get("AMAZON_ACCESS_KEY", "")
+AMAZON_SECRET_KEY   = os.environ.get("AMAZON_SECRET_KEY", "")
+AMAZON_PARTNER_TAG  = os.environ.get("AFFILIATE_TAG", "")
+AMAZON_HOST         = "webservices.amazon.com"
+AMAZON_REGION       = "us-east-1"
 
-# Provider switch
-AMAZON_PROVIDER    = os.environ.get("AMAZON_PROVIDER", "paapi").lower()
+# Creators API credentials
+CREATORS_CREDENTIAL_ID      = os.environ.get("CREATORS_CREDENTIAL_ID", "")
+CREATORS_CREDENTIAL_SECRET  = os.environ.get("CREATORS_CREDENTIAL_SECRET", "")
+CREATORS_CREDENTIAL_VERSION = os.environ.get("CREATORS_CREDENTIAL_VERSION", "")
+CREATORS_MARKETPLACE        = os.environ.get("CREATORS_MARKETPLACE", "www.amazon.com")
+
+# creators = preferred now
+# paapi = fallback if needed
+AMAZON_PROVIDER = os.environ.get("AMAZON_PROVIDER", "creators").lower()
 
 OUTPUT_FILE        = "deals.json"
 MEMORY_FILE        = "deals_memory.json"
 
-# Lower counts for testing
 MAX_DEALS          = 60
 DEALS_TO_SHOW      = 60
 MIN_DISCOUNT_PCT   = 10
@@ -43,14 +52,14 @@ DEAL_TTL_HOURS     = 24
 
 KEEPA_BASE         = "https://api.keepa.com"
 
-# LOW TOKEN TEST SETTINGS
-KEEPA_DEAL_DELTA_PERCENT = 12
-KEEPA_DEAL_INTERVAL      = 4320
-KEEPA_DEAL_PAGES         = 1
+# Keepa test-safe settings
+KEEPA_DEAL_DELTA_PERCENT  = 12
+KEEPA_DEAL_INTERVAL       = 4320
+KEEPA_DEAL_PAGES          = 1
 KEEPA_MAX_CANDIDATE_ASINS = 70
-KEEPA_BATCH_SIZE         = 10
-KEEPA_BATCH_SLEEP_SEC    = 2.5
-AMAZON_BATCH_SLEEP_SEC   = 1.0
+KEEPA_BATCH_SIZE          = 10
+KEEPA_BATCH_SLEEP_SEC     = 2.5
+AMAZON_BATCH_SLEEP_SEC    = 1.0
 
 EXCLUDED_CATEGORY_NAMES = {
     "Books",
@@ -120,7 +129,6 @@ CATEGORY_EMOJI = {
     "Luggage & Travel":          "🧳",
 }
 
-
 # ─── MEMORY HELPERS ───────────────────────────────────────────────────────────
 
 def load_memory():
@@ -148,7 +156,6 @@ def prune_memory(memory):
         except Exception:
             continue
     return pruned
-
 
 # ─── KEEPA HELPERS ────────────────────────────────────────────────────────────
 
@@ -308,7 +315,6 @@ def fetch_keepa_product_details(asins):
     print(f"[Keepa] Total: {len(all_products)} products")
     return all_products
 
-
 # ─── AMAZON PROVIDER INTERFACE ────────────────────────────────────────────────
 
 def normalize_amazon_item(
@@ -340,8 +346,98 @@ def fetch_amazon_live_data(asin_batch):
 
     return fetch_amazon_live_data_paapi(asin_batch)
 
+# ─── CREATORS API IMPLEMENTATION ──────────────────────────────────────────────
 
-# ─── PA API IMPLEMENTATION ────────────────────────────────────────────────────
+def fetch_amazon_live_data_creators(asin_batch):
+    if not CREATORS_CREDENTIAL_ID or not CREATORS_CREDENTIAL_SECRET or not CREATORS_CREDENTIAL_VERSION:
+        print("[Amazon Creators API] Missing credentials — skipping.")
+        return {}
+
+    try:
+        api_client = ApiClient(
+            credential_id=CREATORS_CREDENTIAL_ID,
+            credential_secret=CREATORS_CREDENTIAL_SECRET,
+            version=CREATORS_CREDENTIAL_VERSION,
+        )
+        api = DefaultApi(api_client)
+
+        resources = [
+            "images.primary.medium",
+            "itemInfo.title",
+            "offersV2.listings.price",
+            "offersV2.listings.availability",
+            "offersV2.listings.condition",
+            "offersV2.listings.merchantInfo",
+        ]
+
+        request_body = GetItemsRequestContent(
+            partner_tag=AMAZON_PARTNER_TAG,
+            item_ids=asin_batch,
+            resources=resources,
+        )
+
+        response = api.get_items(
+            x_marketplace=CREATORS_MARKETPLACE,
+            get_items_request_content=request_body,
+        )
+
+        response_dict = response.to_dict() if hasattr(response, "to_dict") else {}
+        items = ((response_dict.get("itemsResult") or {}).get("items")) or []
+
+        result = {}
+
+        for item in items:
+            asin = item.get("asin") or ""
+            if not asin:
+                continue
+
+            title = (((item.get("itemInfo") or {}).get("title") or {}).get("displayValue")) or ""
+
+            image = ""
+            images = item.get("images") or {}
+            primary = images.get("primary") or {}
+            medium = primary.get("medium") or {}
+            large = primary.get("large") or {}
+            image = medium.get("url") or large.get("url") or ""
+
+            offers_v2 = item.get("offersV2") or {}
+            listings = offers_v2.get("listings") or []
+
+            price_display = ""
+            price_amount = None
+            currency = ""
+            prime = False
+
+            if listings:
+                listing = listings[0] or {}
+                price_obj = listing.get("price") or {}
+
+                price_display = price_obj.get("displayAmount") or ""
+                price_amount = price_obj.get("amount")
+                currency = price_obj.get("currency") or ""
+
+                availability = listing.get("availability") or {}
+                availability_type = availability.get("type") or ""
+                prime = "prime" in str(availability_type).lower()
+
+            result[asin] = normalize_amazon_item(
+                asin=asin,
+                title=title,
+                image=image,
+                price_display=price_display,
+                price_amount=price_amount,
+                currency=currency,
+                prime=prime,
+            )
+
+        print(f"[Amazon Creators API] Got data for {len(result)} products")
+        return result
+
+    except Exception as e:
+        print(f"[Amazon Creators API] ERROR: {e}")
+        return {}
+
+# ─── PA API FALLBACK ──────────────────────────────────────────────────────────
 
 def sign_aws(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
@@ -371,9 +467,8 @@ def fetch_amazon_live_data_paapi(asin_batch):
             "Images.Primary.Large",
             "ItemInfo.Title",
             "Offers.Listings.Price",
-            "Offers.Listings.Availability.Message",
-            "Offers.Listings.DeliveryInfo.IsPrimeEligible",
             "Offers.Summaries.LowestPrice",
+            "Offers.Listings.DeliveryInfo.IsPrimeEligible",
         ],
     }
 
@@ -447,14 +542,6 @@ def fetch_amazon_live_data_paapi(asin_batch):
     except Exception as e:
         print(f"[Amazon PA API] ERROR: {e}")
         return {}
-
-
-# ─── CREATORS API PLACEHOLDER ─────────────────────────────────────────────────
-
-def fetch_amazon_live_data_creators(asin_batch):
-    print("[Amazon Creators API] Not implemented yet.")
-    return {}
-
 
 # ─── BUILD deals.json ─────────────────────────────────────────────────────────
 
@@ -546,6 +633,7 @@ def build_deals_json():
                     pass
 
             has_live_price = bool((a.get("price_display") or "").strip() or price_amount is not None)
+
             if not price:
                 price = "See price on Amazon"
 
