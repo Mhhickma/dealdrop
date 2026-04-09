@@ -1,18 +1,11 @@
 """
 DealDrop — fetch_deals.py
---------------------------
-Two-API pipeline:
-  1. Keepa API     — finds deals using price history + coupon detection
-  2. Amazon PA API — fetches live prices, images, titles for display
+Provider-based transition version
 
-This version:
-- Uses a broader Keepa deal search
-- Pulls pages 0, 1, and 2 from Keepa
-- Uses domain on the Keepa product endpoint
-- Uses PA API price fallback so more cards show an Amazon price
-- Filters out books, magazines, manga, comics, journals, and similar items
-- Does NOT discard deals just because DisplayAmount is blank
-- Keeps zero-overwrite protection so bad runs do not wipe deals.json
+Purpose:
+- Keep Keepa for deal discovery
+- Isolate Amazon enrichment behind one provider interface
+- Make it easy to replace PA API with Creators API next
 """
 
 import json
@@ -32,6 +25,11 @@ AMAZON_PARTNER_TAG = os.environ.get("AFFILIATE_TAG", "")
 AMAZON_HOST        = "webservices.amazon.com"
 AMAZON_REGION      = "us-east-1"
 
+# Transition switch:
+# "paapi" for current production path
+# "creators" for future Creators API path
+AMAZON_PROVIDER    = os.environ.get("AMAZON_PROVIDER", "paapi").lower()
+
 OUTPUT_FILE        = "deals.json"
 MEMORY_FILE        = "deals_memory.json"
 
@@ -50,7 +48,6 @@ KEEPA_DEAL_DELTA_PERCENT = 8
 KEEPA_DEAL_INTERVAL      = 4320
 KEEPA_DEAL_PAGES         = 3
 
-# Book / magazine exclusions
 EXCLUDED_CATEGORY_NAMES = {
     "Books",
 }
@@ -74,8 +71,6 @@ EXCLUDED_TITLE_TERMS = [
     " manga",
     " novel",
 ]
-
-# ─── CATEGORY MAPPING ─────────────────────────────────────────────────────────
 
 CATEGORY_NAMES = {
     281052:      "Electronics",
@@ -121,6 +116,7 @@ CATEGORY_EMOJI = {
     "Luggage & Travel":          "🧳",
 }
 
+
 # ─── MEMORY HELPERS ───────────────────────────────────────────────────────────
 
 def load_memory():
@@ -149,20 +145,20 @@ def prune_memory(memory):
             continue
     return pruned
 
-# ─── KEEPA DEAL REQUEST ───────────────────────────────────────────────────────
+
+# ─── KEEPA HELPERS ────────────────────────────────────────────────────────────
 
 def keepa_deal_request(deal_params):
-    url     = f"{KEEPA_BASE}/deal"
-    params  = {"key": KEEPA_API_KEY}
+    url = f"{KEEPA_BASE}/deal"
+    params = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
+
     r = requests.post(url, params=params, json=deal_params, headers=headers, timeout=60)
     print(f"    Deal status: {r.status_code}")
     if r.status_code != 200:
         print(f"    Deal response: {r.text[:500]}")
     r.raise_for_status()
     return r.json()
-
-# ─── KEEPA PRODUCT REQUEST ────────────────────────────────────────────────────
 
 def keepa_product_request(asins):
     url = f"{KEEPA_BASE}/product"
@@ -227,7 +223,7 @@ def parse_coupon(product):
     idx = len(coupon_history) - 3
     while idx >= 0:
         one_time = coupon_history[idx + 1]
-        sns      = coupon_history[idx + 2]
+        sns = coupon_history[idx + 2]
 
         for val, ctype in [(one_time, "clip"), (sns, "sns")]:
             if val and val != 0:
@@ -236,7 +232,7 @@ def parse_coupon(product):
                         "type": ctype,
                         "kind": "percent",
                         "value": val,
-                        "display": f"{val}% off coupon"
+                        "display": f"{val}% off coupon",
                     }
                 elif val < 0:
                     dollars = abs(val) / 100.0
@@ -245,17 +241,14 @@ def parse_coupon(product):
                             "type": ctype,
                             "kind": "dollars",
                             "value": dollars,
-                            "display": f"${dollars:.0f} off coupon"
+                            "display": f"${dollars:.0f} off coupon",
                         }
         idx -= 3
 
     return None
 
-# ─── STEP 1: KEEPA — FIND DEALS ───────────────────────────────────────────────
-
 def fetch_keepa_asins():
     print("\n[Keepa] Fetching deal ASINs...")
-
     all_candidates = []
 
     for page in range(KEEPA_DEAL_PAGES):
@@ -306,7 +299,40 @@ def fetch_keepa_product_details(asins):
     print(f"[Keepa] Total: {len(all_products)} products")
     return all_products
 
-# ─── STEP 2: AMAZON PA API ────────────────────────────────────────────────────
+
+# ─── AMAZON PROVIDER INTERFACE ────────────────────────────────────────────────
+
+def normalize_amazon_item(
+    *,
+    asin: str,
+    title: str = "",
+    image: str = "",
+    price_display: str = "",
+    price_amount=None,
+    currency: str = "",
+    prime: bool = False,
+):
+    return {
+        "asin": asin,
+        "title": title or "",
+        "image": image or "",
+        "price_display": price_display or "",
+        "price_amount": price_amount,
+        "currency": currency or "",
+        "prime": bool(prime),
+    }
+
+def fetch_amazon_live_data(asin_batch):
+    provider = AMAZON_PROVIDER
+    print(f"[Amazon] Provider: {provider}")
+
+    if provider == "creators":
+        return fetch_amazon_live_data_creators(asin_batch)
+
+    return fetch_amazon_live_data_paapi(asin_batch)
+
+
+# ─── PA API IMPLEMENTATION (CURRENT) ──────────────────────────────────────────
 
 def sign_aws(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
@@ -318,18 +344,18 @@ def get_aws_signing_key(secret, date_stamp, region, service):
     k = sign_aws(k, "aws4_request")
     return k
 
-def fetch_amazon_live_data(asin_batch):
+def fetch_amazon_live_data_paapi(asin_batch):
     if not AMAZON_ACCESS_KEY:
         print("[Amazon PA API] Not configured — skipping.")
         return {}
 
-    service  = "ProductAdvertisingAPI"
-    path     = "/paapi5/getitems"
+    service = "ProductAdvertisingAPI"
+    path = "/paapi5/getitems"
     endpoint = f"https://{AMAZON_HOST}{path}"
 
     payload = {
-        "ItemIds":     asin_batch,
-        "PartnerTag":  AMAZON_PARTNER_TAG,
+        "ItemIds": asin_batch,
+        "PartnerTag": AMAZON_PARTNER_TAG,
         "PartnerType": "Associates",
         "Marketplace": "www.amazon.com",
         "Resources": [
@@ -339,12 +365,12 @@ def fetch_amazon_live_data(asin_batch):
             "Offers.Listings.Availability.Message",
             "Offers.Listings.DeliveryInfo.IsPrimeEligible",
             "Offers.Summaries.LowestPrice",
-        ]
+        ],
     }
 
     body = json.dumps(payload)
-    now        = datetime.datetime.utcnow()
-    amz_date   = now.strftime("%Y%m%dT%H%M%SZ")
+    now = datetime.datetime.utcnow()
+    amz_date = now.strftime("%Y%m%dT%H%M%SZ")
     date_stamp = now.strftime("%Y%m%d")
 
     canonical_headers = (
@@ -354,8 +380,8 @@ def fetch_amazon_live_data(asin_batch):
         f"x-amz-date:{amz_date}\n"
         f"x-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems\n"
     )
-    signed_headers    = "content-encoding;content-type;host;x-amz-date;x-amz-target"
-    payload_hash      = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    signed_headers = "content-encoding;content-type;host;x-amz-date;x-amz-target"
+    payload_hash = hashlib.sha256(body.encode("utf-8")).hexdigest()
     canonical_request = "\n".join(["POST", path, "", canonical_headers, signed_headers, payload_hash])
 
     credential_scope = f"{date_stamp}/{AMAZON_REGION}/{service}/aws4_request"
@@ -376,43 +402,35 @@ def fetch_amazon_live_data(asin_batch):
 
     headers = {
         "content-encoding": "amz-1.0",
-        "content-type":     "application/json; charset=utf-8",
-        "host":             AMAZON_HOST,
-        "x-amz-date":       amz_date,
-        "x-amz-target":     "com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems",
-        "Authorization":    authorization,
+        "content-type": "application/json; charset=utf-8",
+        "host": AMAZON_HOST,
+        "x-amz-date": amz_date,
+        "x-amz-target": "com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems",
+        "Authorization": authorization,
     }
 
     try:
-        r = requests.post(endpoint, headers=headers, data=body, timeout=15)
+        r = requests.post(endpoint, headers=headers, data=body, timeout=20)
         r.raise_for_status()
         items = r.json().get("ItemsResult", {}).get("Items", [])
         result = {}
 
         for item in items:
-            asin      = item.get("ASIN")
-            listing   = (item.get("Offers", {}).get("Listings") or [{}])[0]
+            asin = item.get("ASIN")
+            listing = (item.get("Offers", {}).get("Listings") or [{}])[0]
             price_obj = listing.get("Price", {}) or {}
-
             summaries = item.get("Offers", {}).get("Summaries") or []
             lowest_price_obj = summaries[0].get("LowestPrice", {}) if summaries else {}
 
-            img_obj   = item.get("Images", {}).get("Primary", {}).get("Large", {})
-            title     = item.get("ItemInfo", {}).get("Title", {}).get("DisplayValue", "")
-            prime     = listing.get("DeliveryInfo", {}).get("IsPrimeEligible", False)
-
-            price_display = price_obj.get("DisplayAmount") or lowest_price_obj.get("DisplayAmount", "")
-            price_amount  = price_obj.get("Amount") or lowest_price_obj.get("Amount")
-            currency      = price_obj.get("Currency") or lowest_price_obj.get("Currency")
-
-            result[asin] = {
-                "price_display": price_display,
-                "price_amount": price_amount,
-                "currency": currency,
-                "image": img_obj.get("URL", ""),
-                "title": title,
-                "prime": prime,
-            }
+            result[asin] = normalize_amazon_item(
+                asin=asin,
+                title=item.get("ItemInfo", {}).get("Title", {}).get("DisplayValue", ""),
+                image=item.get("Images", {}).get("Primary", {}).get("Large", {}).get("URL", ""),
+                price_display=price_obj.get("DisplayAmount") or lowest_price_obj.get("DisplayAmount", ""),
+                price_amount=price_obj.get("Amount") or lowest_price_obj.get("Amount"),
+                currency=price_obj.get("Currency") or lowest_price_obj.get("Currency"),
+                prime=listing.get("DeliveryInfo", {}).get("IsPrimeEligible", False),
+            )
 
         print(f"[Amazon PA API] Got data for {len(result)} products")
         return result
@@ -421,7 +439,31 @@ def fetch_amazon_live_data(asin_batch):
         print(f"[Amazon PA API] ERROR: {e}")
         return {}
 
-# ─── STEP 3: BUILD deals.json ─────────────────────────────────────────────────
+
+# ─── CREATORS API IMPLEMENTATION (NEXT STEP PLACEHOLDER) ─────────────────────
+
+def fetch_amazon_live_data_creators(asin_batch):
+    """
+    Placeholder for Creators API implementation.
+
+    Return shape must match normalize_amazon_item() output:
+    {
+      asin: {
+        "asin": ...,
+        "title": ...,
+        "image": ...,
+        "price_display": ...,
+        "price_amount": ...,
+        "currency": ...,
+        "prime": ...
+      }
+    }
+    """
+    print("[Amazon Creators API] Not implemented yet.")
+    return {}
+
+
+# ─── BUILD deals.json ─────────────────────────────────────────────────────────
 
 def build_deals_json():
     print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop deal fetch...\n")
@@ -429,8 +471,7 @@ def build_deals_json():
     if not KEEPA_API_KEY:
         raise RuntimeError("Missing KEEPA_API_KEY")
 
-    memory = load_memory()
-    memory = prune_memory(memory)
+    memory = prune_memory(load_memory())
 
     all_asins = fetch_keepa_asins()
     if not all_asins:
@@ -442,8 +483,8 @@ def build_deals_json():
     keepa_deals = {}
     for p in keepa_products:
         try:
-            asin    = p.get("asin", "")
-            stats   = p.get("stats", {})
+            asin = p.get("asin", "")
+            stats = p.get("stats", {})
             cur_raw = stats.get("current", [])
             avg_raw = stats.get("avg90", [])
 
@@ -451,8 +492,8 @@ def build_deals_json():
                 return v / 100.0 if v and v > 0 else None
 
             current = to_d(cur_raw[0] if cur_raw and len(cur_raw) > 0 else None)
-            avg90   = to_d(avg_raw[0] if avg_raw and len(avg_raw) > 0 else None)
-            coupon  = parse_coupon(p)
+            avg90 = to_d(avg_raw[0] if avg_raw and len(avg_raw) > 0 else None)
+            coupon = parse_coupon(p)
 
             pct = 0
             if current and avg90 and avg90 > 0 and current < avg90:
@@ -462,7 +503,6 @@ def build_deals_json():
                 continue
 
             category_name = get_category(p)
-
             if is_excluded_product(p, category_name):
                 continue
 
@@ -483,12 +523,11 @@ def build_deals_json():
     amazon_data = {}
     for i in range(0, len(qualifying_asins), 10):
         batch = qualifying_asins[i:i+10]
-        result = fetch_amazon_live_data(batch)
-        amazon_data.update(result)
+        amazon_data.update(fetch_amazon_live_data(batch))
         time.sleep(1)
 
     formatted = []
-    deal_id   = 1
+    deal_id = 1
     now_iso = datetime.datetime.utcnow().isoformat() + "Z"
 
     for asin in qualifying_asins:
@@ -514,15 +553,14 @@ def build_deals_json():
                     pass
 
             has_live_price = bool((a.get("price_display") or "").strip() or price_amount is not None)
-
             if not price:
                 price = "See price on Amazon"
 
-            image  = a.get("image", "")
-            prime  = a.get("prime", False)
+            image = a.get("image", "")
+            prime = a.get("prime", False)
             coupon = k["coupon"]
-            pct    = k["pct"]
-            cat    = k["category"]
+            pct = k["pct"]
+            cat = k["category"]
             effective_pct = pct
 
             if coupon and coupon["kind"] == "percent":
@@ -565,16 +603,8 @@ def build_deals_json():
             existing = memory.get(asin, {})
             memory[asin] = {
                 **deal,
-                "firstSeen": existing.get("firstSeen", now_iso)
+                "firstSeen": existing.get("firstSeen", now_iso),
             }
-
-            print(
-                f"FORMAT {asin}: "
-                f"title={bool(title)} "
-                f"display={a.get('price_display')} "
-                f"amount={a.get('price_amount')} "
-                f"final_price={price}"
-            )
 
             deal_id += 1
 
@@ -590,15 +620,14 @@ def build_deals_json():
         print("No formatted deals found. Keeping existing deals.json and not overwriting.")
         return
 
-    memory = prune_memory(memory)
-    save_memory(memory)
+    save_memory(prune_memory(memory))
 
     output = {
-        "updatedAt":   now_iso,
-        "totalDeals":  len(formatted),
-        "hotDeals":    sum(1 for d in formatted if d["hot"]),
+        "updatedAt": now_iso,
+        "totalDeals": len(formatted),
+        "hotDeals": sum(1 for d in formatted if d["hot"]),
         "couponDeals": sum(1 for d in formatted if d["hasCoupon"]),
-        "deals":       formatted,
+        "deals": formatted,
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -608,6 +637,7 @@ def build_deals_json():
     print(f"Hot deals:    {output['hotDeals']}")
     print(f"Coupon deals: {output['couponDeals']}")
     print(f"Updated:      {output['updatedAt']}")
+
 
 if __name__ == "__main__":
     build_deals_json()
