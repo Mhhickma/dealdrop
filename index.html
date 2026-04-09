@@ -3,15 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DealDrop — Fresh Amazon Deals, Daily</title>
+<title>DealDrop — Fresh Deals, Daily</title>
 <meta name="description" content="The best Amazon deals curated daily. Hot deals, coupons, and discounts across every category — updated automatically.">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ES3MC2ZTTM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ES3MC2ZTTM');
-</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,8 +28,8 @@
   .signup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; box-shadow: var(--shadow); }
   .signup-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .signup-box > p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
-  .signup-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 14px; width: 100%; }
-  .tab-btn { flex: 1; padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--text-secondary); transition: all 0.15s; white-space: nowrap; }
+  .signup-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 14px; }
+  .tab-btn { flex: 1; padding: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: none; border: none; cursor: pointer; color: var(--text-secondary); transition: all 0.15s; }
   .tab-btn.active { background: var(--accent); color: white; }
   .signup-field { display: flex; gap: 8px; }
   .signup-field input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-primary); background: var(--bg); outline: none; transition: border-color 0.15s; }
@@ -78,10 +71,11 @@
   .hot-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
   .hot-btn { display: block; width: 100%; padding: 8px; text-align: center; background: var(--red); color: white; border: none; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-top: auto; }
   .hot-btn:hover { background: var(--red-mid); }
-  .filters-wrap { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; overflow: visible; }
+  .filters-wrap { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; }
   .filter-label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: block; }
-  .filters-row { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
-  .filter-btn { padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .filters-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .filters-scroll::-webkit-scrollbar { display: none; }
+  .filter-btn { flex-shrink: 0; padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
   .deals-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; }
@@ -151,7 +145,7 @@
 <section class="hero">
   <div class="hero-text">
     <h1>The best deals,<br>curated for you.</h1>
-    <p>Top Amazon discounts across every category — updated every 4 hours automatically.</p>
+    <p>Top Amazon discounts across every category — updated hourly automatically.</p>
   </div>
   <div class="signup-box">
     <h3>Never miss a deal</h3>
@@ -180,7 +174,7 @@
   <div class="loading-msg"><div class="spinner"></div> Loading fresh deals...</div>
 </div>
 <div class="error-msg" id="error-msg">
-  Could not load deals. Make sure <strong>deals.json</strong> is in the same folder and the fetch script has been run at least once.
+  Could not load deals. Make sure the GitHub raw deals file is updating and publicly accessible.
 </div>
 
 <div class="hot-section" id="hot-section" style="display:none;">
@@ -199,7 +193,7 @@
 
 <div class="filters-wrap" id="filters-wrap" style="display:none;">
   <span class="filter-label">Browse by Amazon category:</span>
-  <div class="filters-row" id="filter-row"></div>
+  <div class="filters-scroll" id="filter-row"></div>
 </div>
 
 <div class="deals-section" id="deals-section" style="display:none;">
@@ -216,35 +210,29 @@
 </footer>
 
 <script>
+const DEALS_URL = 'https://raw.githubusercontent.com/Mhhickma/dealdrop/main/deals.json';
+
 const CATEGORIES = [
-  { id:'All',                        label:'All Deals',                  emoji:'✦' },
-  { id:'Arts, Crafts & Sewing',      label:'Arts, Crafts & Sewing',      emoji:'🎨' },
-  { id:'Automotive',                 label:'Automotive',                  emoji:'🚗' },
-  { id:'Baby',                       label:'Baby',                        emoji:'🍼' },
-  { id:'Beauty & Personal Care',     label:'Beauty & Personal Care',      emoji:'💄' },
-  { id:'Books',                      label:'Books',                       emoji:'📚' },
-  { id:'Cell Phones & Accessories',  label:'Cell Phones & Accessories',   emoji:'📱' },
-  { id:'Clothing, Shoes & Jewelry',  label:'Clothing, Shoes & Jewelry',   emoji:'👗' },
-  { id:'Computers',                  label:'Computers',                   emoji:'🖥️' },
-  { id:'Electronics',                label:'Electronics',                 emoji:'💻' },
-  { id:'Grocery & Gourmet Food',     label:'Grocery & Gourmet Food',      emoji:'🛒' },
-  { id:'Handmade Products',          label:'Handmade Products',           emoji:'🤝' },
-  { id:'Health & Household',         label:'Health & Household',          emoji:'💊' },
-  { id:'Home & Kitchen',             label:'Home & Kitchen',              emoji:'🏠' },
-  { id:'Industrial & Scientific',    label:'Industrial & Scientific',     emoji:'🔩' },
-  { id:'Kitchen & Dining',           label:'Kitchen & Dining',            emoji:'🍳' },
-  { id:'Movies & TV',                label:'Movies & TV',                 emoji:'🎬' },
-  { id:'Music',                      label:'Music',                       emoji:'🎵' },
-  { id:'Musical Instruments',        label:'Musical Instruments',         emoji:'🎸' },
-  { id:'Office Products',            label:'Office Products',             emoji:'📎' },
-  { id:'Patio, Lawn & Garden',       label:'Patio, Lawn & Garden',        emoji:'🌱' },
-  { id:'Pet Supplies',               label:'Pet Supplies',                emoji:'🐾' },
-  { id:'Software',                   label:'Software',                    emoji:'💿' },
-  { id:'Sports & Outdoors',          label:'Sports & Outdoors',           emoji:'⚽' },
-  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',    emoji:'🔧' },
-  { id:'Toys & Games',               label:'Toys & Games',                emoji:'🧸' },
-  { id:'Video Games',                label:'Video Games',                 emoji:'🎮' },
-  { id:'Luggage & Travel',           label:'Luggage & Travel',            emoji:'🧳' },
+  { id:'All',                        label:'All Deals',               emoji:'✦' },
+  { id:'Electronics',                label:'Electronics',             emoji:'💻' },
+  { id:'Home & Kitchen',             label:'Home & Kitchen',          emoji:'🏠' },
+  { id:'Clothing, Shoes & Jewelry',  label:'Clothing & Jewelry',      emoji:'👗' },
+  { id:'Beauty & Personal Care',     label:'Beauty & Personal Care',  emoji:'💄' },
+  { id:'Health & Household',         label:'Health & Household',      emoji:'💊' },
+  { id:'Toys & Games',               label:'Toys & Games',            emoji:'🧸' },
+  { id:'Sports & Outdoors',          label:'Sports & Outdoors',       emoji:'⚽' },
+  { id:'Automotive',                 label:'Automotive',              emoji:'🚗' },
+  { id:'Pet Supplies',               label:'Pet Supplies',            emoji:'🐾' },
+  { id:'Baby',                       label:'Baby',                    emoji:'🍼' },
+  { id:'Garden & Outdoor',           label:'Garden & Outdoor',        emoji:'🌱' },
+  { id:'Office Products',            label:'Office Products',         emoji:'📎' },
+  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',emoji:'🔧' },
+  { id:'Kitchen & Dining',           label:'Kitchen & Dining',        emoji:'🍳' },
+  { id:'Video Games',                label:'Video Games',             emoji:'🎮' },
+  { id:'Books',                      label:'Books',                   emoji:'📚' },
+  { id:'Musical Instruments',        label:'Musical Instruments',     emoji:'🎸' },
+  { id:'Grocery & Gourmet Food',     label:'Grocery & Food',          emoji:'🛒' },
+  { id:'Luggage & Travel',           label:'Luggage & Travel',        emoji:'🧳' },
 ];
 
 const filterRow = document.getElementById('filter-row');
@@ -261,26 +249,32 @@ let allDeals = [];
 
 async function loadDeals() {
   try {
-    const res = await fetch('https://raw.githubusercontent.com/Mhhickma/dealdrop/main/deals.json?t=' + Date.now());
+    const res = await fetch(DEALS_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('not found');
+
     const data = await res.json();
     allDeals = data.deals || [];
+
     document.getElementById('stat-total').textContent   = data.totalDeals  || allDeals.length;
     document.getElementById('stat-hot').textContent     = data.hotDeals    || allDeals.filter(d => d.pct >= 50).length;
     document.getElementById('stat-coupons').textContent = data.couponDeals || allDeals.filter(d => d.hasCoupon).length;
+
     if (data.updatedAt) {
       const mins = Math.round((Date.now() - new Date(data.updatedAt)) / 60000);
-      document.getElementById('stat-updated').textContent = mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
+      document.getElementById('stat-updated').textContent = mins < 60 ? mins + 'm ago' : Math.round(mins / 60) + 'h ago';
     }
-    document.getElementById('loading-bar').style.display  = 'none';
-    document.getElementById('hot-section').style.display  = '';
-    document.getElementById('filters-wrap').style.display = '';
-    document.getElementById('deals-section').style.display= '';
+
+    document.getElementById('loading-bar').style.display   = 'none';
+    document.getElementById('hot-section').style.display   = '';
+    document.getElementById('filters-wrap').style.display  = '';
+    document.getElementById('deals-section').style.display = '';
+
     renderHotDeals();
     renderDeals('All');
-  } catch(e) {
+  } catch (e) {
     document.getElementById('loading-bar').style.display = 'none';
     document.getElementById('error-msg').classList.add('show');
+    console.error('Failed to load deals:', e);
   }
 }
 
@@ -302,7 +296,7 @@ function renderHotDeals() {
         <div class="hot-card-title">${esc(d.title)}</div>
         <div class="hot-card-prices">
           <span class="hot-price-now">${esc(d.price||'See price')}</span>
-          ${d.price && d.was ? `<span class="hot-price-was">${esc(d.was)}</span>` : ''}
+          ${d.price ? `<span class="hot-price-was">${esc(d.was||'')}</span>` : ''}
         </div>
         <button class="hot-btn">Grab Deal →</button>
       </div>
@@ -344,10 +338,10 @@ function filterDeals(cat, btn) {
 }
 
 function switchTab(tab) {
-  document.getElementById('tab-email').classList.toggle('active', tab==='email');
-  document.getElementById('tab-sms').classList.toggle('active',   tab==='sms');
+  document.getElementById('tab-email').classList.toggle('active', tab === 'email');
+  document.getElementById('tab-sms').classList.toggle('active', tab === 'sms');
   const input = document.getElementById('signup-input');
-  input.type        = tab === 'email' ? 'email' : 'tel';
+  input.type = tab === 'email' ? 'email' : 'tel';
   input.placeholder = tab === 'email' ? 'your@email.com' : '(555) 000-0000';
   document.getElementById('signup-msg').textContent = tab === 'email'
     ? 'No spam, ever. Unsubscribe anytime.'
@@ -365,9 +359,14 @@ function handleSignup() {
 
 const btt = document.getElementById('back-to-top');
 window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400), { passive: true });
-function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 setInterval(loadDeals, 30 * 60 * 1000);
 loadDeals();
