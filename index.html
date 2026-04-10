@@ -1231,6 +1231,28 @@ CATEGORIES.forEach(cat => {
 });
 
 let allDeals = [];
+let lastUpdatedISO = null;
+
+function formatUpdatedTime(isoString) {
+  if (!isoString) return '—';
+
+  const mins = Math.max(0, Math.round((Date.now() - new Date(isoString)) / 60000));
+
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return mins + 'm ago';
+
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return hours + 'h ago';
+
+  const days = Math.round(hours / 24);
+  return days + 'd ago';
+}
+
+function updateTimeLabels() {
+  const label = formatUpdatedTime(lastUpdatedISO);
+  const desktop = document.getElementById('stat-updated');
+  if (desktop) desktop.textContent = label;
+}
 
 async function loadDeals() {
   try {
@@ -1251,10 +1273,8 @@ async function loadDeals() {
     document.getElementById('mobile-stat-hot').textContent = hotDeals;
     document.getElementById('mobile-stat-coupons').textContent = couponDeals;
 
-    if (data.updatedAt) {
-      const mins = Math.round((Date.now() - new Date(data.updatedAt)) / 60000);
-      document.getElementById('stat-updated').textContent = mins < 60 ? mins + 'm ago' : Math.round(mins / 60) + 'h ago';
-    }
+    lastUpdatedISO = data.updatedAt || null;
+    updateTimeLabels();
 
     document.getElementById('loading-bar').style.display = 'none';
     document.getElementById('hot-section').style.display = '';
@@ -1384,6 +1404,8 @@ function esc(s) {
 }
 
 setInterval(loadDeals, 30 * 60 * 1000);
+setInterval(updateTimeLabels, 60 * 1000);
+
 loadDeals();
 </script>
 </body>
