@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: fetch-deals-main
+  cancel-in-progress: false
+
 jobs:
   fetch-deals:
     runs-on: ubuntu-latest
