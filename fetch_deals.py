@@ -5,6 +5,7 @@ Creators API transition version
 - Keepa finds candidate deals
 - Amazon enrichment can use Creators API or PA API
 - Default provider is Creators API
+- SKIPS items with no visible live price
 """
 
 import json
@@ -211,6 +212,8 @@ def get_category(product):
         return "Toys & Games"
     if any(w in title for w in ["tool", "drill", "saw", "router", "sander", "clamp", "blade", "bit"]):
         return "Tools & Home Improvement"
+    if any(w in title for w in ["brake", "control arm", "suspension", "wheel hub", "engine", "filter", "spark plug"]):
+        return "Automotive"
 
     return "Electronics"
 
@@ -632,11 +635,12 @@ def build_deals_json():
                 except Exception:
                     pass
 
-            has_live_price = bool((a.get("price_display") or "").strip() or price_amount is not None)
-
+            # SKIP items with no visible price
             if not price:
-                price = "See price on Amazon"
+                print(f"[Amazon] No visible price for ASIN {asin} - skipping")
+                continue
 
+            has_live_price = True
             image = a.get("image", "")
             prime = a.get("prime", False)
             coupon = k["coupon"]
