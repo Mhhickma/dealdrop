@@ -1,18 +1,5 @@
 """
 DealDrop — fetch_deals.py
---------------------------
-Two-API pipeline:
-  1. Keepa API     — finds deals using recent price movement + coupon detection
-  2. Amazon PA API — fetches live prices, images, titles (TOS compliant to display)
-
-This version:
-- pulls multiple Keepa deal pages
-- filters out books by default
-- limits overrepresented categories like clothing/shoes
-- uses a simple Keepa product request
-- treats 10%+ as a deal
-- treats 30%+ as a hot deal
-- keeps Amazon PA API as the display source for compliance
 """
 
 import json
@@ -25,8 +12,6 @@ from collections import Counter
 
 import requests
 
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
-
 KEEPA_API_KEY      = os.environ.get("KEEPA_API_KEY", "")
 AMAZON_ACCESS_KEY  = os.environ.get("AMAZON_ACCESS_KEY", "")
 AMAZON_SECRET_KEY  = os.environ.get("AMAZON_SECRET_KEY", "")
@@ -37,12 +22,10 @@ AMAZON_REGION      = "us-east-1"
 OUTPUT_FILE        = "deals.json"
 
 MAX_DEALS          = 150
-
 KEEPA_PAGES        = 3
 PAGE_DELAY_SEC     = 1.2
-PRODUCT_DELAY_SEC  = 0.5
+PRODUCT_DELAY_SEC  = 0.35
 
-# Deal thresholds
 MIN_DISCOUNT_PCT   = 10
 HOT_DEAL_PCT       = 30
 MIN_COUPON_VALUE   = 3
@@ -62,8 +45,6 @@ CATEGORY_LIMITS = {
 DEFAULT_CATEGORY_LIMIT = 8
 
 KEEPA_BASE = "https://api.keepa.com"
-
-# ─── CATEGORY MAPPING ─────────────────────────────────────────────────────────
 
 CATEGORY_NAMES = {
     281052:      "Electronics",
@@ -109,10 +90,8 @@ CATEGORY_EMOJI = {
     "Luggage & Travel":          "🧳",
 }
 
-# ─── KEEPA DEAL REQUEST ───────────────────────────────────────────────────────
 
 def keepa_deal_request(deal_params):
-    """Call Keepa deal endpoint — POST with JSON body."""
     url = f"{KEEPA_BASE}/deal"
     params = {"key": KEEPA_API_KEY}
     headers = {"Content-Type": "application/json"}
@@ -124,15 +103,9 @@ def keepa_deal_request(deal_params):
     r.raise_for_status()
     return r.json()
 
-# ─── KEEPA PRODUCT REQUEST ────────────────────────────────────────────────────
 
 def keepa_product_request(asins):
-    """
-    Simple Keepa product request.
-    Uses GET + key + domain + asin only.
-    """
     url = f"{KEEPA_BASE}/product"
-
     params = {
         "key": KEEPA_API_KEY,
         "domain": 1,
@@ -142,16 +115,14 @@ def keepa_product_request(asins):
     try:
         r = requests.get(url, params=params, timeout=60)
         print(f"    Product status: {r.status_code}")
-
         if r.status_code != 200:
             print(f"    Response: {r.text[:500]}")
-
         r.raise_for_status()
         return r.json()
-
     except Exception as e:
         print(f"    Product request error: {e}")
         return {"products": []}
+
 
 def get_category(product):
     root = product.get("rootCategory")
@@ -176,6 +147,7 @@ def get_category(product):
         return "Toys & Games"
 
     return "Electronics"
+
 
 def parse_coupon(product):
     coupon_history = product.get("coupon")
@@ -209,12 +181,11 @@ def parse_coupon(product):
 
     return None
 
-# ─── STEP 1: KEEPA — FIND DEAL ASINS ──────────────────────────────────────────
 
-def fetch_keepa_asins():
+def fetch_keepa_candidates():
     print("\n  [Keepa] Fetching deals across multiple pages...")
 
-    all_asins = []
+    candidates = {}
     seen = set()
 
     for page in range(KEEPA_PAGES):
@@ -229,32 +200,47 @@ def fetch_keepa_asins():
         try:
             data = keepa_deal_request(body)
             deals_raw = data.get("deals", {}).get("dr", [])
-            page_asins = [d.get("asin") for d in deals_raw if d.get("asin")]
 
             new_count = 0
-            for asin in page_asins:
+            for d in deals_raw:
+                asin = d.get("asin")
+                if not asin:
+                    continue
                 if asin not in seen:
                     seen.add(asin)
-                    all_asins.append(asin)
                     new_count += 1
 
-            print(f"  [Keepa] Page {page}: {len(page_asins)} candidates, {new_count} new unique")
+                # Keepa deal endpoint already matched these as deals.
+                # We do not require product stats later to prove that again.
+                delta = d.get("deltaPercent")
+                if isinstance(delta, (int, float)):
+                    pct = max(MIN_DISCOUNT_PCT, int(delta))
+                else:
+                    pct = MIN_DISCOUNT_PCT
+
+                existing = candidates.get(asin)
+                if not existing or pct > existing["pct"]:
+                    candidates[asin] = {
+                        "asin": asin,
+                        "pct": pct,
+                    }
+
+            print(f"  [Keepa] Page {page}: {len(deals_raw)} candidates, {new_count} new unique")
         except Exception as e:
             print(f"  [Keepa] Page {page} failed: {e}")
 
         time.sleep(PAGE_DELAY_SEC)
 
-    print(f"  [Keepa] {len(all_asins)} unique ASINs across {KEEPA_PAGES} pages")
-    return all_asins
+    print(f"  [Keepa] {len(candidates)} unique ASINs across {KEEPA_PAGES} pages")
+    return candidates
 
-# ─── STEP 2: KEEPA — PRODUCT DETAILS ──────────────────────────────────────────
 
 def fetch_keepa_product_details(asins):
     if not asins:
-        return []
+        return {}
 
     print(f"  [Keepa] Fetching product details for {len(asins)} ASINs...")
-    all_products = []
+    products_by_asin = {}
 
     for i, asin in enumerate(asins, start=1):
         try:
@@ -262,26 +248,26 @@ def fetch_keepa_product_details(asins):
             products = data.get("products", [])
 
             if products:
-                all_products.extend(products)
+                products_by_asin[asin] = products[0]
 
             if i % 10 == 0 or i == len(asins):
-                print(f"    Progress: {i}/{len(asins)} ({len(all_products)} successful)")
+                print(f"    Progress: {i}/{len(asins)} ({len(products_by_asin)} successful)")
 
             time.sleep(PRODUCT_DELAY_SEC)
 
         except Exception as e:
             print(f"  [Keepa] Error on {asin}: {e}")
 
-        if len(all_products) >= MAX_DEALS + 75:
+        if len(products_by_asin) >= MAX_DEALS + 75:
             break
 
-    print(f"  [Keepa] Total products returned: {len(all_products)}")
-    return all_products
+    print(f"  [Keepa] Total products returned: {len(products_by_asin)}")
+    return products_by_asin
 
-# ─── STEP 3: AMAZON PA API ────────────────────────────────────────────────────
 
 def sign_aws(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
 
 def get_aws_signing_key(secret, date_stamp, region, service):
     k = sign_aws(("AWS4" + secret).encode("utf-8"), date_stamp)
@@ -289,6 +275,7 @@ def get_aws_signing_key(secret, date_stamp, region, service):
     k = sign_aws(k, service)
     k = sign_aws(k, "aws4_request")
     return k
+
 
 def fetch_amazon_live_data(asin_batch):
     if not AMAZON_ACCESS_KEY:
@@ -380,14 +367,13 @@ def fetch_amazon_live_data(asin_batch):
         print(f"  [Amazon PA API] ERROR: {e}")
         return {}
 
-# ─── SCORING / VARIETY ────────────────────────────────────────────────────────
 
 def category_limit_for(category):
     return CATEGORY_LIMITS.get(category, DEFAULT_CATEGORY_LIMIT)
 
+
 def compute_sort_score(deal):
     score = 0
-
     effective_pct = deal.get("effectivePct", 0)
     pct = deal.get("pct", 0)
 
@@ -411,14 +397,11 @@ def compute_sort_score(deal):
 
     return score
 
+
 def apply_variety_limits(deals):
     sorted_deals = sorted(
         deals,
-        key=lambda d: (
-            -compute_sort_score(d),
-            d.get("cat", ""),
-            d.get("title", ""),
-        )
+        key=lambda d: (-compute_sort_score(d), d.get("cat", ""), d.get("title", ""))
     )
 
     selected = []
@@ -426,10 +409,8 @@ def apply_variety_limits(deals):
 
     for deal in sorted_deals:
         cat = deal.get("cat", "Other")
-
         if cat in EXCLUDED_CATEGORIES:
             continue
-
         if counts[cat] >= category_limit_for(cat):
             continue
 
@@ -450,21 +431,19 @@ def apply_variety_limits(deals):
 
             selected.append(deal)
             selected_asins.add(asin)
-
             if len(selected) >= MAX_DEALS:
                 break
 
     return selected
 
-# ─── STEP 4: BUILD deals.json ─────────────────────────────────────────────────
 
 def build_deals_json():
     print("RUNNING NEW FETCH_DEALS VERSION")
     print(f"\n[{datetime.datetime.now().strftime('%H:%M:%S')}] Starting DealDrop deal fetch...\n")
 
-    all_asins = fetch_keepa_asins()
+    candidate_map = fetch_keepa_candidates()
 
-    if not all_asins:
+    if not candidate_map:
         print("\n  No ASINs returned. Saving empty deals.json.")
         output = {
             "updatedAt": datetime.datetime.utcnow().isoformat() + "Z",
@@ -477,48 +456,33 @@ def build_deals_json():
             json.dump(output, f, indent=2)
         return
 
-    keepa_products = fetch_keepa_product_details(all_asins)
+    candidate_asins = list(candidate_map.keys())
+    keepa_products = fetch_keepa_product_details(candidate_asins)
 
-    keepa_deals = {}
-    for p in keepa_products:
-        try:
-            asin = p.get("asin", "")
-            stats = p.get("stats", {})
-            cur_raw = stats.get("current", [])
-            avg_raw = stats.get("avg90", [])
+    qualifying = {}
+    for asin, base in candidate_map.items():
+        product = keepa_products.get(asin)
+        if not product:
+            continue
 
-            def to_d(v):
-                return v / 100.0 if v and v > 0 else None
+        category = get_category(product)
+        if category in EXCLUDED_CATEGORIES:
+            continue
 
-            current = to_d(cur_raw[0] if cur_raw and cur_raw[0] and cur_raw[0] > 0 else None)
-            avg90 = to_d(avg_raw[0] if avg_raw and avg_raw[0] and avg_raw[0] > 0 else None)
-            coupon = parse_coupon(p)
-            pct = 0
+        coupon = parse_coupon(product)
 
-            if current and avg90 and avg90 > 0 and current < avg90:
-                pct = round((1 - current / avg90) * 100)
+        qualifying[asin] = {
+            "asin": asin,
+            "category": category,
+            "pct": max(MIN_DISCOUNT_PCT, int(base.get("pct", MIN_DISCOUNT_PCT))),
+            "coupon": coupon,
+            "title_fallback": (product.get("title") or "")[:120],
+        }
 
-            if pct < MIN_DISCOUNT_PCT and coupon is None:
-                continue
-
-            category = get_category(p)
-            if category in EXCLUDED_CATEGORIES:
-                continue
-
-            keepa_deals[asin] = {
-                "asin": asin,
-                "category": category,
-                "pct": pct,
-                "coupon": coupon,
-                "title_fallback": (p.get("title") or "")[:120],
-            }
-        except Exception as e:
-            print(f"  Skipping Keepa product: {e}")
-
-    qualifying_asins = list(keepa_deals.keys())
-    print(f"\n  {len(qualifying_asins)} qualifying deals after Keepa filtering")
+    print(f"\n  {len(qualifying)} qualifying deals after Keepa filtering")
 
     amazon_data = {}
+    qualifying_asins = list(qualifying.keys())
     for i in range(0, len(qualifying_asins), 10):
         batch = qualifying_asins[i:i+10]
         result = fetch_amazon_live_data(batch)
@@ -530,7 +494,7 @@ def build_deals_json():
 
     for asin in qualifying_asins:
         try:
-            k = keepa_deals[asin]
+            k = qualifying[asin]
             a = amazon_data.get(asin, {})
 
             title = a.get("title") or k["title_fallback"]
@@ -607,6 +571,7 @@ def build_deals_json():
     print("  Category mix:")
     for cat, count in by_cat.most_common():
         print(f"    {cat}: {count}")
+
 
 if __name__ == "__main__":
     build_deals_json()
