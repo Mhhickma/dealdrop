@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
     --bg: #f9f8f5;
     --surface: #ffffff;
@@ -36,22 +37,34 @@
     line-height: 1.6;
   }
 
+  body.menu-open {
+    overflow: hidden;
+  }
+
   nav {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 300;
   }
 
   .nav-inner {
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 24px;
-    height: 60px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
+  }
+
+  .nav-left,
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
   .logo {
@@ -59,6 +72,7 @@
     font-size: 22px;
     color: var(--text-primary);
     letter-spacing: -0.5px;
+    text-decoration: none;
   }
 
   .logo span { color: var(--accent); }
@@ -68,6 +82,201 @@
     color: var(--text-muted);
     letter-spacing: 0.05em;
     text-transform: uppercase;
+  }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .desktop-nav a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+
+  .desktop-nav a:hover {
+    color: var(--accent);
+  }
+
+  .nav-alert-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .nav-alert-btn:hover {
+    background: var(--accent-mid);
+  }
+
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: inline-flex;
+  }
+
+  .mobile-menu-btn,
+  .mobile-alert-btn {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text-primary);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  .mobile-menu-btn svg,
+  .mobile-alert-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.36);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+    z-index: 390;
+  }
+
+  .mobile-drawer-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(86vw, 360px);
+    height: 100vh;
+    background: var(--surface);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.16);
+    transform: translateX(100%);
+    transition: transform 0.24s ease;
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-drawer.show {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .drawer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    letter-spacing: -0.4px;
+  }
+
+  .drawer-title span {
+    color: var(--accent);
+  }
+
+  .drawer-close {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  .drawer-content {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+  }
+
+  .drawer-alert {
+    background: linear-gradient(135deg, #eef7f1 0%, #f8fbf8 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .drawer-alert h3 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .drawer-alert p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .drawer-alert button {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 14px;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .drawer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .drawer-links a,
+  .drawer-links button {
+    width: 100%;
+    text-align: left;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 13px 14px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .drawer-links .muted-link {
+    color: var(--text-secondary);
+    font-weight: 500;
   }
 
   .hero {
@@ -729,13 +938,21 @@
   }
 
   @media (max-width: 700px) {
-    .nav-inner {
-      padding: 0 16px;
-      height: 58px;
+    .desktop-nav,
+    .desktop-only,
+    .nav-tagline {
+      display: none;
     }
 
-    .nav-tagline {
-      font-size: 11px;
+    .mobile-only,
+    .mobile-menu-btn,
+    .mobile-alert-btn {
+      display: inline-flex;
+    }
+
+    .nav-inner {
+      padding: 0 16px;
+      height: 60px;
     }
 
     .hero {
@@ -1091,12 +1308,66 @@
 </head>
 <body>
 
+<div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeMobileMenu()"></div>
+
+<aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <div class="drawer-title">Deal<span>Drop</span></div>
+    <button class="drawer-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
+  </div>
+  <div class="drawer-content">
+    <div class="drawer-alert">
+      <h3>Never miss a deal</h3>
+      <p>Get alerts when fresh deals drop.</p>
+      <button onclick="closeMobileMenu(); scrollToAlerts();">Get Deal Alerts</button>
+    </div>
+
+    <div class="drawer-links">
+      <button onclick="closeMobileMenu(); scrollToTop();">Home</button>
+      <button onclick="closeMobileMenu(); scrollToHotDeals();">Hot Deals</button>
+      <button onclick="closeMobileMenu(); scrollToCategories();">Categories</button>
+      <button onclick="closeMobileMenu(); scrollToAllDeals();">All Deals</button>
+      <a href="#" class="muted-link">About</a>
+      <a href="#" class="muted-link">Privacy</a>
+      <a href="#" class="muted-link">Contact</a>
+    </div>
+  </div>
+</aside>
+
 <button id="back-to-top" onclick="scrollToTop()" aria-label="Back to top">↑</button>
 
 <nav>
   <div class="nav-inner">
-    <div class="logo">Deal<span>Drop</span></div>
-    <div class="nav-tagline">Fresh deals, daily</div>
+    <div class="nav-left">
+      <a href="#" class="logo">Deal<span>Drop</span></a>
+      <div class="nav-tagline">Fresh deals, daily</div>
+    </div>
+
+    <div class="nav-right">
+      <div class="desktop-nav">
+        <a href="#" onclick="scrollToTop(); return false;">Home</a>
+        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
+        <a href="#" onclick="scrollToCategories(); return false;">Categories</a>
+        <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
+      </div>
+
+      <button class="nav-alert-btn desktop-only" onclick="scrollToAlerts()">Get Alerts</button>
+
+      <button class="mobile-alert-btn mobile-only" onclick="scrollToAlerts()" aria-label="Get alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+          <path d="M10 17a2 2 0 0 0 4 0"></path>
+        </svg>
+      </button>
+
+      <button class="mobile-menu-btn mobile-only" onclick="openMobileMenu()" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18"></path>
+          <path d="M3 12h18"></path>
+          <path d="M3 18h18"></path>
+        </svg>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -1105,7 +1376,7 @@
     <h1>The best deals,<br>curated for you.</h1>
     <p>Top Amazon discounts across every category — updated every 4 hours automatically.</p>
   </div>
-  <div class="signup-box">
+  <div class="signup-box" id="alerts-box">
     <h3>Never miss a deal</h3>
     <p>Get alerts the moment new deals drop.</p>
     <div class="signup-tabs">
@@ -1154,6 +1425,7 @@
   <div class="stat"><span class="stat-num" id="stat-coupons">—</span><span class="stat-label">Coupons</span></div>
   <div class="stat"><span class="stat-num" id="stat-updated">—</span><span class="stat-label">Last updated</span></div>
 </div>
+
 <div class="divider"></div>
 
 <div class="loading-bar" id="loading-bar">
@@ -1161,7 +1433,7 @@
 </div>
 
 <div class="error-msg" id="error-msg">
-  Could not load deals. Make sure <strong>deals.json</strong> is in the same folder and the fetch script has been run at least once.
+  Could not load deals. Check the GitHub raw file path and make sure the fetch script has run successfully.
 </div>
 
 <div class="hot-section" id="hot-section" style="display:none;">
@@ -1169,7 +1441,7 @@
     <div class="hot-title-wrap">
       <span class="hot-icon">🔥</span>
       <span class="hot-title">Hot Deals</span>
-      <span class="hot-subtitle">— 50% off or more</span>
+      <span class="hot-subtitle">— 30% off or more</span>
     </div>
     <span class="hot-pill" id="hot-count-pill"></span>
   </div>
@@ -1197,6 +1469,8 @@
 </footer>
 
 <script>
+const DEALS_URL = "https://raw.githubusercontent.com/Mhhickma/dealdrop/main/deals.json";
+
 const CATEGORIES = [
   { id:'All',                        label:'All Deals',               emoji:'✦' },
   { id:'Electronics',                label:'Electronics',             emoji:'💻' },
@@ -1256,14 +1530,15 @@ function updateTimeLabels() {
 
 async function loadDeals() {
   try {
-    const res = await fetch('deals.json?t=' + Date.now());
+    const res = await fetch(DEALS_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('not found');
-    const data = await res.json();
-    allDeals = data.deals || [];
 
-    const totalDeals = data.totalDeals || allDeals.length;
-    const hotDeals = data.hotDeals || allDeals.filter(d => d.pct >= 50 || d.hot).length;
-    const couponDeals = data.couponDeals || allDeals.filter(d => d.hasCoupon).length;
+    const data = await res.json();
+    allDeals = Array.isArray(data.deals) ? data.deals : [];
+
+    const totalDeals = data.totalDeals ?? allDeals.length;
+    const hotDeals = data.hotDeals ?? allDeals.filter(d => (Number(d.pct) >= 30 || d.hot)).length;
+    const couponDeals = data.couponDeals ?? allDeals.filter(d => d.hasCoupon).length;
 
     document.getElementById('stat-total').textContent = totalDeals;
     document.getElementById('stat-hot').textContent = hotDeals;
@@ -1277,6 +1552,7 @@ async function loadDeals() {
     updateTimeLabels();
 
     document.getElementById('loading-bar').style.display = 'none';
+    document.getElementById('error-msg').classList.remove('show');
     document.getElementById('hot-section').style.display = '';
     document.getElementById('filters-wrap').style.display = '';
     document.getElementById('deals-section').style.display = '';
@@ -1284,6 +1560,7 @@ async function loadDeals() {
     renderHotDeals();
     renderDeals('All');
   } catch (e) {
+    console.error('Deal load error:', e);
     document.getElementById('loading-bar').style.display = 'none';
     document.getElementById('error-msg').classList.add('show');
   }
@@ -1299,7 +1576,7 @@ function img(src, emoji, size) {
 }
 
 function renderHotDeals() {
-  const hot = allDeals.filter(d => d.pct >= 50 || d.hot);
+  const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot);
   document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
 
   document.getElementById('hot-grid').innerHTML = hot.length === 0
@@ -1332,7 +1609,7 @@ function renderDeals(cat) {
         <div class="card-body">
           <div class="card-meta">
             <span class="card-category">${esc(d.cat)}</span>
-            ${(d.pct >= 50 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : ''}
+            ${(Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : ''}
           </div>
           <div class="card-title">${esc(d.title)}</div>
           <div class="card-desc">${esc(d.desc || '')}</div>
@@ -1378,20 +1655,53 @@ function handleSignup() {
   document.getElementById('signup-input').value = '';
 }
 
+function openMobileMenu() {
+  document.body.classList.add('menu-open');
+  document.getElementById('mobile-drawer').classList.add('show');
+  document.getElementById('mobile-drawer-overlay').classList.add('show');
+  document.getElementById('mobile-drawer').setAttribute('aria-hidden', 'false');
+}
+
+function closeMobileMenu() {
+  document.body.classList.remove('menu-open');
+  document.getElementById('mobile-drawer').classList.remove('show');
+  document.getElementById('mobile-drawer-overlay').classList.remove('show');
+  document.getElementById('mobile-drawer').setAttribute('aria-hidden', 'true');
+}
+
 function scrollToHotDeals() {
+  closeMobileMenu();
   const el = document.getElementById('hot-section');
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function scrollToAlerts() {
-  const el = document.querySelector('.signup-box') || document.getElementById('hot-section');
+  closeMobileMenu();
+  const el = document.getElementById('alerts-box') || document.getElementById('hot-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function scrollToCategories() {
+  closeMobileMenu();
+  const el = document.getElementById('filters-wrap');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function scrollToAllDeals() {
+  closeMobileMenu();
+  const el = document.getElementById('deals-section');
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 const btt = document.getElementById('back-to-top');
 window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400), { passive: true });
 
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMobileMenu();
+});
+
 function scrollToTop() {
+  closeMobileMenu();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
