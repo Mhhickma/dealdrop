@@ -72,20 +72,7 @@ jobs:
             exit 0
           fi
 
-          COMMIT_MSG="Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git commit -m "$COMMIT_MSG"
+          git commit -m "Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
 
-          git fetch origin main
-          git reset --soft origin/main
-
-          git add -f deals.json || true
-          git add -f deals_memory.json || true
-          git add -f notified_deals.json || true
-
-          if git diff --staged --quiet; then
-            echo "No changes after sync"
-            exit 0
-          fi
-
-          git commit -m "$COMMIT_MSG"
-          git push origin HEAD:main
+          git pull origin main --no-rebase || true
+          git push origin main
