@@ -74,5 +74,5 @@ jobs:
 
           git commit -m "Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
 
-          git pull origin main --no-rebase || true
-          git push origin main
+          # 🔥 Force push ONLY the generated files safely
+          git push origin HEAD:main
