@@ -9,15 +9,14 @@ import requests
 CREDENTIAL_ID = os.getenv("CREATORS_CREDENTIAL_ID")
 CREDENTIAL_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
 CREDENTIAL_VERSION = os.getenv("CREATORS_CREDENTIAL_VERSION", "v3.1")
+CREATORS_SCOPE = os.getenv("CREATORS_SCOPE", "")
 MARKETPLACE = os.getenv("CREATORS_MARKETPLACE", "www.amazon.com")
 CREATOR_URL = os.getenv("CREATOR_API_URL", "https://creators-api.amazon.com").rstrip("/")
 
 AFFILIATE_TAG = os.getenv("AFFILIATE_TAG")
 KEEPA_API_KEY = os.getenv("KEEPA_API_KEY")
 
-# NA v3.1 token endpoint
 TOKEN_URL = "https://api.amazon.com/auth/o2/token"
-
 OUTPUT_FILE = "deals.json"
 
 MAX_DEALS = 150
@@ -33,11 +32,13 @@ def get_access_token():
     print(f"[Auth] Credential ID present: {bool(CREDENTIAL_ID)}")
     print(f"[Auth] Credential Secret present: {bool(CREDENTIAL_SECRET)}")
     print(f"[Auth] Credential Version: {CREDENTIAL_VERSION}")
+    print(f"[Auth] Scope present: {bool(CREATORS_SCOPE)}")
 
     payload = {
         "grant_type": "client_credentials",
         "client_id": CREDENTIAL_ID or "",
         "client_secret": CREDENTIAL_SECRET or "",
+        "scope": CREATORS_SCOPE or "",
     }
 
     headers = {
