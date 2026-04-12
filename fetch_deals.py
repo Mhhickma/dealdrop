@@ -6,17 +6,14 @@ import requests
 # =========================
 # ENV VARS
 # =========================
-CLIENT_ID = os.getenv("CREATORS_CREDENTIAL_ID")
-CLIENT_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
-CREDENTIAL_VERSION = os.getenv("CREATORS_CREDENTIAL_VERSION", "2.1")
+CREDENTIAL_ID = os.getenv("CREATORS_CREDENTIAL_ID")
+CREDENTIAL_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
+CREDENTIAL_VERSION = os.getenv("CREATORS_CREDENTIAL_VERSION", "v3.1")
 MARKETPLACE = os.getenv("CREATORS_MARKETPLACE", "www.amazon.com")
 CREATOR_URL = os.getenv("CREATOR_API_URL", "https://creators-api-na.amazon.com").rstrip("/")
 
 AFFILIATE_TAG = os.getenv("AFFILIATE_TAG")
 KEEPA_API_KEY = os.getenv("KEEPA_API_KEY")
-
-TOKEN_URL = "https://creatorsapi.auth.us-east-1.amazoncognito.com/oauth2/token"
-GET_ITEMS_PATH = "/getitems"
 
 OUTPUT_FILE = "deals.json"
 
@@ -26,39 +23,7 @@ HOT_DEAL_PCT = 30
 
 
 # =========================
-# AUTH
-# =========================
-def get_access_token():
-    print("[Auth] Getting token...")
-    print(f"[Auth] Client ID present: {bool(CLIENT_ID)}")
-    print(f"[Auth] Client Secret present: {bool(CLIENT_SECRET)}")
-
-    payload = {
-        "grant_type": "client_credentials",
-        "client_id": CLIENT_ID or "",
-        "client_secret": CLIENT_SECRET or "",
-        "scope": "creators::api",
-    }
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-
-    r = requests.post(TOKEN_URL, data=payload, headers=headers, timeout=30)
-
-    print(f"[Auth] Status: {r.status_code}")
-    print(f"[Auth] Response: {r.text}")
-
-    r.raise_for_status()
-
-    data = r.json()
-    token = data["access_token"]
-    print("[Auth] Token received")
-    return token
-
-
-# =========================
-# KEEPA DEAL FETCH
+# KEEP A DEAL FETCH
 # =========================
 def get_keepa_deals():
     print("[Keepa] Fetching deals...")
@@ -106,11 +71,15 @@ def get_keepa_deals():
 # =========================
 # CREATORS API
 # =========================
-def fetch_creator_data(asins, token):
+def fetch_creator_data(asins):
     print("[Creator API] Fetching product data...")
+    print(f"[Creator API] Credential ID present: {bool(CREDENTIAL_ID)}")
+    print(f"[Creator API] Credential Secret present: {bool(CREDENTIAL_SECRET)}")
+    print(f"[Creator API] Credential Version: {CREDENTIAL_VERSION}")
+    print(f"[Creator API] Marketplace: {MARKETPLACE}")
 
     headers = {
-        "Authorization": f"Bearer {token}, Version {CREDENTIAL_VERSION}",
+        "Authorization": f"Bearer {CREDENTIAL_SECRET}",
         "Content-Type": "application/json",
         "x-marketplace": MARKETPLACE,
     }
@@ -129,7 +98,7 @@ def fetch_creator_data(asins, token):
         ]
     }
 
-    url = f"{CREATOR_URL}{GET_ITEMS_PATH}"
+    url = f"{CREATOR_URL}/getitems"
     print(f"[Creator API] URL: {url}")
 
     r = requests.post(url, headers=headers, json=payload, timeout=30)
@@ -191,7 +160,6 @@ def fetch_creator_data(asins, token):
 # BUILD DEALS
 # =========================
 def build_deals():
-    token = get_access_token()
     keepa_deals = get_keepa_deals()
 
     asin_list = [d["asin"] for d in keepa_deals]
@@ -199,7 +167,7 @@ def build_deals():
 
     for i in range(0, len(asin_list), 10):
         batch = asin_list[i:i+10]
-        batch_data = fetch_creator_data(batch, token)
+        batch_data = fetch_creator_data(batch)
         creator_data.update(batch_data)
         time.sleep(0.5)
 
