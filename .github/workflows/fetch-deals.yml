@@ -34,25 +34,15 @@ jobs:
         env:
           KEEPA_API_KEY: ${{ secrets.KEEPA_API_KEY }}
           AFFILIATE_TAG: ${{ secrets.AFFILIATE_TAG }}
-          AMAZON_ACCESS_KEY: ${{ secrets.AMAZON_ACCESS_KEY }}
-          AMAZON_SECRET_KEY: ${{ secrets.AMAZON_SECRET_KEY }}
-          MAILCHIMP_API_KEY: ${{ secrets.MAILCHIMP_API_KEY }}
-          MAILCHIMP_SERVER: ${{ secrets.MAILCHIMP_SERVER }}
-          MAILCHIMP_LIST_ID: ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
-          SITE_URL: ${{ secrets.SITE_URL }}
+          CREATORS_CREDENTIAL_ID: ${{ secrets.CREATORS_CREDENTIAL_ID }}
+          CREATORS_CREDENTIAL_SECRET: ${{ secrets.CREATORS_CREDENTIAL_SECRET }}
+          CREATORS_CREDENTIAL_VERSION: ${{ secrets.CREATORS_CREDENTIAL_VERSION }}
+          CREATORS_MARKETPLACE: ${{ secrets.CREATORS_MARKETPLACE }}
+          CREATOR_API_URL: ${{ secrets.CREATOR_API_URL }}
         run: python fetch_deals.py
 
       - name: Run notifier
         env:
-          MAILCHIMP_API_KEY: ${{ secrets.MAILCHIMP_API_KEY }}
-          MAILCHIMP_SERVER: ${{ secrets.MAILCHIMP_SERVER }}
-          MAILCHIMP_LIST_ID: ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
           SITE_URL: ${{ secrets.SITE_URL }}
         run: python notify.py
 
@@ -73,6 +63,4 @@ jobs:
           fi
 
           git commit -m "Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
-
-          # 🔥 Force push ONLY the generated files safely
           git push origin HEAD:main
