@@ -15,6 +15,9 @@ CREATOR_URL = os.getenv("CREATOR_API_URL", "https://creators-api-na.amazon.com")
 AFFILIATE_TAG = os.getenv("AFFILIATE_TAG")
 KEEPA_API_KEY = os.getenv("KEEPA_API_KEY")
 
+# v3.1 NA token endpoint
+TOKEN_URL = "https://api.amazon.com/auth/o2/token"
+
 OUTPUT_FILE = "deals.json"
 
 MAX_DEALS = 150
@@ -23,7 +26,39 @@ HOT_DEAL_PCT = 30
 
 
 # =========================
-# KEEP A DEAL FETCH
+# AUTH
+# =========================
+def get_access_token():
+    print("[Auth] Getting token...")
+    print(f"[Auth] Credential ID present: {bool(CREDENTIAL_ID)}")
+    print(f"[Auth] Credential Secret present: {bool(CREDENTIAL_SECRET)}")
+    print(f"[Auth] Credential Version: {CREDENTIAL_VERSION}")
+
+    payload = {
+        "grant_type": "client_credentials",
+        "client_id": CREDENTIAL_ID or "",
+        "client_secret": CREDENTIAL_SECRET or "",
+    }
+
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+
+    r = requests.post(TOKEN_URL, data=payload, headers=headers, timeout=30)
+
+    print(f"[Auth] Status: {r.status_code}")
+    print(f"[Auth] Response: {r.text}")
+
+    r.raise_for_status()
+
+    data = r.json()
+    token = data["access_token"]
+    print("[Auth] Token received")
+    return token
+
+
+# =========================
+# KEEPA DEAL FETCH
 # =========================
 def get_keepa_deals():
     print("[Keepa] Fetching deals...")
@@ -71,15 +106,13 @@ def get_keepa_deals():
 # =========================
 # CREATORS API
 # =========================
-def fetch_creator_data(asins):
+def fetch_creator_data(asins, token):
     print("[Creator API] Fetching product data...")
-    print(f"[Creator API] Credential ID present: {bool(CREDENTIAL_ID)}")
-    print(f"[Creator API] Credential Secret present: {bool(CREDENTIAL_SECRET)}")
-    print(f"[Creator API] Credential Version: {CREDENTIAL_VERSION}")
     print(f"[Creator API] Marketplace: {MARKETPLACE}")
+    print(f"[Creator API] Base URL: {CREATOR_URL}")
 
     headers = {
-        "Authorization": f"Bearer {CREDENTIAL_SECRET}",
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "x-marketplace": MARKETPLACE,
     }
@@ -160,6 +193,7 @@ def fetch_creator_data(asins):
 # BUILD DEALS
 # =========================
 def build_deals():
+    token = get_access_token()
     keepa_deals = get_keepa_deals()
 
     asin_list = [d["asin"] for d in keepa_deals]
@@ -167,7 +201,7 @@ def build_deals():
 
     for i in range(0, len(asin_list), 10):
         batch = asin_list[i:i+10]
-        batch_data = fetch_creator_data(batch)
+        batch_data = fetch_creator_data(batch, token)
         creator_data.update(batch_data)
         time.sleep(0.5)
 
