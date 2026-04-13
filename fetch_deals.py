@@ -9,6 +9,7 @@ and saves the results to deals.json for your website.
 import json
 import os
 import time
+from datetime import datetime, timezone
 import keepa
 from amazon_creatorsapi import AmazonCreatorsApi, Country
 from amazon_creatorsapi.models import GetItemsResource
@@ -24,12 +25,12 @@ PARTNER_TAG       = os.getenv("AFFILIATE_TAG", "simplewoodsho-20")
 if not KEEPA_API_KEY:
     raise RuntimeError("Missing KEEPA_API_KEY")
 if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
-    raise RuntimeError("Missing AMAZON_CREATOR_CREDENTIAL_ID or AMAZON_CREATOR_CREDENTIAL_SECRET")
+    raise RuntimeError("Missing CREATORS_CREDENTIAL_ID or CREATORS_CREDENTIAL_SECRET")
 
 # ─────────────────────────────────────────────
 # SETTINGS
 # ─────────────────────────────────────────────
-OUTPUT_FILE       = "deals.json"   # saves to repo root for GitHub Pages
+OUTPUT_FILE       = "deals.json"
 MAX_ASINS         = 10
 AMAZON_BATCH_SIZE = 10
 
@@ -173,20 +174,29 @@ def build_output(asins, amazon_items):
         except:
             url = f"https://www.amazon.com/dp/{asin}?tag={PARTNER_TAG}"
 
+        is_hot = bool(savings_pct and savings_pct >= 30)
+        discount_label = f"-{savings_pct}%" if savings_pct else ""
+
         deals.append({
-            "asin":          asin,
-            "title":         title,
-            "brand":         brand,
-            "category":      category,
-            "image":         image,
-            "price":         price_display,
-            "price_amount":  price_amount,
-            "currency":      currency,
-            "savings":       savings_amount,
-            "savings_pct":   savings_pct,
-            "deal_type":     deal_type,
-            "availability":  availability,
-            "affiliate_url": url,
+            "asin":         asin,
+            "title":        title,
+            "brand":        brand,
+            "cat":          category,
+            "image":        image,
+            "price":        price_display,
+            "price_amount": price_amount,
+            "currency":     currency,
+            "was":          None,
+            "savings":      savings_amount,
+            "pct":          savings_pct,
+            "discount":     discount_label,
+            "deal_type":    deal_type,
+            "availability": availability,
+            "link":         url,
+            "hot":          is_hot,
+            "hasCoupon":    False,
+            "couponDisplay": "",
+            "desc":         brand or "",
         })
 
     return deals
@@ -208,8 +218,17 @@ def main():
 
     deals = build_output(asins, amazon_items)
 
+    output = {
+        "deals":      deals,
+        "count":      len(deals),
+        "totalDeals": len(deals),
+        "hotDeals":   sum(1 for d in deals if d.get("hot")),
+        "couponDeals": 0,
+        "updatedAt":  datetime.now(timezone.utc).isoformat(),
+    }
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump({"deals": deals, "count": len(deals)}, f, indent=2)
+        json.dump(output, f, indent=2)
 
     print(f"\n✅ Saved {len(deals)} deals to {OUTPUT_FILE}")
     print("Done.")
