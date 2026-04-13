@@ -37,9 +37,7 @@
     line-height: 1.6;
   }
 
-  body.menu-open {
-    overflow: hidden;
-  }
+  body.menu-open { overflow: hidden; }
 
   nav {
     background: var(--surface);
@@ -60,8 +58,7 @@
     gap: 16px;
   }
 
-  .nav-left,
-  .nav-right {
+  .nav-left, .nav-right {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -87,19 +84,246 @@
   .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 4px;
   }
 
-  .desktop-nav a {
+  .desktop-nav a,
+  .nav-dropdown-trigger {
     text-decoration: none;
     color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
     transition: color 0.15s;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
-  .desktop-nav a:hover {
+  .desktop-nav a:hover,
+  .nav-dropdown-trigger:hover {
     color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .nav-dropdown-trigger.open {
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .nav-dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .nav-dropdown-trigger.open .nav-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* ── Dropdown wrapper ── */
+  .nav-dropdown {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 8px;
+    min-width: 220px;
+    z-index: 500;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Hot deals dropdown is wider with cards */
+  .dropdown-menu.hot-dropdown {
+    min-width: 480px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  .dropdown-menu.hot-dropdown.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: background 0.12s, color 0.12s;
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .dropdown-item:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .dropdown-item.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .dropdown-item-emoji {
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+  }
+
+  /* Hot deals dropdown grid */
+  .hot-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .hot-dropdown-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hot-dropdown-see-all {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+
+  .hot-dropdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 4px 4px;
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .hot-dropdown-card {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 0.12s, border-color 0.12s;
+    background: var(--bg);
+  }
+
+  .hot-dropdown-card:hover {
+    background: #fff5f5;
+    border-color: #f5c0c0;
+  }
+
+  .hot-dropdown-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .hot-dropdown-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
+
+  .hot-dropdown-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hot-dropdown-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .hot-dropdown-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  .hot-dropdown-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--red);
+    background: var(--red-light);
+    padding: 2px 6px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .hot-dropdown-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 13px;
   }
 
   .nav-alert-btn {
@@ -118,20 +342,12 @@
     text-decoration: none;
   }
 
-  .nav-alert-btn:hover {
-    background: var(--accent-mid);
-  }
+  .nav-alert-btn:hover { background: var(--accent-mid); }
 
-  .mobile-only {
-    display: none;
-  }
+  .mobile-only { display: none; }
+  .desktop-only { display: inline-flex; }
 
-  .desktop-only {
-    display: inline-flex;
-  }
-
-  .mobile-menu-btn,
-  .mobile-alert-btn {
+  .mobile-menu-btn, .mobile-alert-btn {
     width: 42px;
     height: 42px;
     border: 1px solid var(--border);
@@ -145,8 +361,7 @@
     box-shadow: var(--shadow);
   }
 
-  .mobile-menu-btn svg,
-  .mobile-alert-btn svg {
+  .mobile-menu-btn svg, .mobile-alert-btn svg {
     width: 20px;
     height: 20px;
   }
@@ -181,9 +396,7 @@
     flex-direction: column;
   }
 
-  .mobile-drawer.show {
-    transform: translateX(0);
-  }
+  .mobile-drawer.show { transform: translateX(0); }
 
   .drawer-header {
     display: flex;
@@ -199,9 +412,7 @@
     letter-spacing: -0.4px;
   }
 
-  .drawer-title span {
-    color: var(--accent);
-  }
+  .drawer-title span { color: var(--accent); }
 
   .drawer-close {
     width: 42px;
@@ -228,10 +439,7 @@
     padding: 16px;
   }
 
-  .drawer-alert h3 {
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
+  .drawer-alert h3 { font-size: 15px; margin-bottom: 4px; }
 
   .drawer-alert p {
     font-size: 13px;
@@ -258,8 +466,7 @@
     gap: 8px;
   }
 
-  .drawer-links a,
-  .drawer-links button {
+  .drawer-links a, .drawer-links button {
     width: 100%;
     text-align: left;
     border: 1px solid var(--border);
@@ -277,6 +484,67 @@
   .drawer-links .muted-link {
     color: var(--text-secondary);
     font-weight: 500;
+  }
+
+  /* Mobile category accordion */
+  .drawer-cat-section {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .drawer-cat-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 14px;
+    background: var(--surface);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .drawer-cat-toggle-arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+  }
+
+  .drawer-cat-toggle.open .drawer-cat-toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  .drawer-cat-list {
+    display: none;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+  }
+
+  .drawer-cat-list.open { display: flex; }
+
+  .drawer-cat-item {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: none;
+    background: none;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .drawer-cat-item:last-child { border-bottom: none; }
+
+  .drawer-cat-item:hover {
+    background: var(--accent-light);
+    color: var(--accent);
   }
 
   .hero {
@@ -312,17 +580,8 @@
     box-shadow: var(--shadow);
   }
 
-  .signup-box h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .signup-box > p {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 18px;
-  }
+  .signup-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .signup-box > p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
 
   .signup-tabs {
     display: flex;
@@ -345,15 +604,9 @@
     transition: all 0.15s;
   }
 
-  .tab-btn.active {
-    background: var(--accent);
-    color: white;
-  }
+  .tab-btn.active { background: var(--accent); color: white; }
 
-  .signup-field {
-    display: flex;
-    gap: 8px;
-  }
+  .signup-field { display: flex; gap: 8px; }
 
   .signup-field input {
     flex: 1;
@@ -387,11 +640,7 @@
 
   .btn-sub:hover { background: var(--accent-mid); }
 
-  .signup-note {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 10px;
-  }
+  .signup-note { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
 
   .stats-bar {
     max-width: 1100px;
@@ -401,23 +650,9 @@
     gap: 32px;
   }
 
-  .stat {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .stat-num {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--text-primary);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
+  .stat { display: flex; flex-direction: column; }
+  .stat-num { font-size: 22px; font-weight: 600; color: var(--text-primary); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
   .divider {
     max-width: 1100px;
@@ -426,11 +661,7 @@
     border-bottom: 1px solid var(--border);
   }
 
-  .loading-bar {
-    max-width: 1100px;
-    margin: 0 auto 20px;
-    padding: 0 24px;
-  }
+  .loading-bar { max-width: 1100px; margin: 0 auto 20px; padding: 0 24px; }
 
   .loading-msg {
     font-size: 13px;
@@ -466,9 +697,7 @@
 
   .error-msg.show { display: block; }
 
-  .mobile-hot-hero {
-    display: none;
-  }
+  .mobile-hot-hero { display: none; }
 
   .hot-section {
     max-width: 1100px;
@@ -498,10 +727,7 @@
     color: var(--text-primary);
   }
 
-  .hot-subtitle {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
+  .hot-subtitle { font-size: 13px; color: var(--text-muted); }
 
   .hot-pill {
     font-size: 11px;
@@ -610,17 +836,8 @@
     gap: 6px;
   }
 
-  .hot-price-now {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--red);
-  }
-
-  .hot-price-was {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-decoration: line-through;
-  }
+  .hot-price-now { font-size: 16px; font-weight: 700; color: var(--red); }
+  .hot-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
 
   .hot-btn {
     display: block;
@@ -682,16 +899,8 @@
     white-space: nowrap;
   }
 
-  .filter-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  .filter-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 
   .deals-section {
     max-width: 1100px;
@@ -714,10 +923,7 @@
     letter-spacing: 0.08em;
   }
 
-  .deal-count {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
+  .deal-count { font-size: 13px; color: var(--text-muted); }
 
   .deals-grid {
     display: grid;
@@ -754,12 +960,7 @@
     overflow: hidden;
   }
 
-  .card-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 12px;
-  }
+  .card-img img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
 
   .card-body {
     padding: 16px 18px 18px;
@@ -821,23 +1022,9 @@
     border-top: 1px solid var(--border);
   }
 
-  .price-block {
-    display: flex;
-    align-items: baseline;
-    gap: 7px;
-  }
-
-  .price-now {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .price-was {
-    font-size: 13px;
-    color: var(--text-muted);
-    text-decoration: line-through;
-  }
+  .price-block { display: flex; align-items: baseline; gap: 7px; }
+  .price-now { font-size: 20px; font-weight: 600; color: var(--text-primary); }
+  .price-was { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
 
   .discount-badge {
     font-size: 12px;
@@ -904,12 +1091,7 @@
     z-index: 200;
   }
 
-  #back-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
+  #back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
   #back-to-top:hover { background: var(--accent-mid); }
 
   footer {
@@ -919,15 +1101,8 @@
     text-align: center;
   }
 
-  footer p {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  footer a {
-    color: var(--accent);
-    text-decoration: none;
-  }
+  footer p { font-size: 13px; color: var(--text-muted); }
+  footer a { color: var(--accent); text-decoration: none; }
 
   .disclaimer {
     max-width: 600px;
@@ -938,34 +1113,12 @@
   }
 
   @media (max-width: 700px) {
-    .desktop-nav,
-    .desktop-only,
-    .nav-tagline {
-      display: none;
-    }
-
-    .mobile-only,
-    .mobile-menu-btn,
-    .mobile-alert-btn {
-      display: inline-flex;
-    }
-
-    .nav-inner {
-      padding: 0 16px;
-      height: 60px;
-    }
-
-    .hero {
-      display: none;
-    }
-
-    .stats-bar {
-      display: none;
-    }
-
-    .divider {
-      display: none;
-    }
+    .desktop-nav, .desktop-only, .nav-tagline { display: none; }
+    .mobile-only, .mobile-menu-btn, .mobile-alert-btn { display: inline-flex; }
+    .nav-inner { padding: 0 16px; height: 60px; }
+    .hero { display: none; }
+    .stats-bar { display: none; }
+    .divider { display: none; }
 
     .mobile-hot-hero {
       display: block;
@@ -1039,10 +1192,7 @@
       cursor: pointer;
     }
 
-    .mobile-hero-btn-primary {
-      background: white;
-      color: var(--red-dark);
-    }
+    .mobile-hero-btn-primary { background: white; color: var(--red-dark); }
 
     .mobile-hero-btn-secondary {
       background: rgba(255,255,255,0.16);
@@ -1065,13 +1215,7 @@
       text-align: center;
     }
 
-    .mobile-stat-num {
-      display: block;
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
+    .mobile-stat-num { display: block; font-size: 18px; font-weight: 700; line-height: 1; }
     .mobile-stat-label {
       display: block;
       font-size: 10px;
@@ -1081,26 +1225,14 @@
       color: rgba(255,255,255,0.85);
     }
 
-    .loading-bar,
-    .error-msg,
-    .hot-section,
-    .filters-wrap,
-    .deals-section {
+    .loading-bar, .error-msg, .hot-section, .filters-wrap, .deals-section {
       padding-left: 16px;
       padding-right: 16px;
     }
 
-    .loading-bar {
-      margin-top: 2px;
-    }
-
-    .hot-section {
-      margin-bottom: 20px;
-    }
-
-    .hot-header {
-      display: none;
-    }
+    .loading-bar { margin-top: 2px; }
+    .hot-section { margin-bottom: 20px; }
+    .hot-header { display: none; }
 
     .hot-strip {
       padding: 14px;
@@ -1129,30 +1261,11 @@
       box-shadow: 0 6px 16px rgba(201,64,64,0.10);
     }
 
-    .hot-card-img {
-      height: 130px;
-      background: #fff8f6;
-    }
-
-    .hot-card-badge {
-      font-size: 12px;
-      padding: 5px 10px;
-      top: 9px;
-      right: 9px;
-    }
-
-    .hot-card-title {
-      font-size: 13px;
-      min-height: 36px;
-    }
-
-    .hot-price-now {
-      font-size: 20px;
-    }
-
-    .hot-price-was {
-      font-size: 12px;
-    }
+    .hot-card-img { height: 130px; background: #fff8f6; }
+    .hot-card-badge { font-size: 12px; padding: 5px 10px; top: 9px; right: 9px; }
+    .hot-card-title { font-size: 13px; min-height: 36px; }
+    .hot-price-now { font-size: 20px; }
+    .hot-price-was { font-size: 12px; }
 
     .hot-btn {
       padding: 10px;
@@ -1161,48 +1274,15 @@
       background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
     }
 
-    .filters-wrap {
-      margin-bottom: 18px;
-    }
-
-    .filter-label {
-      font-size: 11px;
-      margin-bottom: 8px;
-    }
-
-    .filters-scroll {
-      gap: 8px;
-      padding-bottom: 2px;
-    }
-
-    .filter-btn {
-      padding: 8px 14px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .deals-section {
-      padding-bottom: 88px;
-    }
-
-    .section-header {
-      margin-bottom: 12px;
-      align-items: center;
-    }
-
-    .section-title {
-      font-size: 12px;
-      color: var(--text-primary);
-    }
-
-    .deal-count {
-      font-size: 12px;
-    }
-
-    .deals-grid {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
+    .filters-wrap { margin-bottom: 18px; }
+    .filter-label { font-size: 11px; margin-bottom: 8px; }
+    .filters-scroll { gap: 8px; padding-bottom: 2px; }
+    .filter-btn { padding: 8px 14px; font-size: 12px; font-weight: 600; }
+    .deals-section { padding-bottom: 88px; }
+    .section-header { margin-bottom: 12px; align-items: center; }
+    .section-title { font-size: 12px; color: var(--text-primary); }
+    .deal-count { font-size: 12px; }
+    .deals-grid { grid-template-columns: 1fr; gap: 12px; }
 
     .deal-card {
       flex-direction: row;
@@ -1211,28 +1291,10 @@
       overflow: hidden;
     }
 
-    .card-img {
-      width: 108px;
-      min-width: 108px;
-      height: 108px;
-      background: #f7f4f0;
-    }
-
-    .card-body {
-      padding: 10px 12px;
-      justify-content: space-between;
-      min-width: 0;
-    }
-
-    .card-meta {
-      margin-bottom: 4px;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .card-category {
-      display: none;
-    }
+    .card-img { width: 108px; min-width: 108px; height: 108px; background: #f7f4f0; }
+    .card-body { padding: 10px 12px; justify-content: space-between; min-width: 0; }
+    .card-meta { margin-bottom: 4px; gap: 6px; align-items: center; }
+    .card-category { display: none; }
 
     .card-badge-hot {
       font-size: 10px;
@@ -1252,32 +1314,11 @@
       margin-bottom: 4px;
     }
 
-    .card-desc {
-      display: none;
-    }
-
-    .card-footer {
-      border-top: none;
-      padding-top: 0;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .price-block {
-      min-width: 0;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .price-now {
-      font-size: 17px;
-      color: var(--text-primary);
-      font-weight: 700;
-    }
-
-    .price-was {
-      font-size: 11px;
-    }
+    .card-desc { display: none; }
+    .card-footer { border-top: none; padding-top: 0; align-items: center; gap: 8px; }
+    .price-block { min-width: 0; flex-wrap: wrap; gap: 5px; }
+    .price-now { font-size: 17px; color: var(--text-primary); font-weight: 700; }
+    .price-was { font-size: 11px; }
 
     .discount-badge {
       font-size: 11px;
@@ -1287,22 +1328,9 @@
       white-space: nowrap;
     }
 
-    .coupon-row,
-    .btn-deal {
-      display: none;
-    }
-
-    footer {
-      padding: 26px 16px;
-    }
-
-    #back-to-top {
-      bottom: 20px;
-      right: 16px;
-      width: 44px;
-      height: 44px;
-      font-size: 18px;
-    }
+    .coupon-row, .btn-deal { display: none; }
+    footer { padding: 26px 16px; }
+    #back-to-top { bottom: 20px; right: 16px; width: 44px; height: 44px; font-size: 18px; }
   }
 </style>
 </head>
@@ -1324,9 +1352,18 @@
 
     <div class="drawer-links">
       <button onclick="closeMobileMenu(); scrollToTop();">Home</button>
-      <button onclick="closeMobileMenu(); scrollToHotDeals();">Hot Deals</button>
-      <button onclick="closeMobileMenu(); scrollToCategories();">Categories</button>
+      <button onclick="closeMobileMenu(); scrollToHotDeals();">🔥 Hot Deals</button>
       <button onclick="closeMobileMenu(); scrollToAllDeals();">All Deals</button>
+
+      <!-- Mobile category accordion -->
+      <div class="drawer-cat-section">
+        <button class="drawer-cat-toggle" id="drawer-cat-toggle" onclick="toggleDrawerCats()">
+          📂 Browse Categories
+          <span class="drawer-cat-toggle-arrow">▼</span>
+        </button>
+        <div class="drawer-cat-list" id="drawer-cat-list"></div>
+      </div>
+
       <a href="#" class="muted-link">About</a>
       <a href="#" class="muted-link">Privacy</a>
       <a href="#" class="muted-link">Contact</a>
@@ -1346,8 +1383,33 @@
     <div class="nav-right">
       <div class="desktop-nav">
         <a href="#" onclick="scrollToTop(); return false;">Home</a>
-        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
-        <a href="#" onclick="scrollToCategories(); return false;">Categories</a>
+
+        <!-- Hot Deals dropdown -->
+        <div class="nav-dropdown" id="dropdown-hot">
+          <button class="nav-dropdown-trigger" onclick="toggleDropdown('hot')" id="trigger-hot">
+            🔥 Hot Deals <span class="nav-dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu hot-dropdown" id="menu-hot">
+            <div class="hot-dropdown-header">
+              <span class="hot-dropdown-title">🔥 Hot Deals — 30%+ off</span>
+              <button class="hot-dropdown-see-all" onclick="closeAllDropdowns(); scrollToHotDeals();">See all →</button>
+            </div>
+            <div class="hot-dropdown-grid" id="hot-dropdown-grid">
+              <div class="hot-dropdown-empty">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories dropdown -->
+        <div class="nav-dropdown" id="dropdown-categories">
+          <button class="nav-dropdown-trigger" onclick="toggleDropdown('categories')" id="trigger-categories">
+            📂 Categories <span class="nav-dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu" id="menu-categories" style="min-width:240px;">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
         <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
       </div>
 
@@ -1374,7 +1436,7 @@
 <section class="hero">
   <div class="hero-text">
     <h1>The best deals,<br>curated for you.</h1>
-    <p>Top Amazon discounts across every category — updated every 4 hours automatically.</p>
+    <p>Top Amazon discounts across every category — updated every hour automatically.</p>
   </div>
   <div class="signup-box" id="alerts-box">
     <h3>Never miss a deal</h3>
@@ -1396,12 +1458,10 @@
     <span class="mobile-hot-kicker">🔥 Live Deal Feed</span>
     <h2>HOT DEALS<br>RIGHT NOW</h2>
     <p>Fresh drops, strong discounts, and the best deals pushed to the top first.</p>
-
     <div class="mobile-hero-actions">
       <button class="mobile-hero-btn mobile-hero-btn-primary" onclick="scrollToAlerts()">Get Deal Alerts</button>
       <button class="mobile-hero-btn mobile-hero-btn-secondary" onclick="scrollToHotDeals()">See Hot Deals</button>
     </div>
-
     <div class="mobile-hot-quickstats">
       <div class="mobile-stat">
         <span class="mobile-stat-num" id="mobile-stat-total">—</span>
@@ -1476,247 +1536,4 @@ const CATEGORIES = [
   { id:'Electronics',                label:'Electronics',             emoji:'💻' },
   { id:'Home & Kitchen',             label:'Home & Kitchen',          emoji:'🏠' },
   { id:'Clothing, Shoes & Jewelry',  label:'Clothing & Jewelry',      emoji:'👗' },
-  { id:'Beauty & Personal Care',     label:'Beauty & Personal Care',  emoji:'💄' },
-  { id:'Health & Household',         label:'Health & Household',      emoji:'💊' },
-  { id:'Toys & Games',               label:'Toys & Games',            emoji:'🧸' },
-  { id:'Sports & Outdoors',          label:'Sports & Outdoors',       emoji:'⚽' },
-  { id:'Automotive',                 label:'Automotive',              emoji:'🚗' },
-  { id:'Pet Supplies',               label:'Pet Supplies',            emoji:'🐾' },
-  { id:'Baby',                       label:'Baby',                    emoji:'🍼' },
-  { id:'Garden & Outdoor',           label:'Garden & Outdoor',        emoji:'🌱' },
-  { id:'Office Products',            label:'Office Products',         emoji:'📎' },
-  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',emoji:'🔧' },
-  { id:'Kitchen & Dining',           label:'Kitchen & Dining',        emoji:'🍳' },
-  { id:'Video Games',                label:'Video Games',             emoji:'🎮' },
-  { id:'Books',                      label:'Books',                   emoji:'📚' },
-  { id:'Musical Instruments',        label:'Musical Instruments',     emoji:'🎸' },
-  { id:'Grocery & Gourmet Food',     label:'Grocery & Food',          emoji:'🛒' },
-  { id:'Luggage & Travel',           label:'Luggage & Travel',        emoji:'🧳' },
-];
-
-const filterRow = document.getElementById('filter-row');
-CATEGORIES.forEach(cat => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (cat.id === 'All' ? ' active' : '');
-  btn.textContent = cat.emoji + ' ' + cat.label;
-  btn.dataset.cat = cat.id;
-  btn.onclick = () => filterDeals(cat.id, btn);
-  filterRow.appendChild(btn);
-});
-
-let allDeals = [];
-let lastUpdatedISO = null;
-
-function formatUpdatedTime(isoString) {
-  if (!isoString) return '—';
-
-  const mins = Math.max(0, Math.round((Date.now() - new Date(isoString)) / 60000));
-
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return mins + 'm ago';
-
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return hours + 'h ago';
-
-  const days = Math.round(hours / 24);
-  return days + 'd ago';
-}
-
-function updateTimeLabels() {
-  const label = formatUpdatedTime(lastUpdatedISO);
-  const desktop = document.getElementById('stat-updated');
-  if (desktop) desktop.textContent = label;
-}
-
-async function loadDeals() {
-  try {
-    const res = await fetch(DEALS_URL + '?t=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('not found');
-
-    const data = await res.json();
-    allDeals = Array.isArray(data.deals) ? data.deals : [];
-
-    const totalDeals = data.totalDeals ?? allDeals.length;
-    const hotDeals = data.hotDeals ?? allDeals.filter(d => (Number(d.pct) >= 30 || d.hot)).length;
-    const couponDeals = data.couponDeals ?? allDeals.filter(d => d.hasCoupon).length;
-
-    document.getElementById('stat-total').textContent = totalDeals;
-    document.getElementById('stat-hot').textContent = hotDeals;
-    document.getElementById('stat-coupons').textContent = couponDeals;
-
-    document.getElementById('mobile-stat-total').textContent = totalDeals;
-    document.getElementById('mobile-stat-hot').textContent = hotDeals;
-    document.getElementById('mobile-stat-coupons').textContent = couponDeals;
-
-    lastUpdatedISO = data.updatedAt || null;
-    updateTimeLabels();
-
-    document.getElementById('loading-bar').style.display = 'none';
-    document.getElementById('error-msg').classList.remove('show');
-    document.getElementById('hot-section').style.display = '';
-    document.getElementById('filters-wrap').style.display = '';
-    document.getElementById('deals-section').style.display = '';
-
-    renderHotDeals();
-    renderDeals('All');
-  } catch (e) {
-    console.error('Deal load error:', e);
-    document.getElementById('loading-bar').style.display = 'none';
-    document.getElementById('error-msg').classList.add('show');
-  }
-}
-
-function img(src, emoji, size) {
-  const pad = size === 'hot' ? '8px' : '12px';
-  const fs = size === 'hot' ? '34px' : '44px';
-  if (src) {
-    return `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:contain;padding:${pad};" onerror="this.parentElement.innerHTML='<span style=\\'font-size:${fs}px\\'>${emoji || '🛒'}</span>'"/>`;
-  }
-  return `<span style="font-size:${fs}px">${emoji || '🛒'}</span>`;
-}
-
-function renderHotDeals() {
-  const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot);
-  document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
-
-  document.getElementById('hot-grid').innerHTML = hot.length === 0
-    ? `<div style="padding:18px;color:var(--text-muted);font-size:13px;">No hot deals yet — check back soon.</div>`
-    : hot.map(d => `
-      <a class="hot-card" href="${esc(d.link || '#')}" target="_blank" rel="noopener sponsored">
-        <div class="hot-card-img">${img(d.image, d.emoji, 'hot')}</div>
-        <span class="hot-card-badge">${esc(d.discount || (d.pct + '% off'))}</span>
-        <div class="hot-card-body">
-          <div class="hot-card-title">${esc(d.title)}</div>
-          <div class="hot-card-prices">
-            <span class="hot-price-now">${esc(d.price || 'See price')}</span>
-            ${d.was ? `<span class="hot-price-was">${esc(d.was)}</span>` : ''}
-          </div>
-          <button class="hot-btn">Grab Deal →</button>
-        </div>
-      </a>
-    `).join('');
-}
-
-function renderDeals(cat) {
-  const filtered = cat === 'All' ? allDeals : allDeals.filter(d => d.cat === cat);
-  document.getElementById('count-label').textContent = filtered.length + ' deal' + (filtered.length !== 1 ? 's' : '');
-
-  document.getElementById('deals-grid').innerHTML = filtered.length === 0
-    ? `<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">No deals in this category right now — check back soon!</div>`
-    : filtered.map(d => `
-      <a class="deal-card" href="${esc(d.link || '#')}" target="_blank" rel="noopener sponsored">
-        <div class="card-img">${img(d.image, d.emoji, 'card')}</div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-category">${esc(d.cat)}</span>
-            ${(Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : ''}
-          </div>
-          <div class="card-title">${esc(d.title)}</div>
-          <div class="card-desc">${esc(d.desc || '')}</div>
-          <div class="card-footer">
-            <div class="price-block">
-              <span class="price-now">${esc(d.price || 'See price on Amazon')}</span>
-              ${d.was ? `<span class="price-was">${esc(d.was)}</span>` : ''}
-            </div>
-            <span class="discount-badge">${esc(d.discount || '')}</span>
-          </div>
-          ${d.hasCoupon ? `<div class="coupon-row"><span class="coupon-badge">🏷️ ${esc(d.couponDisplay)}</span></div>` : ''}
-          <button class="btn-deal">See Deal on Amazon →</button>
-        </div>
-      </a>
-    `).join('');
-}
-
-function filterDeals(cat, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderDeals(cat);
-}
-
-function switchTab(tab) {
-  document.getElementById('tab-email').classList.toggle('active', tab === 'email');
-  document.getElementById('tab-sms').classList.toggle('active', tab === 'sms');
-
-  const input = document.getElementById('signup-input');
-  input.type = tab === 'email' ? 'email' : 'tel';
-  input.placeholder = tab === 'email' ? 'your@email.com' : '(555) 000-0000';
-
-  document.getElementById('signup-msg').textContent = tab === 'email'
-    ? 'No spam, ever. Unsubscribe anytime.'
-    : 'Standard msg rates may apply. Text STOP to unsubscribe.';
-}
-
-function handleSignup() {
-  const val = document.getElementById('signup-input').value.trim();
-  if (!val) return;
-  const msg = document.getElementById('signup-msg');
-  msg.textContent = "✓ You're in! Watch for your first deal alert.";
-  msg.style.color = '#2a6041';
-  document.getElementById('signup-input').value = '';
-}
-
-function openMobileMenu() {
-  document.body.classList.add('menu-open');
-  document.getElementById('mobile-drawer').classList.add('show');
-  document.getElementById('mobile-drawer-overlay').classList.add('show');
-  document.getElementById('mobile-drawer').setAttribute('aria-hidden', 'false');
-}
-
-function closeMobileMenu() {
-  document.body.classList.remove('menu-open');
-  document.getElementById('mobile-drawer').classList.remove('show');
-  document.getElementById('mobile-drawer-overlay').classList.remove('show');
-  document.getElementById('mobile-drawer').setAttribute('aria-hidden', 'true');
-}
-
-function scrollToHotDeals() {
-  closeMobileMenu();
-  const el = document.getElementById('hot-section');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function scrollToAlerts() {
-  closeMobileMenu();
-  const el = document.getElementById('alerts-box') || document.getElementById('hot-section');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function scrollToCategories() {
-  closeMobileMenu();
-  const el = document.getElementById('filters-wrap');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function scrollToAllDeals() {
-  closeMobileMenu();
-  const el = document.getElementById('deals-section');
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-const btt = document.getElementById('back-to-top');
-window.addEventListener('scroll', () => btt.classList.toggle('visible', window.scrollY > 400), { passive: true });
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeMobileMenu();
-});
-
-function scrollToTop() {
-  closeMobileMenu();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function esc(s) {
-  return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-setInterval(loadDeals, 30 * 60 * 1000);
-setInterval(updateTimeLabels, 60 * 1000);
-
-loadDeals();
-</script>
-</body>
-</html>
+  { id:'Beauty &
