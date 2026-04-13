@@ -17,8 +17,8 @@ from amazon_creatorsapi.models import GetItemsResource
 # CREDENTIALS — read from environment variables
 # ─────────────────────────────────────────────
 KEEPA_API_KEY     = os.getenv("KEEPA_API_KEY")
-CREDENTIAL_ID     = os.getenv("AMAZON_CREATOR_CREDENTIAL_ID")
-CREDENTIAL_SECRET = os.getenv("AMAZON_CREATOR_CREDENTIAL_SECRET")
+CREDENTIAL_ID     = os.getenv("CREATORS_CREDENTIAL_ID")
+CREDENTIAL_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
 PARTNER_TAG       = os.getenv("AFFILIATE_TAG", "simplewoodsho-20")
 
 if not KEEPA_API_KEY:
