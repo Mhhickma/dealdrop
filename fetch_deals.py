@@ -39,7 +39,7 @@ DEAL_TTL_HOURS    = 24
 AMAZON_BATCH_SIZE = 10
 MIN_DISCOUNT_PCT  = 10
 
-# Keepa root category IDs to exclude
+# Keepa root category IDs to exclude (clothing, shoes, jewelry, luggage)
 EXCLUDED_CATEGORIES = [
     7141123011,
     679255031,
@@ -52,7 +52,7 @@ EXCLUDED_CATEGORIES = [
     9057119011,
 ]
 
-# Amazon category name keywords to exclude
+# Amazon category name keywords to exclude as a second filter
 EXCLUDED_CATEGORY_NAMES = [
     "apparel", "clothing", "shoes", "shoe", "jewelry", "jewellery",
     "luggage", "handbag", "wallet", "fashion", "dress", "shirt",
@@ -101,17 +101,28 @@ def get_keepa_deals(api_key, fetch_asins):
     api = keepa.Keepa(api_key)
 
     product_params = {
-        "sort":                  [["delta_percent", "asc"]],
-        "productType":           [0],
-        "delta_percent":         {"min": MIN_DISCOUNT_PCT, "max": -1},
-        "deltaRange":            10080,
-        "excludeCategories":     EXCLUDED_CATEGORIES,
-        "current_COUNT_REVIEWS": {"min": 10, "max": -1},
-        "current_AMAZON":        {"min": 1,  "max": -1},
+        # Sort by biggest 7-day price drop percentage
+        "sort":                      [["deltaPercent7_AMAZON", "asc"]],
+
+        # Standard products only
+        "productType":               [0],
+
+        # At least 10% price drop over the past 7 days
+        # (negative = price went down)
+        "deltaPercent7_AMAZON_lte":  -10,
+
+        # Must currently be in stock on Amazon (price > 0, in cents)
+        "current_AMAZON_gte":        1,
+
+        # At least 10 reviews
+        "current_COUNT_REVIEWS_gte": 10,
+
+        # Exclude clothing and shoes root categories
+        "categories_exclude":        EXCLUDED_CATEGORIES,
     }
 
     try:
-        asins = api.product_finder(product_params)
+        asins = api.product_finder(product_params, n_products=fetch_asins)
         asins = list(asins[:fetch_asins])
         print(f"    Found {len(asins)} price drop ASINs.")
     except Exception as e:
@@ -135,7 +146,7 @@ def get_keepa_deals(api_key, fetch_asins):
     for i in range(0, len(asins), 10):
         batch = asins[i:i + 10]
         try:
-            products = api.query(batch, stats=90, history=True)
+            products = api.query(batch, stats=90, history=False)
             for product in products:
                 asin = product.get("asin")
                 if not asin:
