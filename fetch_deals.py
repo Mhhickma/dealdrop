@@ -4,9 +4,6 @@ Keepa + Amazon Creators API — Deal Price Scraper
 Pulls price drop deals from Keepa, enriches them with
 real-time pricing from the Amazon Creators API,
 and saves the results to deals.json for your website.
-
-Install dependencies:
-  pip install keepa python-amazon-paapi
 """
 
 import json
@@ -17,17 +14,22 @@ from amazon_creatorsapi import AmazonCreatorsApi, Country
 from amazon_creatorsapi.models import GetItemsResource
 
 # ─────────────────────────────────────────────
-# YOUR CREDENTIALS
+# CREDENTIALS — read from environment variables
 # ─────────────────────────────────────────────
-KEEPA_API_KEY     = "your-keepa-api-key-here"
-CREDENTIAL_ID     = "your-client-id-here"
-CREDENTIAL_SECRET = "your-client-secret-here"
-PARTNER_TAG       = "simplewoodsho-20"
+KEEPA_API_KEY     = os.getenv("KEEPA_API_KEY")
+CREDENTIAL_ID     = os.getenv("AMAZON_CREATOR_CREDENTIAL_ID")
+CREDENTIAL_SECRET = os.getenv("AMAZON_CREATOR_CREDENTIAL_SECRET")
+PARTNER_TAG       = os.getenv("AFFILIATE_TAG", "simplewoodsho-20")
+
+if not KEEPA_API_KEY:
+    raise RuntimeError("Missing KEEPA_API_KEY")
+if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
+    raise RuntimeError("Missing AMAZON_CREATOR_CREDENTIAL_ID or AMAZON_CREATOR_CREDENTIAL_SECRET")
 
 # ─────────────────────────────────────────────
 # SETTINGS
 # ─────────────────────────────────────────────
-OUTPUT_FILE       = os.path.join(os.path.expanduser("~"), "Downloads", "deals.json")
+OUTPUT_FILE       = "deals.json"   # saves to repo root for GitHub Pages
 MAX_ASINS         = 10
 AMAZON_BATCH_SIZE = 10
 
@@ -39,11 +41,9 @@ def get_keepa_deals(api_key, max_asins):
     print("\n[1/3] Fetching price drops from Keepa...")
     api = keepa.Keepa(api_key)
 
-    # Search for products with a recent price drop of at least 10%
     product_params = {
-        "sort":          [["delta_percent", "asc"]],
-        "productType":   [0],
-        "delta_percent": {"min": 10, "max": -1},
+        "sort":        [["delta_percent", "asc"]],
+        "productType": [0],
     }
 
     try:
@@ -54,15 +54,10 @@ def get_keepa_deals(api_key, max_asins):
     except Exception as e:
         print(f"    product_finder failed: {e}")
 
-    # Fallback: use deal finder with minimal params
+    # Fallback: deal finder
     try:
         print("    Trying deal finder fallback...")
-        deal_response = api.deals(
-            {
-                "page":     0,
-                "domainId": 1,
-            }
-        )
+        deal_response = api.deals({"page": 0, "domainId": 1})
         asins = list(deal_response.get("asinList", []))[:max_asins]
         print(f"    Found {len(asins)} deal ASINs.")
         return asins
@@ -216,8 +211,7 @@ def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump({"deals": deals, "count": len(deals)}, f, indent=2)
 
-    print(f"\n✅ Saved {len(deals)} deals to:")
-    print(f"   {OUTPUT_FILE}")
+    print(f"\n✅ Saved {len(deals)} deals to {OUTPUT_FILE}")
     print("Done.")
 
 
