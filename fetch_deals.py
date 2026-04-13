@@ -9,7 +9,8 @@ and saves the results to deals.json for your website.
 import json
 import os
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import numpy as np
 import keepa
 from amazon_creatorsapi import AmazonCreatorsApi, Country
 from amazon_creatorsapi.models import GetItemsResource
@@ -31,40 +32,152 @@ if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
 # SETTINGS
 # ─────────────────────────────────────────────
 OUTPUT_FILE       = "deals.json"
-MAX_ASINS         = 10
+MEMORY_FILE       = "deals_memory.json"
+FETCH_ASINS       = 280
+MAX_DISPLAY       = 500
+DEAL_TTL_HOURS    = 24
 AMAZON_BATCH_SIZE = 10
+MIN_DISCOUNT_PCT  = 10    # Minimum % off to include a deal
+
+# Keepa root category IDs to exclude
+EXCLUDED_CATEGORIES = [
+    7141123011,
+    679255031,
+    1040660,
+    2475809011,
+    2475810011,
+    15743631,
+    679337011,
+    2476761011,
+    9057119011,
+]
+
+# Amazon category name keywords to exclude
+EXCLUDED_CATEGORY_NAMES = [
+    "apparel", "clothing", "shoes", "shoe", "jewelry", "jewellery",
+    "luggage", "handbag", "wallet", "fashion", "dress", "shirt",
+    "pants", "jeans", "sneaker", "boot", "sandal", "accessory",
+    "accessories", "watch", "sunglasses",
+]
 
 
 # ─────────────────────────────────────────────
-# STEP 1: Pull price drop ASINs from Keepa
+# MEMORY: Load and save deal history
 # ─────────────────────────────────────────────
-def get_keepa_deals(api_key, max_asins):
+def load_memory():
+    if not os.path.exists(MEMORY_FILE):
+        return {}
+    try:
+        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except:
+        return {}
+
+
+def save_memory(memory):
+    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(memory, f, indent=2)
+
+
+def purge_expired(memory):
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=DEAL_TTL_HOURS)
+    before = len(memory)
+    memory = {
+        asin: deal for asin, deal in memory.items()
+        if datetime.fromisoformat(deal["seen_at"]) > cutoff
+    }
+    purged = before - len(memory)
+    if purged:
+        print(f"    Purged {purged} expired deals (older than {DEAL_TTL_HOURS}h).")
+    return memory
+
+
+# ─────────────────────────────────────────────
+# STEP 1: Pull price drop ASINs + price history
+# ─────────────────────────────────────────────
+def get_keepa_deals(api_key, fetch_asins):
     print("\n[1/3] Fetching price drops from Keepa...")
     api = keepa.Keepa(api_key)
 
     product_params = {
-        "sort":        [["delta_percent", "asc"]],
-        "productType": [0],
+        "sort":                  [["delta_percent", "asc"]],
+        "productType":           [0],
+        "delta_percent":         {"min": MIN_DISCOUNT_PCT, "max": -1},
+        "deltaRange":            10080,
+        "excludeCategories":     EXCLUDED_CATEGORIES,
+        "current_COUNT_REVIEWS": {"min": 10, "max": -1},
+        "current_AMAZON":        {"min": 1,  "max": -1},
     }
 
     try:
         asins = api.product_finder(product_params)
-        asins = list(asins[:max_asins])
+        asins = list(asins[:fetch_asins])
         print(f"    Found {len(asins)} price drop ASINs.")
-        return asins
     except Exception as e:
         print(f"    product_finder failed: {e}")
+        asins = []
 
-    # Fallback: deal finder
-    try:
-        print("    Trying deal finder fallback...")
-        deal_response = api.deals({"page": 0, "domainId": 1})
-        asins = list(deal_response.get("asinList", []))[:max_asins]
-        print(f"    Found {len(asins)} deal ASINs.")
-        return asins
-    except Exception as e:
-        print(f"    Deal finder also failed: {e}")
-        return []
+    if not asins:
+        try:
+            print("    Trying deal finder fallback...")
+            deal_response = api.deals({"page": 0, "domainId": 1})
+            asins = list(deal_response.get("asinList", []))[:fetch_asins]
+            print(f"    Found {len(asins)} deal ASINs.")
+        except Exception as e:
+            print(f"    Deal finder also failed: {e}")
+            return [], {}
+
+    # Pull Keepa price history for these ASINs in batches of 10
+    # This gives us the 90-day high so we can calculate true % off
+    print(f"    Fetching Keepa price history for {len(asins)} ASINs...")
+    keepa_prices = {}
+
+    for i in range(0, len(asins), 10):
+        batch = asins[i:i + 10]
+        try:
+            products = api.query(batch, stats=90, history=True)
+            for product in products:
+                asin = product.get("asin")
+                if not asin:
+                    continue
+
+                stats = product.get("stats", {})
+
+                # Current Amazon price (in cents, divide by 100)
+                current_raw = stats.get("current", [None] * 10)
+                current_price = None
+                if isinstance(current_raw, list) and len(current_raw) > 0:
+                    val = current_raw[0]  # index 0 = AMAZON price
+                    if val and val > 0:
+                        current_price = val / 100.0
+
+                # 90-day high price (index 0 = AMAZON)
+                high_raw = stats.get("max90", [None] * 10)
+                high_price = None
+                if isinstance(high_raw, list) and len(high_raw) > 0:
+                    val = high_raw[0]
+                    if val and val > 0:
+                        high_price = val / 100.0
+
+                # 90-day average price
+                avg_raw = stats.get("avg90", [None] * 10)
+                avg_price = None
+                if isinstance(avg_raw, list) and len(avg_raw) > 0:
+                    val = avg_raw[0]
+                    if val and val > 0:
+                        avg_price = val / 100.0
+
+                keepa_prices[asin] = {
+                    "current":   current_price,
+                    "high_90d":  high_price,
+                    "avg_90d":   avg_price,
+                }
+        except Exception as e:
+            print(f"    Warning: Keepa history batch failed — {e}")
+        time.sleep(0.5)
+
+    print(f"    Got price history for {len(keepa_prices)} ASINs.")
+    return asins, keepa_prices
 
 
 # ─────────────────────────────────────────────
@@ -110,11 +223,53 @@ def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
 
 
 # ─────────────────────────────────────────────
-# STEP 3: Build and save JSON output
+# HELPER: Check if a category should be excluded
 # ─────────────────────────────────────────────
-def build_output(asins, amazon_items):
-    print("\n[3/3] Building JSON output...")
-    deals = []
+def is_excluded_category(category):
+    if not category:
+        return False
+    cat_lower = category.lower()
+    return any(word in cat_lower for word in EXCLUDED_CATEGORY_NAMES)
+
+
+# ─────────────────────────────────────────────
+# HELPER: Calculate % off and was price
+# ─────────────────────────────────────────────
+def calculate_discount(current_price, keepa_data):
+    """
+    Calculate the true % off using:
+    1. Amazon Creators API current price vs Keepa 90-day high
+    2. Fall back to Keepa 90-day average if no high available
+    Returns (was_price, pct_off, discount_label)
+    """
+    if not current_price or not keepa_data:
+        return None, None, ""
+
+    # Use 90-day high as the "was" price, fall back to avg
+    was_price = keepa_data.get("high_90d") or keepa_data.get("avg_90d")
+
+    if not was_price or was_price <= current_price:
+        # If no valid "was" price or current is higher, no discount to show
+        return None, None, ""
+
+    pct_off = round(((was_price - current_price) / was_price) * 100)
+
+    if pct_off < MIN_DISCOUNT_PCT:
+        return None, None, ""
+
+    was_display   = f"${was_price:.2f}"
+    discount_label = f"-{pct_off}%"
+
+    return was_display, pct_off, discount_label
+
+
+# ─────────────────────────────────────────────
+# STEP 3: Build deals and merge with memory
+# ─────────────────────────────────────────────
+def build_and_merge(asins, amazon_items, keepa_prices, memory):
+    print("\n[3/3] Building and merging deals...")
+    now = datetime.now(timezone.utc).isoformat()
+    new_count = 0
 
     for asin in asins:
         item = amazon_items.get(asin)
@@ -135,6 +290,10 @@ def build_output(asins, amazon_items):
             category = item.item_info.classifications.product_group.display_value
         except:
             category = None
+
+        if is_excluded_category(category):
+            print(f"    Skipping {asin} — excluded category: {category}")
+            continue
 
         try:
             image = item.images.primary.large.url
@@ -163,43 +322,59 @@ def build_output(asins, amazon_items):
             deal_type = "PRICE_DROP"
 
         try:
-            savings_amount = listing.price.savings.money.display_amount
-            savings_pct    = listing.price.savings.percentage
-        except:
-            savings_amount = None
-            savings_pct    = None
-
-        try:
             url = item.detail_page_url
         except:
             url = f"https://www.amazon.com/dp/{asin}?tag={PARTNER_TAG}"
 
-        is_hot = bool(savings_pct and savings_pct >= 30)
-        discount_label = f"-{savings_pct}%" if savings_pct else ""
+        # Calculate true % off using Keepa history + Amazon current price
+        keepa_data = keepa_prices.get(asin, {})
+        was_display, pct_off, discount_label = calculate_discount(
+            price_amount, keepa_data
+        )
 
-        deals.append({
-            "asin":         asin,
-            "title":        title,
-            "brand":        brand,
-            "cat":          category,
-            "image":        image,
-            "price":        price_display,
-            "price_amount": price_amount,
-            "currency":     currency,
-            "was":          None,
-            "savings":      savings_amount,
-            "pct":          savings_pct,
-            "discount":     discount_label,
-            "deal_type":    deal_type,
-            "availability": availability,
-            "link":         url,
-            "hot":          is_hot,
-            "hasCoupon":    False,
+        # Fall back to Amazon savings data if Keepa calc didn't work
+        if not pct_off:
+            try:
+                pct_off        = listing.price.savings.percentage
+                was_display    = None
+                discount_label = f"-{pct_off}%" if pct_off else ""
+            except:
+                pct_off        = None
+                discount_label = ""
+
+        is_hot = bool(pct_off and pct_off >= 30)
+
+        deal = {
+            "asin":          asin,
+            "title":         title,
+            "brand":         brand,
+            "cat":           category,
+            "image":         image,
+            "price":         price_display,
+            "price_amount":  price_amount,
+            "currency":      currency,
+            "was":           was_display,
+            "savings":       was_display,
+            "pct":           pct_off,
+            "discount":      discount_label,
+            "deal_type":     deal_type,
+            "availability":  availability,
+            "link":          url,
+            "hot":           is_hot,
+            "hasCoupon":     False,
             "couponDisplay": "",
-            "desc":         brand or "",
-        })
+            "desc":          brand or "",
+            "seen_at":       memory.get(asin, {}).get("seen_at", now),
+            "updated_at":    now,
+        }
 
-    return deals
+        if asin not in memory:
+            new_count += 1
+
+        memory[asin] = deal
+
+    print(f"    {new_count} new deals added to memory.")
+    return memory
 
 
 def main():
@@ -207,30 +382,56 @@ def main():
     print("  Keepa + Amazon Creators API — Deal Price Scraper")
     print("=" * 55)
 
-    asins = get_keepa_deals(KEEPA_API_KEY, MAX_ASINS)
+    # Load and purge expired deals from memory
+    memory = load_memory()
+    print(f"\n    Memory: {len(memory)} deals before purge.")
+    memory = purge_expired(memory)
+    print(f"    Memory: {len(memory)} deals after purge.")
+
+    # Fetch new ASINs and price history from Keepa
+    asins, keepa_prices = get_keepa_deals(KEEPA_API_KEY, FETCH_ASINS)
+
     if not asins:
-        print("No ASINs found. Exiting.")
-        return
+        print("No ASINs found from Keepa.")
+    else:
+        # Only fetch Amazon pricing for ASINs not already in memory
+        new_asins = [a for a in asins if a not in memory]
+        print(f"\n    {len(new_asins)} new ASINs to price-check "
+              f"({len(asins) - len(new_asins)} already cached).")
 
-    amazon_items = get_amazon_pricing(
-        asins, CREDENTIAL_ID, CREDENTIAL_SECRET, PARTNER_TAG
-    )
+        if new_asins:
+            amazon_items = get_amazon_pricing(
+                new_asins, CREDENTIAL_ID, CREDENTIAL_SECRET, PARTNER_TAG
+            )
+            memory = build_and_merge(
+                new_asins, amazon_items, keepa_prices, memory
+            )
+        else:
+            print("    All ASINs already in memory — skipping Amazon API calls.")
 
-    deals = build_output(asins, amazon_items)
+    # Save updated memory
+    save_memory(memory)
+
+    # Sort newest first, cap at MAX_DISPLAY
+    all_deals = sorted(
+        memory.values(),
+        key=lambda d: d.get("seen_at", ""),
+        reverse=True
+    )[:MAX_DISPLAY]
 
     output = {
-        "deals":      deals,
-        "count":      len(deals),
-        "totalDeals": len(deals),
-        "hotDeals":   sum(1 for d in deals if d.get("hot")),
+        "deals":       all_deals,
+        "count":       len(all_deals),
+        "totalDeals":  len(all_deals),
+        "hotDeals":    sum(1 for d in all_deals if d.get("hot")),
         "couponDeals": 0,
-        "updatedAt":  datetime.now(timezone.utc).isoformat(),
+        "updatedAt":   datetime.now(timezone.utc).isoformat(),
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
 
-    print(f"\n✅ Saved {len(deals)} deals to {OUTPUT_FILE}")
+    print(f"\n✅ Saved {len(all_deals)} deals to {OUTPUT_FILE}")
     print("Done.")
 
 
