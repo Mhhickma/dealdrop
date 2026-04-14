@@ -49,10 +49,7 @@
     letter-spacing: 0.02em;
   }
 
-  .disclosure-bar span {
-    max-width: 900px;
-    display: inline-block;
-  }
+  .disclosure-bar span { max-width: 900px; display: inline-block; }
 
   nav {
     background: var(--surface);
@@ -73,11 +70,7 @@
     gap: 16px;
   }
 
-  .nav-left, .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
+  .nav-left, .nav-right { display: flex; align-items: center; gap: 14px; }
 
   .logo {
     font-family: 'Playfair Display', serif;
@@ -96,11 +89,7 @@
     text-transform: uppercase;
   }
 
-  .desktop-nav {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
+  .desktop-nav { display: flex; align-items: center; gap: 4px; }
 
   .desktop-nav a,
   .nav-dropdown-trigger {
@@ -127,16 +116,8 @@
     background: var(--accent-light);
   }
 
-  .nav-dropdown-arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
-    display: inline-block;
-  }
-
-  .nav-dropdown-trigger.open .nav-dropdown-arrow {
-    transform: rotate(180deg);
-  }
-
+  .nav-dropdown-arrow { font-size: 10px; transition: transform 0.2s; display: inline-block; }
+  .nav-dropdown-trigger.open .nav-dropdown-arrow { transform: rotate(180deg); }
   .nav-dropdown { position: relative; }
 
   .dropdown-menu {
@@ -156,11 +137,7 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
-  .dropdown-menu.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+  .dropdown-menu.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
   .dropdown-menu.hot-dropdown {
     min-width: 480px;
@@ -168,9 +145,7 @@
     transform: translateX(-50%) translateY(-8px);
   }
 
-  .dropdown-menu.hot-dropdown.show {
-    transform: translateX(-50%) translateY(0);
-  }
+  .dropdown-menu.hot-dropdown.show { transform: translateX(-50%) translateY(0); }
 
   .dropdown-item {
     display: flex;
@@ -191,23 +166,9 @@
     font-family: 'DM Sans', sans-serif;
   }
 
-  .dropdown-item:hover {
-    background: var(--accent-light);
-    color: var(--accent);
-  }
-
-  .dropdown-item-emoji {
-    font-size: 15px;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .dropdown-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 6px 0;
-  }
+  .dropdown-item:hover { background: var(--accent-light); color: var(--accent); }
+  .dropdown-item-emoji { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+  .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
 
   .hot-dropdown-header {
     display: flex;
@@ -218,11 +179,7 @@
     margin-bottom: 8px;
   }
 
-  .hot-dropdown-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
+  .hot-dropdown-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
 
   .hot-dropdown-see-all {
     font-size: 12px;
@@ -255,10 +212,7 @@
     background: var(--bg);
   }
 
-  .hot-dropdown-card:hover {
-    background: #fff5f5;
-    border-color: #f5c0c0;
-  }
+  .hot-dropdown-card:hover { background: #fff5f5; border-color: #f5c0c0; }
 
   .hot-dropdown-img {
     width: 48px;
@@ -274,7 +228,6 @@
   }
 
   .hot-dropdown-img img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
-
   .hot-dropdown-info { flex: 1; min-width: 0; }
 
   .hot-dropdown-name {
@@ -300,13 +253,7 @@
     border-radius: 100px;
   }
 
-  .hot-dropdown-empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 24px;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
+  .hot-dropdown-empty { grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
 
   .nav-alert-btn {
     display: inline-flex;
@@ -395,13 +342,7 @@
     color: var(--text-primary);
   }
 
-  .drawer-content {
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    overflow-y: auto;
-  }
+  .drawer-content { padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
 
   .drawer-alert {
     background: linear-gradient(135deg, #eef7f1 0%, #f8fbf8 100%);
@@ -464,7 +405,6 @@
 
   .drawer-cat-toggle-arrow { font-size: 10px; transition: transform 0.2s; }
   .drawer-cat-toggle.open .drawer-cat-toggle-arrow { transform: rotate(180deg); }
-
   .drawer-cat-list { display: none; flex-direction: column; border-top: 1px solid var(--border); }
   .drawer-cat-list.open { display: flex; }
 
@@ -539,7 +479,6 @@
   }
 
   .tab-btn.active { background: var(--accent); color: white; }
-
   .signup-field { display: flex; gap: 8px; }
 
   .signup-field input {
@@ -591,13 +530,7 @@
 
   .loading-bar { max-width: 1100px; margin: 0 auto 20px; padding: 0 24px; }
 
-  .loading-msg {
-    font-size: 13px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .loading-msg { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
 
   .spinner {
     width: 14px;
@@ -628,15 +561,10 @@
   .mobile-hot-hero { display: none; }
 
   .hot-section { max-width: 1100px; margin: 0 auto 36px; padding: 0 24px; }
-
   .hot-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-
   .hot-title-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
-
   .hot-icon { font-size: 22px; }
-
   .hot-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-primary); }
-
   .hot-subtitle { font-size: 13px; color: var(--text-muted); }
 
   .hot-pill {
@@ -699,7 +627,6 @@
   }
 
   .hot-card-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
-
   .hot-card-body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
 
   .hot-card-badge {
@@ -715,9 +642,7 @@
   }
 
   .hot-card-title { font-size: 12px; font-weight: 600; line-height: 1.35; color: var(--text-primary); padding-right: 8px; }
-
   .hot-card-prices { display: flex; align-items: baseline; gap: 6px; }
-
   .hot-price-now { font-size: 16px; font-weight: 700; color: var(--red); }
   .hot-price-was { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
 
@@ -752,17 +677,16 @@
     display: block;
   }
 
-  .filters-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-  .filters-scroll::-webkit-scrollbar { display: none; }
+  .filters-scroll { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 4px; }
 
   .filter-btn {
     flex-shrink: 0;
-    padding: 7px 16px;
+    padding: 5px 12px;
     border: 1px solid var(--border);
-    border-radius: 100px;
+    border-radius: 6px;
     background: var(--surface);
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
@@ -774,11 +698,8 @@
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 
   .deals-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; }
-
   .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
-
   .section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-
   .deal-count { font-size: 13px; color: var(--text-muted); }
 
   .deals-grid {
@@ -818,9 +739,7 @@
   }
 
   .card-img img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
-
   .card-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
-
   .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
 
   .card-category {
@@ -835,19 +754,13 @@
   }
 
   .card-badge-hot { font-size: 11px; font-weight: 600; color: var(--red); background: var(--red-light); padding: 3px 9px; border-radius: 100px; }
-
   .card-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin-bottom: 6px; }
-
   .card-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 14px; flex: 1; }
-
   .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
-
   .price-block { display: flex; align-items: baseline; gap: 7px; }
   .price-now { font-size: 20px; font-weight: 600; color: var(--text-primary); }
   .price-was { font-size: 13px; color: var(--text-muted); text-decoration: line-through; }
-
   .discount-badge { font-size: 12px; font-weight: 600; background: #fff3d4; color: #8a5c00; padding: 4px 10px; border-radius: 100px; }
-
   .coupon-row { margin-top: 8px; }
 
   .coupon-badge {
@@ -910,7 +823,6 @@
   footer { background: var(--surface); border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
   footer p { font-size: 13px; color: var(--text-muted); }
   footer a { color: var(--accent); text-decoration: none; }
-
   .disclaimer { max-width: 600px; margin: 8px auto 0; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
 
   @media (max-width: 700px) {
@@ -967,7 +879,6 @@
     .mobile-hero-btn-secondary { background: rgba(255,255,255,0.16); color: white; border: 1px solid rgba(255,255,255,0.28); }
 
     .mobile-hot-quickstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
-
     .mobile-stat { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 10px 8px; text-align: center; }
     .mobile-stat-num { display: block; font-size: 18px; font-weight: 700; line-height: 1; }
     .mobile-stat-label { display: block; font-size: 10px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.85); }
@@ -992,8 +903,6 @@
 
     .filters-wrap { margin-bottom: 18px; }
     .filter-label { font-size: 11px; margin-bottom: 8px; }
-    .filters-scroll { gap: 8px; padding-bottom: 2px; }
-    .filter-btn { padding: 8px 14px; font-size: 12px; font-weight: 600; }
     .deals-section { padding-bottom: 88px; }
     .section-header { margin-bottom: 12px; align-items: center; }
     .section-title { font-size: 12px; color: var(--text-primary); }
@@ -1116,7 +1025,7 @@
 <section class="hero">
   <div class="hero-text">
     <h1>The best deals,<br>curated for you.</h1>
-    <p>Top Amazon discounts across every category — updated every 4 hours automatically.</p>
+    <p>Top Amazon discounts across every category — updated every hour automatically.</p>
   </div>
   <div class="signup-box" id="alerts-box">
     <h3>Never miss a deal</h3>
@@ -1224,7 +1133,6 @@ const CATEGORIES = [
   { id:'Toys & Games',               label:'Toys & Games',            emoji:'🧸' },
 ];
 
-// Build filter pills
 const filterRow = document.getElementById('filter-row');
 CATEGORIES.forEach(cat => {
   const btn = document.createElement('button');
@@ -1235,7 +1143,6 @@ CATEGORIES.forEach(cat => {
   filterRow.appendChild(btn);
 });
 
-// Build desktop categories dropdown
 const menuCats = document.getElementById('menu-categories');
 CATEGORIES.forEach((cat, i) => {
   if (i === 1) {
@@ -1257,7 +1164,6 @@ CATEGORIES.forEach((cat, i) => {
   menuCats.appendChild(btn);
 });
 
-// Build mobile drawer category list
 const drawerCatList = document.getElementById('drawer-cat-list');
 CATEGORIES.forEach(cat => {
   const btn = document.createElement('button');
