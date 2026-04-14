@@ -120,7 +120,7 @@ def get_keepa_deals(api_key, fetch_asins):
         "productType":               [0],
         "deltaPercent7_AMAZON_lte":  -10,
         "current_AMAZON_gte":        1,
-        "current_COUNT_REVIEWS_gte": 10,
+        "current_COUNT_REVIEWS_gte": 15,
         "categories_include":        INCLUDED_CATEGORIES,
         "categories_exclude":        EXCLUDED_CATEGORIES,
     }
