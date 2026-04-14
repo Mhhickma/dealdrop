@@ -39,25 +39,33 @@ DEAL_TTL_HOURS    = 24
 AMAZON_BATCH_SIZE = 10
 MIN_DISCOUNT_PCT  = 10
 
-# Keepa root category IDs to exclude (clothing, shoes, jewelry, luggage)
-EXCLUDED_CATEGORIES = [
-    7141123011,
-    679255031,
-    1040660,
-    2475809011,
-    2475810011,
-    15743631,
-    679337011,
-    2476761011,
-    9057119011,
+# Only pull from these Keepa category IDs
+INCLUDED_CATEGORIES = [
+    2619525011,   # Appliances
+    2617941011,   # Arts, Crafts & Sewing
+    15684181,     # Automotive
+    165796011,    # Baby Products
+    2335752011,   # Cell Phones & Accessories
+    172282,       # Electronics
+    10272111,     # Everything Else
+    11260432011,  # Handmade Products
+    3760901,      # Health & Household
+    1055398,      # Home & Kitchen
+    16310091,     # Industrial & Scientific
+    11091801,     # Musical Instruments
+    1064954,      # Office Products
+    2972638011,   # Patio, Lawn & Garden
+    2619533011,   # Pet Supplies
+    3375251,      # Sports & Outdoors
+    228013,       # Tools & Home Improvement
+    165793011,    # Toys & Games
 ]
 
-# Amazon category name keywords to exclude as a second filter
+# Still filter out clothing/shoes at Amazon level as a safety net
 EXCLUDED_CATEGORY_NAMES = [
     "apparel", "clothing", "shoes", "shoe", "jewelry", "jewellery",
     "luggage", "handbag", "wallet", "fashion", "dress", "shirt",
-    "pants", "jeans", "sneaker", "boot", "sandal", "accessory",
-    "accessories", "watch", "sunglasses",
+    "pants", "jeans", "sneaker", "boot", "sandal",
 ]
 
 
@@ -99,26 +107,15 @@ def purge_expired(memory):
 def get_keepa_deals(api_key, fetch_asins):
     print("\n[1/3] Fetching price drops from Keepa...")
     api = keepa.Keepa(api_key)
+    print(f"    Keepa tokens available: {api.tokens_left}")
 
     product_params = {
-        # Sort by biggest 7-day price drop percentage
         "sort":                      [["deltaPercent7_AMAZON", "asc"]],
-
-        # Standard products only
         "productType":               [0],
-
-        # At least 10% price drop over the past 7 days
-        # (negative = price went down)
         "deltaPercent7_AMAZON_lte":  -10,
-
-        # Must currently be in stock on Amazon (price > 0, in cents)
         "current_AMAZON_gte":        1,
-
-        # At least 10 reviews
         "current_COUNT_REVIEWS_gte": 10,
-
-        # Exclude clothing and shoes root categories
-        "categories_exclude":        EXCLUDED_CATEGORIES,
+        "categories_include":        INCLUDED_CATEGORIES,
     }
 
     try:
@@ -326,13 +323,11 @@ def build_and_merge(asins, amazon_items, keepa_prices, memory):
         except:
             url = f"https://www.amazon.com/dp/{asin}?tag={PARTNER_TAG}"
 
-        # Calculate true % off using Keepa history + Amazon current price
         keepa_data = keepa_prices.get(asin, {})
         was_display, pct_off, discount_label = calculate_discount(
             price_amount, keepa_data
         )
 
-        # Fall back to Amazon savings data if Keepa calc didn't work
         if not pct_off:
             try:
                 pct_off        = listing.price.savings.percentage
@@ -382,19 +377,16 @@ def main():
     print("  Keepa + Amazon Creators API — Deal Price Scraper")
     print("=" * 55)
 
-    # Load and purge expired deals from memory
     memory = load_memory()
     print(f"\n    Memory: {len(memory)} deals before purge.")
     memory = purge_expired(memory)
     print(f"    Memory: {len(memory)} deals after purge.")
 
-    # Fetch new ASINs and price history from Keepa
     asins, keepa_prices = get_keepa_deals(KEEPA_API_KEY, FETCH_ASINS)
 
     if not asins:
         print("No ASINs found from Keepa.")
     else:
-        # Only fetch Amazon pricing for ASINs not already in memory
         new_asins = [a for a in asins if a not in memory]
         print(f"\n    {len(new_asins)} new ASINs to price-check "
               f"({len(asins) - len(new_asins)} already cached).")
@@ -409,10 +401,8 @@ def main():
         else:
             print("    All ASINs already in memory — skipping Amazon API calls.")
 
-    # Save updated memory
     save_memory(memory)
 
-    # Sort newest first, cap at MAX_DISPLAY
     all_deals = sorted(
         memory.values(),
         key=lambda d: d.get("seen_at", ""),
