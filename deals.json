@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0D212RFJ9",
+      "title": "MRS. MEYER'S CLEAN DAY Multi-Surface Everyday Cleaner, Gingerbread Scent, 16 Fl Oz Bottle",
+      "brand": "Mrs. MEYER'S",
+      "cat": "Drugstore",
+      "image": "https://m.media-amazon.com/images/I/31MzqVPUE0L._SL500_.jpg",
+      "price": "$7.02",
+      "price_amount": 7.02,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": null,
+      "discount": "",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B0D212RFJ9?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Mrs. MEYER'S",
+      "seen_at": "2026-04-14T15:52:03.456647+00:00",
+      "updated_at": "2026-04-14T15:52:03.456647+00:00"
+    },
+    {
       "asin": "B0CGC9VWVW",
       "title": "Eclipse Pembroke 100% Blackout, Faux Linen Grommet Window Curtains, 95 in Long x 42 in Wide, Thermal Insulated Noise Reducing Curtains for Living Room, Bedroom, 2 Curtain Panels, Stormy Blue",
       "brand": "Eclipse",
@@ -1795,9 +1818,9 @@
       "updated_at": "2026-04-14T10:05:45.626101+00:00"
     }
   ],
-  "count": 78,
-  "totalDeals": 78,
+  "count": 79,
+  "totalDeals": 79,
   "hotDeals": 4,
   "couponDeals": 0,
-  "updatedAt": "2026-04-14T15:00:43.194313+00:00"
+  "updatedAt": "2026-04-14T15:52:03.458497+00:00"
 }
