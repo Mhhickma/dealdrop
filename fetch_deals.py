@@ -61,11 +61,17 @@ INCLUDED_CATEGORIES = [
     165793011,    # Toys & Games
 ]
 
-# Still filter out clothing/shoes at Amazon level as a safety net
+# Explicitly exclude these Keepa category IDs
+EXCLUDED_CATEGORIES = [
+    283155,       # Books
+]
+
+# Still filter out at Amazon category name level as safety net
 EXCLUDED_CATEGORY_NAMES = [
     "apparel", "clothing", "shoes", "shoe", "jewelry", "jewellery",
     "luggage", "handbag", "wallet", "fashion", "dress", "shirt",
     "pants", "jeans", "sneaker", "boot", "sandal",
+    "book", "books", "textbook", "novel", "literature",
 ]
 
 
@@ -116,6 +122,7 @@ def get_keepa_deals(api_key, fetch_asins):
         "current_AMAZON_gte":        1,
         "current_COUNT_REVIEWS_gte": 10,
         "categories_include":        INCLUDED_CATEGORIES,
+        "categories_exclude":        EXCLUDED_CATEGORIES,
     }
 
     try:
