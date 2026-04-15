@@ -118,14 +118,13 @@ def get_keepa_deals(api_key, fetch_asins):
     product_params = {
     "sort":                        [["deltaPercent7_AMAZON", "asc"]],
     "productType":                 [0],
-    "deltaPercent7_AMAZON_lte":    -10,        # 10%+ drop over 7 days
-    "current_AMAZON_gte":          1,           # Must have a price
-    "current_COUNT_REVIEWS_gte":   15,          # At least 15 reviews
-    "current_RATING_gte":          40,          # 4.0+ rating (Keepa uses x10)
+    "deltaPercent7_AMAZON_lte":    -10,
+    "current_AMAZON_gte":          1,
+    "current_COUNT_REVIEWS_gte":   15,
+    "current_RATING_gte":          40,
     "categories_include":          INCLUDED_CATEGORIES,
     "categories_exclude":          EXCLUDED_CATEGORIES,
-    "availabilityAmazon":          [0],         # New, in stock on Amazon
-    "isPrimeEligible":             1,           # Prime eligible only
+    "availabilityAmazon":          [0],
 }
 
     try:
