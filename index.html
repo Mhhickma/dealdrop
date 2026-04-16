@@ -1517,13 +1517,41 @@ function switchTab(tab) {
     : 'Standard msg rates may apply. Text STOP to unsubscribe.';
 }
 
-function handleSignup() {
-  const val = document.getElementById('signup-input').value.trim();
+const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycby0XqtB5O1tGCl_xHtcwnsG-o_cLMw7pmnyrJvzMr7zyAmxNMM6JWQki0hnUwm79dfV/exec";
+
+async function handleSignup() {
+  const input = document.getElementById('signup-input');
+  const val   = input.value.trim();
+  const msg   = document.getElementById('signup-msg');
+  const btn   = document.querySelector('.btn-sub');
   if (!val) return;
-  const msg = document.getElementById('signup-msg');
-  msg.textContent = "✓ You're in! Watch for your first deal alert.";
-  msg.style.color = '#1a3a5c';
-  document.getElementById('signup-input').value = '';
+
+  const isEmail = input.type === 'email';
+
+  btn.textContent = 'Saving...';
+  btn.disabled    = true;
+  msg.textContent = 'Saving your info...';
+
+  try {
+    await fetch(SHEET_ENDPOINT, {
+      method: 'POST',
+      mode:   'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: isEmail ? val : '',
+        phone: isEmail ? '' : val,
+      }),
+    });
+    msg.textContent = "✓ You're in! Watch for your first deal alert.";
+    msg.style.color = '#1a3a5c';
+    input.value     = '';
+  } catch (e) {
+    msg.textContent = 'Something went wrong. Please try again.';
+    msg.style.color = 'var(--red)';
+  } finally {
+    btn.textContent = 'Notify me';
+    btn.disabled    = false;
+  }
 }
 
 function openMobileMenu() {
