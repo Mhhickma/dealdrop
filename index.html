@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DealDrop — Fresh Deals, Daily</title>
-<meta name="description" content="The best Amazon deals curated daily. Hot deals, coupons, and discounts across every category — updated automatically.">
+<title>Black Lab Deals — Fresh Deals, Daily</title>
+<meta name="description" content="The best Amazon deals curated daily by Black Lab Deals. Hot deals, coupons, and discounts across every category — updated automatically.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,9 +16,11 @@
     --text-primary: #1a1a18;
     --text-secondary: #6b6b65;
     --text-muted: #9e9e97;
-    --accent: #2a6041;
-    --accent-light: #e8f2ec;
-    --accent-mid: #4a8c62;
+    --accent: #1a3a5c;
+    --accent-light: #e8eef5;
+    --accent-mid: #2a5a8c;
+    --gold: #c9a84c;
+    --gold-light: #fdf8ee;
     --red: #c94040;
     --red-light: #fdf0f0;
     --red-mid: #e05252;
@@ -72,15 +74,30 @@
 
   .nav-left, .nav-right { display: flex; align-items: center; gap: 14px; }
 
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    color: var(--text-primary);
-    letter-spacing: -0.5px;
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     text-decoration: none;
   }
 
-  .logo span { color: var(--accent); }
+  .logo-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .logo-text span { color: var(--gold); }
 
   .nav-tagline {
     font-size: 12px;
@@ -329,8 +346,27 @@
     border-bottom: 1px solid var(--border);
   }
 
-  .drawer-title { font-family: 'Playfair Display', serif; font-size: 24px; letter-spacing: -0.4px; }
-  .drawer-title span { color: var(--accent); }
+  .drawer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .drawer-logo img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+  }
+
+  .drawer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    letter-spacing: -0.4px;
+  }
+
+  .drawer-title span { color: var(--gold); }
 
   .drawer-close {
     width: 42px;
@@ -345,7 +381,7 @@
   .drawer-content { padding: 18px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
 
   .drawer-alert {
-    background: linear-gradient(135deg, #eef7f1 0%, #f8fbf8 100%);
+    background: linear-gradient(135deg, #e8eef5 0%, #f0f4f8 100%);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 16px;
@@ -651,7 +687,7 @@
     width: 100%;
     padding: 8px;
     text-align: center;
-    background: var(--red);
+    background: var(--accent);
     color: white;
     border: none;
     border-radius: 7px;
@@ -663,10 +699,9 @@
     margin-top: auto;
   }
 
-  .hot-btn:hover { background: var(--red-mid); }
+  .hot-btn:hover { background: var(--accent-mid); }
 
   .search-wrap { max-width: 1100px; margin: 0 auto 20px; padding: 0 24px; display: none; }
-
   .search-inner { position: relative; display: flex; align-items: center; }
 
   .search-inner input {
@@ -841,7 +876,7 @@
     border-radius: 50%;
     font-size: 20px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(42,96,65,0.35);
+    box-shadow: 0 4px 16px rgba(26,58,92,0.35);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -877,8 +912,8 @@
       border-radius: 18px;
       padding: 18px 16px 16px;
       color: white;
-      background: linear-gradient(135deg, #ff624d 0%, #d83c3c 55%, #a93131 100%);
-      box-shadow: 0 10px 24px rgba(201,64,64,0.22);
+      background: linear-gradient(135deg, #1a3a5c 0%, #0d2340 55%, #061525 100%);
+      box-shadow: 0 10px 24px rgba(26,58,92,0.3);
     }
 
     .mobile-hot-hero-inner::before {
@@ -888,7 +923,7 @@
       right: -24px;
       width: 120px;
       height: 120px;
-      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(201,168,76,0.18) 0%, transparent 70%);
       border-radius: 50%;
     }
 
@@ -902,15 +937,16 @@
       text-transform: uppercase;
       padding: 5px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.16);
+      background: rgba(201,168,76,0.2);
       margin-bottom: 10px;
+      color: var(--gold);
     }
 
     .mobile-hot-hero h2 { font-size: 29px; line-height: 0.95; letter-spacing: -1px; font-weight: 700; margin-bottom: 8px; }
     .mobile-hot-hero p { font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.92); max-width: 260px; }
     .mobile-hero-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
     .mobile-hero-btn { border: none; border-radius: 999px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .mobile-hero-btn-primary { background: white; color: var(--red-dark); }
+    .mobile-hero-btn-primary { background: var(--gold); color: #1a1a18; }
     .mobile-hero-btn-secondary { background: rgba(255,255,255,0.16); color: white; border: 1px solid rgba(255,255,255,0.28); }
 
     .mobile-hot-quickstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
@@ -934,7 +970,7 @@
     .hot-card-title { font-size: 13px; min-height: 36px; }
     .hot-price-now { font-size: 20px; }
     .hot-price-was { font-size: 12px; }
-    .hot-btn { padding: 10px; font-size: 13px; border-radius: 9px; background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%); }
+    .hot-btn { padding: 10px; font-size: 13px; border-radius: 9px; }
 
     .search-wrap { margin-bottom: 14px; }
     .filters-wrap { margin-bottom: 18px; }
@@ -970,7 +1006,10 @@
 
 <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
   <div class="drawer-header">
-    <div class="drawer-title">Deal<span>Drop</span></div>
+    <div class="drawer-logo">
+      <img src="https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png" alt="Black Lab Deals" />
+      <div class="drawer-title">Black Lab <span>Deals</span></div>
+    </div>
     <button class="drawer-close" onclick="closeMobileMenu()" aria-label="Close menu">✕</button>
   </div>
   <div class="drawer-content">
@@ -1002,7 +1041,10 @@
 <nav>
   <div class="nav-inner">
     <div class="nav-left">
-      <a href="#" class="logo">Deal<span>Drop</span></a>
+      <a href="#" class="logo-wrap">
+        <img class="logo-img" src="https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png" alt="Black Lab Deals" />
+        <div class="logo-text">Black Lab <span>Deals</span></div>
+      </a>
       <div class="nav-tagline">Fresh deals, daily</div>
     </div>
     <div class="nav-right">
@@ -1111,7 +1153,7 @@
 </div>
 
 <div class="error-msg" id="error-msg">
-  Could not load deals. Check the GitHub raw file path and make sure the fetch script has run successfully.
+  Could not load deals. Please try again shortly.
 </div>
 
 <div class="hot-section" id="hot-section" style="display:none;">
@@ -1149,7 +1191,7 @@
 </div>
 
 <footer>
-  <p>Made with care by <strong>DealDrop</strong> · <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Privacy</a></p>
+  <p>Made with care by <strong>Black Lab Deals</strong> · <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Privacy</a></p>
   <p style="margin-top:6px;font-size:12px;color:var(--text-muted);">Trusted deal source since 2023 · Updated every hour</p>
   <p class="disclaimer">As an Amazon Associate I earn from qualifying purchases. Prices sourced live from Amazon. Some deals include clippable coupons on the Amazon product page.</p>
 </footer>
@@ -1448,7 +1490,7 @@ function handleSignup() {
   if (!val) return;
   const msg = document.getElementById('signup-msg');
   msg.textContent = "✓ You're in! Watch for your first deal alert.";
-  msg.style.color = '#2a6041';
+  msg.style.color = '#1a3a5c';
   document.getElementById('signup-input').value = '';
 }
 
