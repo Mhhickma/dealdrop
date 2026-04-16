@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dealdrop-flame.vercel.app/sitemap.xml
