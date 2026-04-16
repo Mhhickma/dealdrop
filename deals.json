@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0DNSNNH7M",
+      "title": "YITAHOME 80 Gallon Resin Deck Box, Weather Resistant Outdoor Storage Box, Lockable Indoor Outdoor Storage for Supplies and Essentials, Dark Gray",
+      "brand": "YITAHOME",
+      "cat": "Lawn & Patio",
+      "image": "https://m.media-amazon.com/images/I/518nwouBY2L._SL500_.jpg",
+      "price": "$74.99",
+      "price_amount": 74.99,
+      "currency": "USD",
+      "was": "$97.21",
+      "savings": "$97.21",
+      "pct": 23,
+      "discount": "-23%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B0DNSNNH7M?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "YITAHOME",
+      "seen_at": "2026-04-16T07:10:53.569032+00:00",
+      "updated_at": "2026-04-16T07:10:53.569032+00:00"
+    },
+    {
       "asin": "B00C8731CM",
       "title": "Johnsen's 4688-8 Octane Booster -6 fl.oz.",
       "brand": "Johnsen's",
@@ -2416,9 +2439,9 @@
       "updated_at": "2026-04-15T09:45:25.353343+00:00"
     }
   ],
-  "count": 105,
-  "totalDeals": 105,
+  "count": 106,
+  "totalDeals": 106,
   "hotDeals": 3,
   "couponDeals": 0,
-  "updatedAt": "2026-04-16T07:00:50.811639+00:00"
+  "updatedAt": "2026-04-16T07:10:53.571469+00:00"
 }
