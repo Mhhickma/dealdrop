@@ -5,6 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Black Lab Deals — Fresh Deals, Hourly</title>
 <meta name="description" content="The best Amazon deals curated daily by Black Lab Deals. Hot deals, coupons, and discounts across every category — updated automatically.">
+
+<!-- Open Graph / Facebook / iMessage -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dealdrop-flame.vercel.app/">
+<meta property="og:title" content="Black Lab Deals — Fresh Amazon Deals, Every 30 Minutes">
+<meta property="og:description" content="Hot Amazon deals across every category, curated automatically every 30 minutes. Save big on electronics, home, kitchen, and more.">
+<meta property="og:image" content="https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Black Lab Deals">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Black Lab Deals — Fresh Amazon Deals, Every 30 Minutes">
+<meta name="twitter:description" content="Hot Amazon deals across every category, curated automatically every 30 minutes.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a3a5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Black Lab Deals">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png">
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -997,6 +1022,72 @@
   footer a { color: var(--accent); text-decoration: none; }
   .disclaimer { max-width: 600px; margin: 8px auto 0; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
 
+  /* Sort control */
+  .sort-wrap {
+    max-width: 1100px;
+    margin: 0 auto 16px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sort-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .sort-select {
+    padding: 6px 28px 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239e9e97' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: border-color 0.15s;
+  }
+
+  .sort-select:focus { border-color: var(--accent); }
+
+  /* Share button on deal cards */
+  .card-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 8px;
+  }
+
+  .card-share-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* Mobile search (was hidden) */
+  @media (max-width: 700px) {
+    .search-wrap { display: block !important; margin-bottom: 14px; }
+    .sort-wrap { padding: 0 16px; margin-bottom: 12px; }
+    .card-share-btn { display: none; } /* hidden on mobile cards to keep them compact */
+  }
+
   @media (max-width: 700px) {
     .desktop-nav, .desktop-only, .nav-tagline { display: none; }
     .mobile-only, .mobile-menu-btn, .mobile-alert-btn { display: inline-flex; }
@@ -1295,6 +1386,17 @@
   <div class="filters-scroll" id="filter-row"></div>
 </div>
 
+<div class="sort-wrap" id="sort-wrap" style="display:none;">
+  <span class="sort-label">Sort by:</span>
+  <select class="sort-select" id="sort-select" onchange="handleSort()">
+    <option value="default">Best Match</option>
+    <option value="discount_desc">Biggest Discount</option>
+    <option value="price_asc">Price: Low to High</option>
+    <option value="price_desc">Price: High to Low</option>
+    <option value="newest">Newest First</option>
+  </select>
+</div>
+
 <div class="deals-section" id="deals-section" style="display:none;">
   <div class="section-header">
     <span class="section-title">All Deals</span>
@@ -1441,11 +1543,13 @@ async function loadDeals() {
     document.getElementById('hot-section').style.display   = '';
     document.getElementById('search-wrap').style.display   = 'block';
     document.getElementById('filters-wrap').style.display  = '';
+    document.getElementById('sort-wrap').style.display     = '';
     document.getElementById('deals-section').style.display = '';
 
     renderHotDeals();
     renderDeals('All');
     renderHotDropdown();
+    restoreCategory();
   } catch (e) {
     console.error('Deal load error:', e);
     document.getElementById('loading-bar').style.display = 'none';
@@ -1483,7 +1587,51 @@ function renderHotDropdown() {
     : hot.map(d => '<a class="hot-dropdown-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored" onclick="closeAllDropdowns()"><div class="hot-dropdown-img">' + (d.image ? '<img src="' + escUrl(d.image) + '" alt="" onerror="this.parentElement.innerHTML=\'🛒\'"/>' : '🛒') + '</div><div class="hot-dropdown-info"><div class="hot-dropdown-name">' + esc(d.title) + '</div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span class="hot-dropdown-price">' + esc(d.price || 'See price') + '</span>' + (d.discount ? '<span class="hot-dropdown-badge">' + esc(d.discount) + '</span>' : '') + '</div></div></a>').join('');
 }
 
+function getSortOrder() {
+  const sel = document.getElementById('sort-select');
+  return sel ? sel.value : 'default';
+}
+
+function handleSort() {
+  renderDeals(getCurrentCategory());
+}
+
+function sortDeals(deals) {
+  const order = getSortOrder();
+  const arr = [...deals];
+  if (order === 'discount_desc') return arr.sort((a, b) => (Number(b.pct) || 0) - (Number(a.pct) || 0));
+  if (order === 'price_asc')     return arr.sort((a, b) => (a.price_amount || 0) - (b.price_amount || 0));
+  if (order === 'price_desc')    return arr.sort((a, b) => (b.price_amount || 0) - (a.price_amount || 0));
+  if (order === 'newest')        return arr.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  return arr; // default: keep feed order
+}
+
+function shareUrl(d) {
+  const url = d.link || 'https://dealdrop-flame.vercel.app/';
+  const text = (d.title ? d.title.slice(0, 80) : 'Great deal') + (d.price ? ' — ' + d.price : '') + (d.discount ? ' (' + d.discount + ' off)' : '');
+  return 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url);
+}
+
+function handleShareClick(e, tweetUrl) {
+  e.preventDefault();
+  e.stopPropagation();
+  // Try native share first (mobile), fall back to Twitter
+  if (navigator.share) {
+    const card = e.target.closest('a.deal-card');
+    const title = card ? card.querySelector('.card-title') : null;
+    navigator.share({
+      title: title ? title.textContent : 'Check out this deal',
+      url: card ? card.href : window.location.href
+    }).catch(() => {});
+  } else {
+    window.open(tweetUrl, '_blank', 'width=550,height=420');
+  }
+}
+
 function renderDeals(cat) {
+  // Persist category to localStorage
+  try { localStorage.setItem('bld_cat', cat); } catch(e) {}
+
   let filtered = cat === 'All' ? allDeals : allDeals.filter(d => d.cat === cat);
   if (searchQuery) {
     filtered = filtered.filter(d =>
@@ -1492,10 +1640,14 @@ function renderDeals(cat) {
       (d.cat   || '').toLowerCase().includes(searchQuery)
     );
   }
+  filtered = sortDeals(filtered);
   document.getElementById('count-label').textContent = filtered.length + ' deal' + (filtered.length !== 1 ? 's' : '');
   document.getElementById('deals-grid').innerHTML = filtered.length === 0
     ? '<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">' + (searchQuery ? 'No deals found for "' + esc(searchQuery) + '" — try a different search.' : 'No deals in this category right now — check back soon!') + '</div>'
-    : filtered.map(d => '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge">🏷️ ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon →</button></div></a>').join('');
+    : filtered.map(d => {
+        const tw = shareUrl(d);
+        return '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge">🏷️ ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon →</button><button class="card-share-btn" onclick="handleShareClick(event, \'' + escUrl(tw) + '\')">↗ Share deal</button></div></a>';
+      }).join('');
 }
 
 function handleSearch() {
@@ -1522,6 +1674,17 @@ function filterDeals(cat, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderDeals(cat);
+}
+
+// Restore persisted category after deals load
+function restoreCategory() {
+  try {
+    const saved = localStorage.getItem('bld_cat');
+    if (saved && saved !== 'All') {
+      const btn = [...document.querySelectorAll('.filter-btn')].find(b => b.dataset.cat === saved);
+      if (btn) filterDeals(saved, btn);
+    }
+  } catch(e) {}
 }
 
 function toggleDropdown(name) {
