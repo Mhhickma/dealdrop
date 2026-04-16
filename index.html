@@ -458,7 +458,6 @@
   .drawer-cat-item:last-child { border-bottom: none; }
   .drawer-cat-item:hover { background: var(--accent-light); color: var(--accent); }
 
-  /* ── Hero ── */
   .hero {
     max-width: 1100px;
     margin: 0 auto;
@@ -581,7 +580,6 @@
   .divider { max-width: 1100px; margin: 0 auto 28px; padding: 0 24px; border-bottom: 1px solid var(--border); }
 
   .loading-bar { max-width: 1100px; margin: 0 auto 20px; padding: 0 24px; }
-
   .loading-msg { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
 
   .spinner {
@@ -919,7 +917,6 @@
     .stats-bar { display: none; }
     .divider { display: none; }
     .disclosure-bar { font-size: 10px; padding: 12px 16px; }
-
     .mobile-hot-hero { display: block; padding: 16px; }
 
     .mobile-hot-hero-inner {
@@ -974,12 +971,9 @@
     .loading-bar { margin-top: 2px; }
     .hot-section { margin-bottom: 20px; }
     .hot-header { display: none; }
-
     .hot-strip { padding: 14px; border-radius: 18px; background: linear-gradient(135deg, #fff1f1 0%, #fff7ef 100%); border: 1px solid #f3c2c2; }
-
     .hot-grid { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 4px; scroll-snap-type: x proximity; scrollbar-width: none; }
     .hot-grid::-webkit-scrollbar { display: none; }
-
     .hot-card { min-width: 220px; max-width: 220px; scroll-snap-align: start; border-radius: 14px; border: 1px solid #efc2bc; box-shadow: 0 6px 16px rgba(201,64,64,0.10); }
     .hot-card-img { height: 130px; background: #fff8f6; }
     .hot-card-badge { font-size: 12px; padding: 5px 10px; top: 9px; right: 9px; }
@@ -987,7 +981,6 @@
     .hot-price-now { font-size: 20px; }
     .hot-price-was { font-size: 12px; }
     .hot-btn { padding: 10px; font-size: 13px; border-radius: 9px; }
-
     .search-wrap { margin-bottom: 14px; }
     .filters-wrap { margin-bottom: 18px; }
     .filter-label { font-size: 11px; margin-bottom: 8px; }
@@ -996,7 +989,6 @@
     .section-title { font-size: 12px; color: var(--text-primary); }
     .deal-count { font-size: 12px; }
     .deals-grid { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
-
     .deal-card { flex-direction: row; min-height: 108px; border-radius: 14px; overflow: hidden; }
     .card-img { width: 108px; min-width: 108px; height: 108px; background: #f7f4f0; }
     .card-body { padding: 10px 12px; justify-content: space-between; min-width: 0; }
@@ -1088,16 +1080,13 @@
         </div>
         <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
       </div>
-
       <button class="nav-alert-btn desktop-only" onclick="scrollToAlerts()">Get Alerts</button>
-
       <button class="mobile-alert-btn mobile-only" onclick="scrollToAlerts()" aria-label="Get alerts">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
           <path d="M10 17a2 2 0 0 0 4 0"></path>
         </svg>
       </button>
-
       <button class="mobile-menu-btn mobile-only" onclick="openMobileMenu()" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 6h18"></path>
@@ -1214,6 +1203,7 @@
 
 <script>
 const DEALS_URL = "https://raw.githubusercontent.com/Mhhickma/dealdrop/main/deals.json";
+const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_7DAtiZJQWFwhphywmmnKuAssYQlumY32lPlJSwaSEQ9lWYx5PXOEP8BDW8_QeSsQ/exec";
 
 const CATEGORIES = [
   { id:'All',                        label:'All Deals',               emoji:'✦' },
@@ -1308,7 +1298,6 @@ async function loadDeals() {
   try {
     const res = await fetch(DEALS_URL + '?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('not found');
-
     const data = await res.json();
     allDeals = Array.isArray(data.deals) ? data.deals : [];
 
@@ -1316,16 +1305,13 @@ async function loadDeals() {
     const hotDeals    = data.hotDeals    ?? allDeals.filter(d => (Number(d.pct) >= 30 || d.hot)).length;
     const couponDeals = data.couponDeals ?? allDeals.filter(d => d.hasCoupon).length;
 
-    document.getElementById('stat-total').textContent        = totalDeals;
-    document.getElementById('stat-hot').textContent          = hotDeals;
-    document.getElementById('mobile-stat-total').textContent = totalDeals;
-    document.getElementById('mobile-stat-hot').textContent   = hotDeals;
+    document.getElementById('stat-total').textContent          = totalDeals;
+    document.getElementById('stat-hot').textContent            = hotDeals;
+    document.getElementById('mobile-stat-total').textContent   = totalDeals;
+    document.getElementById('mobile-stat-hot').textContent     = hotDeals;
     document.getElementById('mobile-stat-coupons').textContent = couponDeals;
+    document.getElementById('hero-pill-text').textContent      = totalDeals + ' deals live right now';
 
-    // Live stats pill
-    document.getElementById('hero-pill-text').textContent = totalDeals + ' deals live right now';
-
-    // Avg price & avg discount
     const priced = allDeals.filter(d => d.price_amount > 0);
     const avgPrice = priced.length
       ? (priced.reduce((s, d) => s + d.price_amount, 0) / priced.length).toFixed(2)
@@ -1375,7 +1361,6 @@ function img(src, emoji, size) {
 function renderHotDeals() {
   const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot);
   document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
-
   document.getElementById('hot-grid').innerHTML = hot.length === 0
     ? `<div style="padding:18px;color:var(--text-muted);font-size:13px;">No hot deals yet — check back soon.</div>`
     : hot.map(d => `
@@ -1426,7 +1411,6 @@ function renderDeals(cat) {
     );
   }
   document.getElementById('count-label').textContent = filtered.length + ' deal' + (filtered.length !== 1 ? 's' : '');
-
   document.getElementById('deals-grid').innerHTML = filtered.length === 0
     ? `<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">${searchQuery ? 'No deals found for "' + esc(searchQuery) + '" — try a different search.' : 'No deals in this category right now — check back soon!'}</div>`
     : filtered.map(d => `
@@ -1517,7 +1501,6 @@ function switchTab(tab) {
     : 'Standard msg rates may apply. Text STOP to unsubscribe.';
 }
 
-const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_7DAtiZJQWFwhphywmmnKuAssYQlumY32lPlJSwaSEQ9lWYx5PXOEP8BDW8_QeSsQ/exec";
 async function handleSignup() {
   const input = document.getElementById('signup-input');
   const val   = input.value.trim();
@@ -1526,26 +1509,23 @@ async function handleSignup() {
   if (!val) return;
 
   const isEmail = input.type === 'email';
-
   btn.textContent = 'Saving...';
   btn.disabled    = true;
-  msg.textContent = 'Saving your info...';
 
- try {
-      await fetch(SHEET_ENDPOINT + '?' + params.toString(), {
-        method: 'GET',
-        mode:   'no-cors',
-      });
-      msg.textContent = "✓ You're in! Watch for your first deal alert.";
-      msg.style.color = '#1a3a5c';
-      input.value     = '';
-    } catch (e) {
-      msg.textContent = 'Something went wrong. Please try again.';
-      msg.style.color = 'var(--red)';
-    } finally {
-      btn.textContent = 'Notify me';
-      btn.disabled    = false;
-    }
+  const params = new URLSearchParams();
+  params.append('email', isEmail ? val : '');
+  params.append('phone', isEmail ? '' : val);
+
+  await fetch(SHEET_ENDPOINT + '?' + params.toString(), {
+    method: 'GET',
+    mode:   'no-cors',
+  });
+
+  msg.textContent = "✓ You're in! Watch for your first deal alert.";
+  msg.style.color = '#1a3a5c';
+  input.value     = '';
+  btn.textContent = 'Notify me';
+  btn.disabled    = false;
 }
 
 function openMobileMenu() {
