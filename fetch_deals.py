@@ -21,7 +21,7 @@ from amazon_creatorsapi.models import GetItemsResource
 KEEPA_API_KEY     = os.getenv("KEEPA_API_KEY")
 CREDENTIAL_ID     = os.getenv("CREATORS_CREDENTIAL_ID")
 CREDENTIAL_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
-PARTNER_TAG       = os.getenv("AFFILIATE_TAG", "simplewoodsho-20")
+PARTNER_TAG       = os.getenv("AFFILIATE_TAG", "sawsustsavings-20")
 
 if not KEEPA_API_KEY:
     raise RuntimeError("Missing KEEPA_API_KEY")
@@ -87,6 +87,17 @@ EXCLUDED_CATEGORY_NAMES = [
     "book", "books", "textbook", "novel", "literature",
 ]
 
+# Hardcoded ASIN blacklist — these slip through Keepa category filters
+# and waste tokens every run. Skip them before any API calls.
+BLACKLISTED_ASINS = {
+    "B0CNSFQ988",
+    "B0CNSDDJ1C",
+    "B0CNSDNT27",
+    "B0CNSCN4KW",
+    "B0CNSCZQ1W",
+    "B0CNSBX4ZK",
+}
+
 
 # ─────────────────────────────────────────────
 # MEMORY: Load and save deal history
@@ -144,6 +155,11 @@ def get_keepa_deals(api_key, fetch_asins, cached_asins):
     try:
         asins = api.product_finder(product_params, n_products=fetch_asins)
         asins = list(asins[:fetch_asins])
+        before_blacklist = len(asins)
+        asins = [a for a in asins if a not in BLACKLISTED_ASINS]
+        blocked = before_blacklist - len(asins)
+        if blocked:
+            print(f"    Blocked {blocked} blacklisted ASINs.")
         print(f"    Found {len(asins)} price drop ASINs.")
     except Exception as e:
         print(f"    product_finder failed: {e}")
