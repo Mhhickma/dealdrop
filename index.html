@@ -1531,26 +1531,21 @@ async function handleSignup() {
   btn.disabled    = true;
   msg.textContent = 'Saving your info...';
 
-  try {
-    await fetch(SHEET_ENDPOINT, {
-      method: 'GET',
-      mode:   'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: isEmail ? val : '',
-        phone: isEmail ? '' : val,
-      }),
-    });
-    msg.textContent = "✓ You're in! Watch for your first deal alert.";
-    msg.style.color = '#1a3a5c';
-    input.value     = '';
-  } catch (e) {
-    msg.textContent = 'Something went wrong. Please try again.';
-    msg.style.color = 'var(--red)';
-  } finally {
-    btn.textContent = 'Notify me';
-    btn.disabled    = false;
-  }
+ try {
+      await fetch(SHEET_ENDPOINT + '?' + params.toString(), {
+        method: 'GET',
+        mode:   'no-cors',
+      });
+      msg.textContent = "✓ You're in! Watch for your first deal alert.";
+      msg.style.color = '#1a3a5c';
+      input.value     = '';
+    } catch (e) {
+      msg.textContent = 'Something went wrong. Please try again.';
+      msg.style.color = 'var(--red)';
+    } finally {
+      btn.textContent = 'Notify me';
+      btn.disabled    = false;
+    }
 }
 
 function openMobileMenu() {
