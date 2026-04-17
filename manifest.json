@@ -1,0 +1,32 @@
+{
+  "name": "Black Lab Deals",
+  "short_name": "BL Deals",
+  "description": "Fresh Amazon deals every 30 minutes, curated automatically.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9f8f5",
+  "theme_color": "#1a3a5c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "https://raw.githubusercontent.com/Mhhickma/dealdrop/main/logo.png",
+      "sizes": "1080x1920",
+      "type": "image/png"
+    }
+  ]
+}
