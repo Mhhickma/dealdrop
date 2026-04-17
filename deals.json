@@ -1,6 +1,52 @@
 {
   "deals": [
     {
+      "asin": "B0CB72MXHM",
+      "title": "Purdue Boilermakers NCAA Officially Licensed T-Shirt Tie Dye, X-Large",
+      "brand": "Blue 84",
+      "cat": "Sports & Outdoors",
+      "image": "https://m.media-amazon.com/images/I/41Y+ks3FhDL._SL500_.jpg",
+      "price": "$42.75",
+      "price_amount": 42.75,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": null,
+      "discount": "",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B0CB72MXHM?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Blue 84",
+      "seen_at": "2026-04-17T04:30:39.338319+00:00",
+      "updated_at": "2026-04-17T04:30:39.338319+00:00"
+    },
+    {
+      "asin": "B07N9GVCLS",
+      "title": "Speakman CDS1574 Polished Chrome Lura Tub Spout",
+      "brand": "Speakman",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/313gV-oreeL._SL500_.jpg",
+      "price": "$93.55",
+      "price_amount": 93.55,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": null,
+      "discount": "",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B07N9GVCLS?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Speakman",
+      "seen_at": "2026-04-17T04:30:39.338319+00:00",
+      "updated_at": "2026-04-17T04:30:39.338319+00:00"
+    },
+    {
       "asin": "B0CTW2B1YT",
       "title": "Drill America 1/2\"-40 Tap and 12.00mm Drill Bit Kit, POU Series",
       "brand": "Drill America",
@@ -5153,9 +5199,9 @@
       "updated_at": "2026-04-16T15:36:49.167584+00:00"
     }
   ],
-  "count": 224,
-  "totalDeals": 224,
+  "count": 226,
+  "totalDeals": 226,
   "hotDeals": 9,
   "couponDeals": 0,
-  "updatedAt": "2026-04-17T04:00:41.008768+00:00"
+  "updatedAt": "2026-04-17T04:30:39.342615+00:00"
 }
