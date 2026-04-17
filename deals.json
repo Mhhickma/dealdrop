@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B000BWY4TK",
+      "title": "Dramm 12342 400DC Nozzle, Metallic Aluminum, Twin",
+      "brand": "Dramm",
+      "cat": "Patio, Lawn & Garden",
+      "image": "https://m.media-amazon.com/images/I/51yH4jwNApL._SL500_.jpg",
+      "price": "$10.95",
+      "price_amount": 10.95,
+      "currency": "USD",
+      "was": "$13.53",
+      "savings": "$13.53",
+      "pct": 19,
+      "discount": "-19%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B000BWY4TK?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Dramm",
+      "seen_at": "2026-04-17T17:31:31.283533+00:00",
+      "updated_at": "2026-04-17T17:31:31.283533+00:00"
+    },
+    {
       "asin": "B0DD44SRBT",
       "title": "Tech21 EvoCrystal for iPhone 16 - Compatible with MagSafe - Impact Protection Case 15x Military Standard Tested - in Gold",
       "brand": "tech21",
@@ -185,9 +208,9 @@
       "updated_at": "2026-04-17T13:28:06.246899+00:00"
     }
   ],
-  "count": 8,
-  "totalDeals": 8,
+  "count": 9,
+  "totalDeals": 9,
   "hotDeals": 2,
   "couponDeals": 0,
-  "updatedAt": "2026-04-17T17:00:25.648026+00:00"
+  "updatedAt": "2026-04-17T17:31:31.286505+00:00"
 }
