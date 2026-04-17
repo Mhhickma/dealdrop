@@ -1,7 +1,7 @@
 """
 Keepa + Amazon Creators API — Deal Price Scraper
 -------------------------------------------------
-A deal = today's price is at least 10% lower than yesterday's price.
+A deal = current price is at least 10% below the 30-day average price.
 """
 
 import json
@@ -30,12 +30,12 @@ if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
 # ─────────────────────────────────────────────
 OUTPUT_FILE         = "deals.json"
 MEMORY_FILE         = "deals_memory.json"
-MAX_NEW_ASINS       = 100    # max new ASINs to fetch Keepa history for per run
-MIN_KEEPA_TOKENS    = 50     # stop mid-run if tokens drop below this
+MAX_NEW_ASINS       = 50     # max new ASINs per run (fits within 5 tokens/min plan)
+MIN_KEEPA_TOKENS    = 20     # stop mid-run if tokens drop below this
 MAX_DISPLAY         = 1000
 DEAL_TTL_HOURS      = 24
 AMAZON_BATCH_SIZE   = 10
-MIN_DISCOUNT_PCT    = 10     # today must be at least this % lower than yesterday
+MIN_DISCOUNT_PCT    = 10     # current price must be at least this % below 30d avg
 
 # Only pull from these Keepa category IDs
 INCLUDED_CATEGORIES = [
@@ -281,7 +281,7 @@ def get_keepa_deals(api_key, cached_asins):
 
     base_params = {
         "productType":               [0],
-        "deltaPercent1_AMAZON_lte":  -10,  # dropped at least 10% in last 24 hours
+        "deltaPercent7_AMAZON_lte":  -10,
         "current_AMAZON_gte":        1,
         "current_COUNT_REVIEWS_gte": 15,
         "current_RATING_gte":        40,
@@ -291,8 +291,8 @@ def get_keepa_deals(api_key, cached_asins):
     }
 
     sort_strategies = [
-        ("deltaPercent1_AMAZON",  "asc",  "24-hour price drop"),
         ("deltaPercent7_AMAZON",  "asc",  "7-day price drop"),
+        ("deltaPercent30_AMAZON", "asc",  "30-day price drop"),
         ("current_COUNT_REVIEWS", "desc", "most reviewed"),
         ("current_RATING",        "desc", "highest rated"),
     ]
@@ -323,7 +323,7 @@ def get_keepa_deals(api_key, cached_asins):
     cached_count = len(asins) - len(new_asins)
     print(f"    {len(new_asins)} new ASINs found ({cached_count} already cached).")
 
-    # Cap at MAX_NEW_ASINS to stay within token budget
+    # Cap to stay within token budget
     if len(new_asins) > MAX_NEW_ASINS:
         print(f"    Capping at {MAX_NEW_ASINS} to stay within token budget.")
         new_asins = new_asins[:MAX_NEW_ASINS]
@@ -336,12 +336,12 @@ def get_keepa_deals(api_key, cached_asins):
 
             # Stop mid-run if tokens drop too low
             if api.tokens_left < MIN_KEEPA_TOKENS:
-                print(f"    Token balance low ({api.tokens_left}) — stopping history fetch early.")
+                print(f"    Token balance low ({api.tokens_left}) — stopping early.")
                 break
 
             batch = new_asins[i:i + 10]
             try:
-                products = api.query(batch, stats=90, history=False)
+                products = api.query(batch, stats=30, history=False)
                 for product in products:
                     asin = product.get("asin")
                     if not asin:
@@ -357,30 +357,21 @@ def get_keepa_deals(api_key, cached_asins):
                         if val and val > 0:
                             current_price = val / 100.0
 
-                    # Yesterday's Amazon price (avg of last 1 day)
-                    avg_1d = None
-                    avg_raw = stats.get("avg1", [])
+                    # 30-day average Amazon price
+                    avg_30d = None
+                    avg_raw = stats.get("avg30", [])
                     if isinstance(avg_raw, list) and len(avg_raw) > 0:
                         val = avg_raw[0]
                         if val and val > 0:
-                            avg_1d = val / 100.0
-
-                    # 90-day average as a sanity check baseline
-                    avg_90d = None
-                    avg90_raw = stats.get("avg90", [])
-                    if isinstance(avg90_raw, list) and len(avg90_raw) > 0:
-                        val = avg90_raw[0]
-                        if val and val > 0:
-                            avg_90d = val / 100.0
+                            avg_30d = val / 100.0
 
                     keepa_prices[asin] = {
                         "current": current_price,
-                        "avg_1d":  avg_1d,
-                        "avg_90d": avg_90d,
+                        "avg_30d": avg_30d,
                     }
             except Exception as e:
                 print(f"    Warning: Keepa history batch failed - {e}")
-                time.sleep(5)  # wait before next batch after failure
+                time.sleep(5)
             time.sleep(0.5)
 
         print(f"    Got price history for {len(keepa_prices)} ASINs.")
@@ -530,14 +521,13 @@ def build_and_merge(asins, amazon_items, keepa_prices, memory):
 
         # ──────────────────────────────────────────────────────
         # CORE DEAL CHECK:
-        # Today's price must be at least 10% lower than yesterday
+        # Current price must be at least 10% below 30-day average
         # ──────────────────────────────────────────────────────
-        keepa_data  = keepa_prices.get(asin, {})
-        avg_1d      = keepa_data.get("avg_1d")
-        avg_90d     = keepa_data.get("avg_90d")
+        keepa_data = keepa_prices.get(asin, {})
+        avg_30d    = keepa_data.get("avg_30d")
 
-        if not avg_1d:
-            print(f"    Skipping {asin} - no yesterday price available")
+        if not avg_30d:
+            print(f"    Skipping {asin} - no 30-day average available")
             skip_count += 1
             continue
 
@@ -546,24 +536,22 @@ def build_and_merge(asins, amazon_items, keepa_prices, memory):
             skip_count += 1
             continue
 
-        # Today must be at least 10% below yesterday
-        if price_amount >= avg_1d * (1 - MIN_DISCOUNT_PCT / 100):
+        # Skip if current price is more than 2x the 30d average (price spike junk)
+        if price_amount > avg_30d * 2:
+            print(f"    Skipping {asin} - price ${price_amount:.2f} is a spike vs "
+                  f"30d avg ${avg_30d:.2f}")
+            skip_count += 1
+            continue
+
+        if price_amount >= avg_30d * (1 - MIN_DISCOUNT_PCT / 100):
             print(f"    Skipping {asin} - price ${price_amount:.2f} not {MIN_DISCOUNT_PCT}% "
-                  f"below yesterday ${avg_1d:.2f}")
+                  f"below 30d avg ${avg_30d:.2f}")
             skip_count += 1
             continue
 
-        # Sanity check: skip if current price is more than 2x the 90d average
-        # (means the "yesterday" price was a spike, not a real normal price)
-        if avg_90d and price_amount > avg_90d * 2:
-            print(f"    Skipping {asin} - price ${price_amount:.2f} is suspiciously "
-                  f"above 90d avg ${avg_90d:.2f}")
-            skip_count += 1
-            continue
-
-        # Calculate discount vs yesterday
-        pct_off        = round(((avg_1d - price_amount) / avg_1d) * 100)
-        was_display    = f"${avg_1d:.2f}"
+        # Calculate discount label
+        pct_off        = round(((avg_30d - price_amount) / avg_30d) * 100)
+        was_display    = f"${avg_30d:.2f}"
         discount_label = f"-{pct_off}%"
         is_hot         = pct_off >= 30
 
