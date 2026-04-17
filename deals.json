@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0DLLMRGVV",
+      "title": "Squishmallows Original Paw Patrol 18in Marshall Sleepamallows \u2013 Ultrasoft Official Jazwares Plush (Large)",
+      "brand": "Squishmallows",
+      "cat": "Toys & Games",
+      "image": "https://m.media-amazon.com/images/I/41euUBE2tgL._SL500_.jpg",
+      "price": "$28.99",
+      "price_amount": 28.99,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 17,
+      "discount": "-17%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B0DLLMRGVV?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Squishmallows",
+      "seen_at": "2026-04-17T02:30:34.181608+00:00",
+      "updated_at": "2026-04-17T02:30:34.181608+00:00"
+    },
+    {
       "asin": "B000BRA6OW",
       "title": "SCC SZ339 Shur Grip Super Z Passenger Car Tire Traction Chain - Set of 2",
       "brand": "SCC",
@@ -4946,9 +4969,9 @@
       "updated_at": "2026-04-16T15:36:49.167584+00:00"
     }
   ],
-  "count": 215,
-  "totalDeals": 215,
+  "count": 216,
+  "totalDeals": 216,
   "hotDeals": 9,
   "couponDeals": 0,
-  "updatedAt": "2026-04-17T02:00:38.560252+00:00"
+  "updatedAt": "2026-04-17T02:30:34.185692+00:00"
 }

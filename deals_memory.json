@@ -4943,5 +4943,28 @@
     "desc": "Amazon Basics",
     "seen_at": "2026-04-17T02:00:38.556528+00:00",
     "updated_at": "2026-04-17T02:00:38.556528+00:00"
+  },
+  "B0DLLMRGVV": {
+    "asin": "B0DLLMRGVV",
+    "title": "Squishmallows Original Paw Patrol 18in Marshall Sleepamallows \u2013 Ultrasoft Official Jazwares Plush (Large)",
+    "brand": "Squishmallows",
+    "cat": "Toys & Games",
+    "image": "https://m.media-amazon.com/images/I/41euUBE2tgL._SL500_.jpg",
+    "price": "$28.99",
+    "price_amount": 28.99,
+    "currency": "USD",
+    "was": null,
+    "savings": null,
+    "pct": 17,
+    "discount": "-17%",
+    "deal_type": "PRICE_DROP",
+    "availability": "IN_STOCK",
+    "link": "https://www.amazon.com/dp/B0DLLMRGVV?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+    "hot": false,
+    "hasCoupon": false,
+    "couponDisplay": "",
+    "desc": "Squishmallows",
+    "seen_at": "2026-04-17T02:30:34.181608+00:00",
+    "updated_at": "2026-04-17T02:30:34.181608+00:00"
   }
 }
