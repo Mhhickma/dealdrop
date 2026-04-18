@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B003WOS1DY",
+      "title": "Kingston Brass CC465 Single Offset Bath Supply, Oil Rubbed Bronze",
+      "brand": "Kingston Brass",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/21xRpo7ZQIS._SL500_.jpg",
+      "price": "$23.41",
+      "price_amount": 23.41,
+      "currency": "USD",
+      "was": "$26.02",
+      "savings": "$26.02",
+      "pct": 10,
+      "discount": "-10%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B003WOS1DY?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Kingston Brass",
+      "seen_at": "2026-04-18T03:01:03.524691+00:00",
+      "updated_at": "2026-04-18T03:01:03.524691+00:00"
+    },
+    {
       "asin": "B0CQNXJ61G",
       "title": "Tech21 Evo Check for Samsung S24 Ultra - Cobalt Blue",
       "brand": "tech21",
@@ -231,9 +254,9 @@
       "updated_at": "2026-04-17T13:28:06.246899+00:00"
     }
   ],
-  "count": 10,
-  "totalDeals": 10,
+  "count": 11,
+  "totalDeals": 11,
   "hotDeals": 3,
   "couponDeals": 0,
-  "updatedAt": "2026-04-18T02:31:05.470552+00:00"
+  "updatedAt": "2026-04-18T03:01:03.527746+00:00"
 }
