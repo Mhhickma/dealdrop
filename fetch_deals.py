@@ -34,14 +34,11 @@ MEMORY_FILE       = "deals_memory.json"
 MAX_DISPLAY       = 1000
 DEAL_TTL_HOURS    = 24
 AMAZON_BATCH_SIZE = 10
-MIN_DISCOUNT_PCT  = 5      # minimum % drop (matches Keepa filter)
+MIN_DISCOUNT_PCT  = 5
 KEEPA_DEALS_URL   = "https://api.keepa.com/deal"
 
-# All 7 price types to query
 PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
-# 7=Buy Box, 0=Amazon, 1=New 3rd party, 10=New FBA, 2=New FBM, 13=Prime exclusive, 3=Lightning
 
-# Categories to exclude
 EXCLUDED_CATEGORIES = [
     283155,       # Books
     5174,         # CDs & Vinyl
@@ -59,13 +56,10 @@ EXCLUDED_CATEGORIES = [
     16310091,     # Industrial & Scientific
 ]
 
-# Keywords to block in titles (adult + junk)
 BAD_KEYWORDS = [
-    # Adult
     "sex", "doll", "erotic", "fetish", "penis", "vagina",
     "dildo", "vibrator", "nude", "naked", "porn", "xxx",
     "bdsm", "bondage",
-    # Industrial junk
     "abrasive", "torque", "fiber optic", "qsfp", "sfp",
     "evaporator", "flame retardant", "safety vest", "hard hat",
     "bearing", "set screw", "end mill", "clamp", "permaculture",
@@ -73,15 +67,45 @@ BAD_KEYWORDS = [
     "pneumatic", "actuator", "splice", "scotchcast", "schuko",
     "waffle polish", "roller refill", "dental", "vapor-tight",
     "jute", "bohemian", "hinge", "barrel hinge", "mortise",
-    "water pump", "latex glove", "industrial", "circuit breaker",
+    "water pump", "latex glove", "circuit breaker",
     "conduit", "junction box", "wire connector",
 ]
 
-# Hardcoded ASIN blacklist
 BLACKLISTED_ASINS = {
     "B0CNSFQ988", "B0CNSDDJ1C", "B0CNSDNT27",
     "B0CNSCN4KW", "B0CNSCZQ1W", "B0CNSBX4ZK",
 }
+
+# ─────────────────────────────────────────────
+# TITLE DECODER
+# Keepa returns titles as int arrays in deals endpoint
+# ─────────────────────────────────────────────
+def decode_title(raw):
+    """Keepa deal titles can be a list of ints (char codes) or a plain string."""
+    if isinstance(raw, list):
+        try:
+            return "".join(chr(c) for c in raw if isinstance(c, int))
+        except:
+            return ""
+    if isinstance(raw, str):
+        return raw
+    return ""
+
+
+def is_bad_title(title):
+    if not title or len(title) < 3:
+        return True
+    # Block foreign language titles (check first 10 chars)
+    try:
+        if not all(ord(c) < 128 for c in title[:10]):
+            return True
+    except:
+        return True
+    title_lower = title.lower()
+    if any(w in title_lower for w in BAD_KEYWORDS):
+        return True
+    return False
+
 
 # ─────────────────────────────────────────────
 # CATEGORY NORMALIZATION
@@ -191,22 +215,6 @@ def purge_expired(memory):
 
 
 # ─────────────────────────────────────────────
-# TITLE FILTER
-# ─────────────────────────────────────────────
-def is_bad_title(title):
-    if not title:
-        return True
-    # Block foreign language titles
-    if not all(ord(c) < 128 for c in title[:10]):
-        return True
-    # Block junk keywords
-    title_lower = title.lower()
-    if any(w in title_lower for w in BAD_KEYWORDS):
-        return True
-    return False
-
-
-# ─────────────────────────────────────────────
 # STEP 1: Pull ASINs from Keepa Deals Endpoint
 # ─────────────────────────────────────────────
 def get_keepa_deals(api_key, cached_asins):
@@ -216,16 +224,16 @@ def get_keepa_deals(api_key, cached_asins):
 
     for pt in PRICE_TYPES:
         payload = {
-            "domainId":           1,
-            "priceTypes":         [pt],
-            "dateRange":          4,
-            "sortType":           4,       # sort by sales rank (most popular first)
-            "page":               0,
-            "filterErotic":       True,
-            "hasReviews":         True,
-            "minRating":          40,      # 4.0 stars minimum
-            "deltaPercentRange":  [-100, -MIN_DISCOUNT_PCT],
-            "excludeCategories":  EXCLUDED_CATEGORIES,
+            "domainId":          1,
+            "priceTypes":        [pt],
+            "dateRange":         4,
+            "sortType":          4,
+            "page":              0,
+            "filterErotic":      True,
+            "hasReviews":        True,
+            "minRating":         40,
+            "deltaPercentRange": [-100, -MIN_DISCOUNT_PCT],
+            "excludeCategories": EXCLUDED_CATEGORIES,
         }
         try:
             r = requests.post(
@@ -243,29 +251,35 @@ def get_keepa_deals(api_key, cached_asins):
             print(f"    priceType {pt} failed: {e}")
         time.sleep(1)
 
-    # Deduplicate by ASIN
+    # Deduplicate and filter
     seen = set(BLACKLISTED_ASINS)
-    unique_deals = []
+    unique_asins = []
+
     for item in all_deals:
         asin = item.get("asin", "")
         if not asin or asin in seen:
             continue
-        title = item.get("title", "")
+
+        # Decode title (may be int array or string)
+        raw_title = item.get("title", "")
+        title = decode_title(raw_title)
+
         if is_bad_title(title):
             continue
-        # Min price filter ($10 minimum)
-        prices = [x for x in item.get("current", []) if x and x > 0]
+
+        # Min price $10 — current is a list, index varies by price type
+        prices = [x for x in item.get("current", []) if isinstance(x, (int, float)) and x > 0]
         if not prices or min(prices) < 1000:
             continue
+
         seen.add(asin)
-        unique_deals.append(asin)
+        unique_asins.append(asin)
 
-    print(f"    {len(unique_deals)} unique clean ASINs after filtering.")
+    print(f"    {len(unique_asins)} unique clean ASINs after filtering.")
 
-    # Only process NEW ASINs not already in memory
-    new_asins = [a for a in unique_deals if a not in cached_asins]
+    new_asins = [a for a in unique_asins if a not in cached_asins]
     print(f"    {len(new_asins)} new ASINs to fetch from Amazon "
-          f"({len(unique_deals) - len(new_asins)} already cached).")
+          f"({len(unique_asins) - len(new_asins)} already cached).")
 
     return new_asins
 
@@ -331,7 +345,6 @@ def build_and_merge(asins, amazon_items, memory):
             title = item.item_info.title.display_value
         except:
             title = None
-
         if not title:
             skip_count += 1
             continue
@@ -399,15 +412,13 @@ def build_and_merge(asins, amazon_items, memory):
         except:
             url = f"https://www.amazon.com/dp/{asin}?tag={PARTNER_TAG}"
 
-        # Calculate discount using Amazon price vs list price if available
-        # Use a conservative 10% discount label since we know Keepa confirmed the drop
+        # Discount
         pct_off        = MIN_DISCOUNT_PCT
         was_display    = None
         discount_label = f"-{pct_off}%+"
         is_hot         = False
 
         try:
-            # Try to get savings from Amazon directly
             savings = listing.price.savings
             if savings:
                 pct_off        = round(savings.percentage)
