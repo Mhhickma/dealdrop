@@ -72,6 +72,24 @@
     letter-spacing: 0.02em;
   }
 
+
+  .search-strip {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px 14px;
+    text-align: center;
+  }
+  .search-strip-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+  .search-strip .search-inner {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
   .disclosure-bar span { max-width: 900px; display: inline-block; }
 
   nav {
@@ -1292,6 +1310,14 @@
   <span>&#x1F517; As an Amazon Associate we earn from qualifying purchases. Prices and availability are accurate at time of posting. &nbsp;&middot;&nbsp; Trusted deal source since 2023.</span>
 </div>
 
+<div class="search-strip">
+  <div class="search-strip-label">What are you looking for today?</div>
+  <div class="search-inner">
+    <input type="text" id="search-input" placeholder="Search deals by name, brand or category..." oninput="handleSearch()" />
+    <button class="search-clear" id="search-clear" onclick="clearSearch()">&#x2715;</button>
+  </div>
+</div>
+
 <!-- Desktop hero (hidden on mobile via CSS) -->
 <section class="hero">
   <div class="hero-text">
@@ -1384,12 +1410,7 @@
   </div>
 </div>
 
-<div class="search-wrap" id="search-wrap">
-  <div class="search-inner">
-    <input type="text" id="search-input" placeholder="Search deals by name, brand or category..." oninput="handleSearch()" />
-    <button class="search-clear" id="search-clear" onclick="clearSearch()">&#x2715;</button>
-  </div>
-</div>
+
 
 <div class="sort-wrap" id="sort-wrap" style="display:none;">
   <span class="sort-label">Sort by:</span>
