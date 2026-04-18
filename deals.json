@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0DC141Y11",
+      "title": "Case-Mate Google Pixel 9 Pro XL Case [6.8\u201d,2024] [12ft Drop Protection] [Wireless Charging] Twinkle Ombre Disco Phone Case for Google Pixel 9 Pro XL - Bling Glitter Cover - Shockproof, Anti Scratch",
+      "brand": "Case-Mate",
+      "cat": "Cell Phones & Accessories",
+      "image": "https://m.media-amazon.com/images/I/4181+khHfDL._SL500_.jpg",
+      "price": "$13.49",
+      "price_amount": 13.49,
+      "currency": "USD",
+      "was": "$21.52",
+      "savings": "$21.52",
+      "pct": 37,
+      "discount": "-37%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B0DC141Y11?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": true,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Case-Mate",
+      "seen_at": "2026-04-18T10:01:04.910735+00:00",
+      "updated_at": "2026-04-18T10:01:04.910735+00:00"
+    },
+    {
       "asin": "B003WOS1DY",
       "title": "Kingston Brass CC465 Single Offset Bath Supply, Oil Rubbed Bronze",
       "brand": "Kingston Brass",
@@ -254,9 +277,9 @@
       "updated_at": "2026-04-17T13:28:06.246899+00:00"
     }
   ],
-  "count": 11,
-  "totalDeals": 11,
-  "hotDeals": 3,
+  "count": 12,
+  "totalDeals": 12,
+  "hotDeals": 4,
   "couponDeals": 0,
-  "updatedAt": "2026-04-18T09:31:06.116689+00:00"
+  "updatedAt": "2026-04-18T10:01:04.913320+00:00"
 }
