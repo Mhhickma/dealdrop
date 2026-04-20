@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Black Lab Deals — Fresh Deals, Hourly</title>
-<meta name="description" content="The best Amazon deals curated daily by Black Lab Deals. Hot deals, coupons, and discounts across every category — updated automatically.">
+<title>Black Lab Deals â Fresh Deals, Hourly</title>
+<meta name="description" content="The best Amazon deals curated daily by Black Lab Deals. Hot deals, coupons, and discounts across every category â updated automatically.">
 
 <!-- Open Graph / Facebook / iMessage -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://blacklabdeals.com/">
-<meta property="og:title" content="Black Lab Deals — Fresh Amazon Deals, Every 30 Minutes">
+<meta property="og:title" content="Black Lab Deals â Fresh Amazon Deals, Every 30 Minutes">
 <meta property="og:description" content="Hot Amazon deals across every category, curated automatically every 30 minutes. Save big on electronics, home, kitchen, and more.">
 <meta property="og:site_name" content="Black Lab Deals">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Black Lab Deals — Fresh Amazon Deals, Every 30 Minutes">
+<meta name="twitter:title" content="Black Lab Deals â Fresh Amazon Deals, Every 30 Minutes">
 <meta name="twitter:description" content="Hot Amazon deals across every category, curated automatically every 30 minutes.">
 
 <!-- PWA -->
@@ -597,7 +597,7 @@
   .btn-sub:hover { background: var(--accent-mid); }
   .signup-note { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
 
-  /* ── Mobile-only signup section ── */
+  /* ââ Mobile-only signup section ââ */
   .mobile-signup-section {
     display: none;
     padding: 0 16px 16px;
@@ -683,7 +683,7 @@
 
   .mobile-btn-sub:hover { background: var(--accent-mid); }
   .mobile-signup-note { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
-  /* ── end mobile signup ── */
+  /* ââ end mobile signup ââ */
 
   .stats-bar {
     max-width: 1100px;
@@ -996,6 +996,32 @@
   .discount-badge { font-size: 12px; font-weight: 600; background: #fff3d4; color: #8a5c00; padding: 4px 10px; border-radius: 100px; }
   .coupon-row { margin-top: 8px; }
 
+
+  .coupon-img-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #1a7a4a;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 100px;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .coupon-strip {
+    background: #e6f4ed;
+    color: #1a7a4a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
   .coupon-badge {
     font-size: 11px;
     font-weight: 600;
@@ -1354,7 +1380,7 @@
   </div>
 </section>
 
-<!-- Mobile signup box — shown only on mobile, scroll target for bell icon -->
+<!-- Mobile signup box â shown only on mobile, scroll target for bell icon -->
 <section class="mobile-signup-section" id="mobile-alerts-box">
   <div class="mobile-signup-box">
     <h3>&#x1F514; Never miss a deal</h3>
@@ -1440,25 +1466,25 @@ const DEALS_URL = "https://raw.githubusercontent.com/Mhhickma/blacklabdeals/main
 const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_7DAtiZJQWFwhphywmmnKuAssYQlumY32lPlJSwaSEQ9lWYx5PXOEP8BDW8_QeSsQ/exec";
 
 const CATEGORIES = [
-  { id:'All',                        label:'All Deals',               emoji:'✦' },
-  { id:'Appliances',                 label:'Appliances',              emoji:'🏠' },
-  { id:'Arts, Crafts & Sewing',      label:'Arts, Crafts & Sewing',   emoji:'🎨' },
-  { id:'Automotive',                 label:'Automotive',              emoji:'🚗' },
-  { id:'Baby Products',              label:'Baby Products',           emoji:'🍼' },
-  { id:'Cell Phones & Accessories',  label:'Cell Phones',             emoji:'📱' },
-  { id:'Electronics',                label:'Electronics',             emoji:'💻' },
-  { id:'Everything Else',            label:'Everything Else',         emoji:'📦' },
-  { id:'Handmade Products',          label:'Handmade',                emoji:'🤝' },
-  { id:'Health & Household',         label:'Health & Household',      emoji:'💊' },
-  { id:'Home & Kitchen',             label:'Home & Kitchen',          emoji:'🏡' },
-  { id:'Industrial & Scientific',    label:'Industrial & Scientific', emoji:'🔬' },
-  { id:'Musical Instruments',        label:'Musical Instruments',     emoji:'🎸' },
-  { id:'Office Products',            label:'Office Products',         emoji:'📎' },
-  { id:'Patio, Lawn & Garden',       label:'Patio, Lawn & Garden',    emoji:'🌱' },
-  { id:'Pet Supplies',               label:'Pet Supplies',            emoji:'🐾' },
-  { id:'Sports & Outdoors',          label:'Sports & Outdoors',       emoji:'⚽' },
-  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',emoji:'🔧' },
-  { id:'Toys & Games',               label:'Toys & Games',            emoji:'🧸' },
+  { id:'All',                        label:'All Deals',               emoji:'â¦' },
+  { id:'Appliances',                 label:'Appliances',              emoji:'ð ' },
+  { id:'Arts, Crafts & Sewing',      label:'Arts, Crafts & Sewing',   emoji:'ð¨' },
+  { id:'Automotive',                 label:'Automotive',              emoji:'ð' },
+  { id:'Baby Products',              label:'Baby Products',           emoji:'ð¼' },
+  { id:'Cell Phones & Accessories',  label:'Cell Phones',             emoji:'ð±' },
+  { id:'Electronics',                label:'Electronics',             emoji:'ð»' },
+  { id:'Everything Else',            label:'Everything Else',         emoji:'ð¦' },
+  { id:'Handmade Products',          label:'Handmade',                emoji:'ð¤' },
+  { id:'Health & Household',         label:'Health & Household',      emoji:'ð' },
+  { id:'Home & Kitchen',             label:'Home & Kitchen',          emoji:'ð¡' },
+  { id:'Industrial & Scientific',    label:'Industrial & Scientific', emoji:'ð¬' },
+  { id:'Musical Instruments',        label:'Musical Instruments',     emoji:'ð¸' },
+  { id:'Office Products',            label:'Office Products',         emoji:'ð' },
+  { id:'Patio, Lawn & Garden',       label:'Patio, Lawn & Garden',    emoji:'ð±' },
+  { id:'Pet Supplies',               label:'Pet Supplies',            emoji:'ð¾' },
+  { id:'Sports & Outdoors',          label:'Sports & Outdoors',       emoji:'â½' },
+  { id:'Tools & Home Improvement',   label:'Tools & Home Improvement',emoji:'ð§' },
+  { id:'Toys & Games',               label:'Toys & Games',            emoji:'ð§¸' },
 ];
 
 const filterRow = document.getElementById('filter-row');
@@ -1513,7 +1539,7 @@ let lastUpdatedISO = null;
 let searchQuery = '';
 
 function formatUpdatedTime(isoString) {
-  if (!isoString) return '—';
+  if (!isoString) return 'â';
   const mins = Math.max(0, Math.round((Date.now() - new Date(isoString)) / 60000));
   if (mins < 1) return 'Just now';
   if (mins < 60) return mins + 'm ago';
@@ -1556,8 +1582,8 @@ async function loadDeals() {
       ? Math.round(discounted.reduce((s, d) => s + d.pct, 0) / discounted.length)
       : null;
 
-    document.getElementById('stat-avg-price').textContent    = avgPrice ? '$' + avgPrice : '—';
-    document.getElementById('stat-avg-discount').textContent = avgDiscount ? avgDiscount + '% off' : '—';
+    document.getElementById('stat-avg-price').textContent    = avgPrice ? '$' + avgPrice : 'â';
+    document.getElementById('stat-avg-discount').textContent = avgDiscount ? avgDiscount + '% off' : 'â';
 
     lastUpdatedISO = data.updatedAt || null;
     updateTimeLabels();
@@ -1587,18 +1613,18 @@ function img(src, emoji, size) {
   const pad = size === 'hot' ? '8px' : '12px';
   const fs  = size === 'hot' ? '34px' : '44px';
   if (src) {
-    return '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:' + pad + ';" onerror="this.parentElement.innerHTML=\'<span style=\\\'font-size:' + fs + '\\\'>' + (emoji || '🛒') + '</span>\'"/>';
+    return '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:contain;padding:' + pad + ';" onerror="this.parentElement.innerHTML=\'<span style=\\\'font-size:' + fs + '\\\'>' + (emoji || 'ð') + '</span>\'"/>';
   }
-  return '<span style="font-size:' + fs + '">' + (emoji || '🛒') + '</span>';
+  return '<span style="font-size:' + fs + '">' + (emoji || 'ð') + '</span>';
 }
 
 function renderHotDeals() {
   const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot);
   document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
   document.getElementById('hot-grid').innerHTML = hot.length === 0
-    ? '<div style="padding:18px;color:var(--text-muted);font-size:13px;">No hot deals yet — check back soon.</div>'
+    ? '<div style="padding:18px;color:var(--text-muted);font-size:13px;">No hot deals yet â check back soon.</div>'
     : hot.map(d => {
-      return '<a class="hot-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="hot-card-img">' + img(d.image, d.emoji, 'hot') + '</div><span class="hot-card-badge">' + esc(d.discount || (d.pct + '% off')) + '</span><div class="hot-card-body"><div class="hot-card-title">' + esc(d.title) + '</div><div class="hot-card-prices"><span class="hot-price-now">' + esc(d.price || 'See price') + '</span>' + (d.was ? '<span class="hot-price-was">' + esc(d.was) + '</span>' : '') + '</div><button class="hot-btn">Grab Deal →</button></div></a>';
+      return '<a class="hot-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="hot-card-img">' + img(d.image, d.emoji, 'hot') + '</div><span class="hot-card-badge">' + esc(d.discount || (d.pct + '% off')) + '</span><div class="hot-card-body"><div class="hot-card-title">' + esc(d.title) + '</div><div class="hot-card-prices"><span class="hot-price-now">' + esc(d.price || 'See price') + '</span>' + (d.was ? '<span class="hot-price-was">' + esc(d.was) + '</span>' : '') + '</div><button class="hot-btn">Grab Deal â</button></div></a>';
     }).join('');
 }
 
@@ -1607,8 +1633,8 @@ function renderHotDropdown() {
   const grid = document.getElementById('hot-dropdown-grid');
   if (!grid) return;
   grid.innerHTML = hot.length === 0
-    ? '<div class="hot-dropdown-empty">No hot deals right now — check back soon.</div>'
-    : hot.map(d => '<a class="hot-dropdown-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored" onclick="closeAllDropdowns()"><div class="hot-dropdown-img">' + (d.image ? '<img src="' + escUrl(d.image) + '" alt="" onerror="this.parentElement.innerHTML=\'🛒\'"/>' : '🛒') + '</div><div class="hot-dropdown-info"><div class="hot-dropdown-name">' + esc(d.title) + '</div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span class="hot-dropdown-price">' + esc(d.price || 'See price') + '</span>' + (d.discount ? '<span class="hot-dropdown-badge">' + esc(d.discount) + '</span>' : '') + '</div></div></a>').join('');
+    ? '<div class="hot-dropdown-empty">No hot deals right now â check back soon.</div>'
+    : hot.map(d => '<a class="hot-dropdown-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored" onclick="closeAllDropdowns()"><div class="hot-dropdown-img">' + (d.image ? '<img src="' + escUrl(d.image) + '" alt="" onerror="this.parentElement.innerHTML=\'ð\'"/>' : 'ð') + '</div><div class="hot-dropdown-info"><div class="hot-dropdown-name">' + esc(d.title) + '</div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span class="hot-dropdown-price">' + esc(d.price || 'See price') + '</span>' + (d.discount ? '<span class="hot-dropdown-badge">' + esc(d.discount) + '</span>' : '') + '</div></div></a>').join('');
 }
 
 function renderDeals(cat) {
@@ -1623,9 +1649,9 @@ function renderDeals(cat) {
   filtered = sortDeals(filtered);
   document.getElementById('count-label').textContent = filtered.length + ' deal' + (filtered.length !== 1 ? 's' : '');
   document.getElementById('deals-grid').innerHTML = filtered.length === 0
-    ? '<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">' + (searchQuery ? 'No deals found for "' + esc(searchQuery) + '" — try a different search.' : 'No deals in this category right now — check back soon!') + '</div>'
+    ? '<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">' + (searchQuery ? 'No deals found for "' + esc(searchQuery) + '" â try a different search.' : 'No deals in this category right now â check back soon!') + '</div>'
     : filtered.map(d => {
-        return '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">🔥 Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge">🏷️ ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon \u2192</button></div></a>';
+        return '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot">ð¥ Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge">ð·ï¸ ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon \u2192</button></div></a>';
       }).join('');
 }
 
@@ -1738,7 +1764,7 @@ async function handleSignup() {
   params.append('email', isEmail ? val : '');
   params.append('phone', isEmail ? '' : val);
   await fetch(SHEET_ENDPOINT + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-  msg.textContent = "✓ You're in! Watch for your first deal alert.";
+  msg.textContent = "â You're in! Watch for your first deal alert.";
   msg.style.color = '#1a3a5c';
   input.value     = '';
   btn.textContent = 'Notify me';
@@ -1758,7 +1784,7 @@ async function handleMobileSignup() {
   params.append('email', isEmail ? val : '');
   params.append('phone', isEmail ? '' : val);
   await fetch(SHEET_ENDPOINT + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-  msg.textContent = "✓ You're in! Watch for your first deal alert.";
+  msg.textContent = "â You're in! Watch for your first deal alert.";
   msg.style.color = '#1a3a5c';
   input.value     = '';
   btn.textContent = 'Notify me';
