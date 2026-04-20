@@ -1,5 +1,5 @@
 """
-Keepa Deals Endpoint + Amazon Creators API — Deal Scraper
+Keepa Deals Endpoint + Amazon Creators API â Deal Scraper
 ----------------------------------------------------------
 Uses Keepa's deals endpoint across all 7 price types (Buy Box, Amazon,
 New, FBA, FBM, Prime, Lightning) then validates pricing via Amazon PA API.
@@ -13,9 +13,9 @@ from datetime import datetime, timezone, timedelta
 from amazon_creatorsapi import AmazonCreatorsApi, Country
 from amazon_creatorsapi.models import GetItemsResource
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # CREDENTIALS
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 KEEPA_API_KEY     = os.getenv("KEEPA_API_KEY")
 CREDENTIAL_ID     = os.getenv("CREATORS_CREDENTIAL_ID")
 CREDENTIAL_SECRET = os.getenv("CREATORS_CREDENTIAL_SECRET")
@@ -26,9 +26,9 @@ if not KEEPA_API_KEY:
 if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
     raise RuntimeError("Missing CREATORS_CREDENTIAL_ID or CREATORS_CREDENTIAL_SECRET")
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # SETTINGS
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 OUTPUT_FILE       = "deals.json"
 MEMORY_FILE       = "deals_memory.json"
 MAX_DISPLAY       = 2000
@@ -76,10 +76,10 @@ BLACKLISTED_ASINS = {
     "B0CNSCN4KW", "B0CNSCZQ1W", "B0CNSBX4ZK",
 }
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # TITLE DECODER
 # Keepa returns titles as int arrays in deals endpoint
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def decode_title(raw):
     """Keepa deal titles can be a list of ints (char codes) or a plain string."""
     if isinstance(raw, list):
@@ -107,9 +107,9 @@ def is_bad_title(title):
     return False
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # CATEGORY NORMALIZATION
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 CATEGORY_MAP = {
     "health": "Health & Household",
     "beauty": "Health & Household",
@@ -182,9 +182,9 @@ def normalize_category(raw_cat):
     return "Everything Else"
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # MEMORY
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def load_memory():
     if not os.path.exists(MEMORY_FILE):
         return {}
@@ -214,9 +214,9 @@ def purge_expired(memory):
     return memory
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # STEP 1: Pull ASINs from Keepa Deals Endpoint
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def get_keepa_deals(api_key, cached_asins):
     print("\n[1/3] Fetching deals from Keepa deals endpoint...")
 
@@ -267,7 +267,7 @@ def get_keepa_deals(api_key, cached_asins):
         if is_bad_title(title):
             continue
 
-        # Min price $10 — current is a list, index varies by price type
+        # Min price $10 â current is a list, index varies by price type
         prices = [x for x in item.get("current", []) if isinstance(x, (int, float)) and x > 500]
         if not prices or min(prices) < 1000:
             continue
@@ -284,9 +284,9 @@ def get_keepa_deals(api_key, cached_asins):
     return new_asins
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # STEP 2: Pull pricing from Amazon Creators API
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
     print("\n[2/3] Fetching pricing from Amazon Creators API...")
 
@@ -326,9 +326,9 @@ def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
     return all_items
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # STEP 3: Build deals and merge with memory
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def build_and_merge(asins, amazon_items, memory):
     print("\n[3/3] Building and merging deals...")
     now = datetime.now(timezone.utc).isoformat()
@@ -428,7 +428,25 @@ def build_and_merge(asins, amazon_items, memory):
         except:
             pass
 
-        deal = {
+        # Coupon detection
+        has_coupon = False
+        coupon_display = ""
+        try:
+            deal_details = listing.deal_details
+            if deal_details:
+                dtype = str(getattr(deal_details, 'type', '') or '').upper()
+                damt  = getattr(deal_details, 'amount', None)
+                dpct  = getattr(deal_details, 'percentage', None)
+                if 'PERCENT' in dtype and dpct:
+                    has_coupon    = True
+                    coupon_display = f"Save extra {int(dpct)}%"
+                elif damt:
+                    has_coupon    = True
+                    coupon_display = f"Save extra ${float(damt):.0f}"
+        except:
+            pass
+
+                deal = {
             "asin":          asin,
             "title":         title,
             "brand":         brand,
@@ -445,8 +463,8 @@ def build_and_merge(asins, amazon_items, memory):
             "availability":  availability,
             "link":          url,
             "hot":           is_hot,
-            "hasCoupon":     False,
-            "couponDisplay": "",
+            "hasCoupon":     has_coupon,
+            "couponDisplay": coupon_display,
             "desc":          brand or "",
             "seen_at":       memory.get(asin, {}).get("seen_at", now),
             "updated_at":    now,
@@ -462,12 +480,12 @@ def build_and_merge(asins, amazon_items, memory):
     return memory
 
 
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 # MAIN
-# ─────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââ
 def main():
     print("=" * 55)
-    print("  Keepa Deals + Amazon Creators API — DealDrop")
+    print("  Keepa Deals + Amazon Creators API â DealDrop")
     print("=" * 55)
 
     memory = load_memory()
