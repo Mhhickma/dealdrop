@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0BDWXGBNS",
+      "title": "Unfinished Wood Daisy Flower Shape Craft up to 46\" DIY 3\" / 1/2\"",
+      "brand": "24 Hour Crafts",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/21NsE+f7CJL._SL500_.jpg",
+      "price": "$1.14",
+      "price_amount": 1.14,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B0BDWXGBNS?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "24 Hour Crafts",
+      "seen_at": "2026-04-20T23:06:12.789299+00:00",
+      "updated_at": "2026-04-20T23:06:12.789299+00:00"
+    },
+    {
       "asin": "B0B8X7B1ZX",
       "title": "Unfinished Wood Water Lily Shape Pond Craft up to 46\" DIY 4\" / 1/8\"",
       "brand": "24 Hour Crafts",
@@ -23622,9 +23645,9 @@
       "updated_at": "2026-04-20T00:00:30.436447+00:00"
     }
   ],
-  "count": 1027,
-  "totalDeals": 1027,
+  "count": 1028,
+  "totalDeals": 1028,
   "hotDeals": 112,
   "couponDeals": 0,
-  "updatedAt": "2026-04-20T23:00:57.955236+00:00"
+  "updatedAt": "2026-04-20T23:06:12.806696+00:00"
 }
