@@ -26,21 +26,8 @@ jobs:
           MAILCHIMP_API_KEY:          ${{ secrets.MAILCHIMP_API_KEY }}
           MAILCHIMP_SERVER:           ${{ secrets.MAILCHIMP_SERVER }}
           MAILCHIMP_LIST_ID:          ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID:         ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN:          ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER:         ${{ secrets.TWILIO_FROM_NUMBER }}
-          SITE_URL:                   ${{ secrets.SITE_URL }}
+          INTERNAL_SECRET:            ${{ secrets.INTERNAL_SECRET }}
         run: python fetch_deals.py
-      - name: Run notifier
-        env:
-          MAILCHIMP_API_KEY:   ${{ secrets.MAILCHIMP_API_KEY }}
-          MAILCHIMP_SERVER:    ${{ secrets.MAILCHIMP_SERVER }}
-          MAILCHIMP_LIST_ID:   ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID:  ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN:   ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER:  ${{ secrets.TWILIO_FROM_NUMBER }}
-          SITE_URL:            ${{ secrets.SITE_URL }}
-        run: python notify.py
       - name: Commit and push updated deals.json
         run: |
           git config user.name  "DealDrop Bot"
@@ -51,57 +38,4 @@ jobs:
           git status
           git diff --staged --quiet || git commit -m "Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
           git pull --rebase origin main
-          git push
-name: Fetch Deals
-on:
-  schedule:
-    - cron: '*/30 * * * *'
-  workflow_dispatch:
-permissions:
-  contents: write
-jobs:
-  fetch-deals:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: pip install requests keepa numpy python-amazon-paapi
-      - name: Run deal fetcher
-        env:
-          KEEPA_API_KEY:              ${{ secrets.KEEPA_API_KEY }}
-          AFFILIATE_TAG:              ${{ secrets.AFFILIATE_TAG }}
-          CREATORS_CREDENTIAL_ID:     ${{ secrets.CREATORS_CREDENTIAL_ID }}
-          CREATORS_CREDENTIAL_SECRET: ${{ secrets.CREATORS_CREDENTIAL_SECRET }}
-          MAILCHIMP_API_KEY:          ${{ secrets.MAILCHIMP_API_KEY }}
-          MAILCHIMP_SERVER:           ${{ secrets.MAILCHIMP_SERVER }}
-          MAILCHIMP_LIST_ID:          ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID:         ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN:          ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER:         ${{ secrets.TWILIO_FROM_NUMBER }}
-          SITE_URL:                   ${{ secrets.SITE_URL }}
-        run: python fetch_deals.py
-      - name: Run notifier
-        env:
-          MAILCHIMP_API_KEY:   ${{ secrets.MAILCHIMP_API_KEY }}
-          MAILCHIMP_SERVER:    ${{ secrets.MAILCHIMP_SERVER }}
-          MAILCHIMP_LIST_ID:   ${{ secrets.MAILCHIMP_LIST_ID }}
-          TWILIO_ACCOUNT_SID:  ${{ secrets.TWILIO_ACCOUNT_SID }}
-          TWILIO_AUTH_TOKEN:   ${{ secrets.TWILIO_AUTH_TOKEN }}
-          TWILIO_FROM_NUMBER:  ${{ secrets.TWILIO_FROM_NUMBER }}
-          SITE_URL:            ${{ secrets.SITE_URL }}
-        run: python notify.py
-      - name: Commit and push updated deals.json
-        run: |
-          git config user.name  "DealDrop Bot"
-          git config user.email "bot@dealdrop.com"
-          git add -f deals.json || true
-          git add -f deals_memory.json || true
-          git add notified_deals.json || true
-          git status
-          git diff --staged --quiet || git commit -m "Update deals $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
