@@ -950,6 +950,40 @@
 
   .deal-card:hover { transform: translateY(-3px); box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
 
+  .share-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: white;
+    border: 0.5px solid var(--border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    z-index: 3;
+    padding: 0;
+  }
+  .share-btn:hover { background: #f5f5f5; }
+  .share-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a3a5c;
+    color: white;
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 100px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .share-toast.show { opacity: 1; }
   .card-img {
     width: 100%;
     height: 160px;
@@ -1883,6 +1917,23 @@ setInterval(loadDeals, 30 * 60 * 1000);
 setInterval(updateTimeLabels, 60 * 1000);
 
 loadDeals();
+</script>
+<div class="share-toast" id="share-toast">Link copied!</div>
+<script>
+function shareDeal(e, asin, title) {
+  e.preventDefault();
+  e.stopPropagation();
+  const url = 'https://blacklabdeals.com/?deal=' + asin;
+  if (navigator.share) {
+    navigator.share({ title: title, text: 'Check out this deal on Black Lab Deals!', url: url });
+  } else {
+    navigator.clipboard.writeText(url).then(function() {
+      var toast = document.getElementById('share-toast');
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    });
+  }
+}
 </script>
 </body>
 </html>
