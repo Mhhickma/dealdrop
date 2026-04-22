@@ -63,6 +63,21 @@
 
   body.menu-open { overflow: hidden; }
 
+  .deal-statement-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 40px;
+  }
+  .footer-deal-statement {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 12px;
+    opacity: 0.7;
+  }
   .disclosure-bar {
     background: #fffbf0;
     border-bottom: 1px solid #f0e8d0;
@@ -1240,6 +1255,7 @@
 <body>
 
 <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeMobileMenu()"></div>
+  <div class="deal-statement-bar">Every deal is at least 10% off the original price, verified through Amazon's live pricing. Hot deals are 40% off or more.</div>
 
 <aside class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
   <div class="drawer-header">
@@ -1460,6 +1476,7 @@
   <p>Made with care by <strong>Black Lab Deals</strong> &middot; <a href="#">About</a> &middot; <a href="#">Contact</a> &middot; <a href="#">Privacy</a></p>
   <p style="margin-top:6px;font-size:12px;color:var(--text-muted);">Updated every 30 minutes &middot; Powered by live Amazon data</p>
   <p class="disclaimer">As an Amazon Associate I earn from qualifying purchases. Prices sourced live from Amazon. Some deals include clippable coupons on the Amazon product page.</p>
+  <p class="footer-deal-statement">Every deal is at least 10% off the original price, verified through Amazon's live pricing. Hot deals are 40% off or more.</p>
 </footer>
 
 <script>
