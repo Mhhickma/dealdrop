@@ -1293,7 +1293,7 @@
           </button>
           <div class="dropdown-menu hot-dropdown" id="menu-hot">
             <div class="hot-dropdown-header">
-              <span class="hot-dropdown-title">HOT Deals &mdash; 30%+ off</span>
+              <span class="hot-dropdown-title">HOT Deals &mdash; 40%+ off</span>
               <button class="hot-dropdown-see-all" onclick="closeAllDropdowns(); scrollToHotDeals();">See all &rarr;</button>
             </div>
             <div class="hot-dropdown-grid" id="hot-dropdown-grid">
@@ -1620,7 +1620,7 @@ function img(src, emoji, size) {
 }
 
 function renderHotDeals() {
-  const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot);
+  const hot = allDeals.filter(d => Number(d.pct) >= 40 || d.hot);
   document.getElementById('hot-count-pill').textContent = hot.length + ' deal' + (hot.length !== 1 ? 's' : '');
   document.getElementById('hot-grid').innerHTML = hot.length === 0
     ? '<div style="padding:18px;color:var(--text-muted);font-size:13px;">No hot deals yet  check back soon.</div>'
@@ -1630,7 +1630,7 @@ function renderHotDeals() {
 }
 
 function renderHotDropdown() {
-  const hot = allDeals.filter(d => Number(d.pct) >= 30 || d.hot).slice(0, 6);
+  const hot = allDeals.filter(d => Number(d.pct) >= 40 || d.hot).slice(0, 6);
   const grid = document.getElementById('hot-dropdown-grid');
   if (!grid) return;
   grid.innerHTML = hot.length === 0
@@ -1652,7 +1652,7 @@ function renderDeals(cat) {
   document.getElementById('deals-grid').innerHTML = filtered.length === 0
     ? '<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text-muted);">' + (searchQuery ? 'No deals found for "' + esc(searchQuery) + '"  try a different search.' : 'No deals in this category right now  check back soon!') + '</div>'
     : filtered.map(d => {
-        return '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 30 || d.hot) ? '<span class="card-badge-hot"> Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge"> ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon </button></div></a>';
+        return '<a class="deal-card" href="' + escUrl(d.link || '#') + '" target="_blank" rel="noopener sponsored"><div class="card-img">' + img(d.image, d.emoji, 'card') + '</div><div class="card-body"><div class="card-meta"><span class="card-category">' + esc(d.cat) + '</span>' + ((Number(d.pct) >= 40 || d.hot) ? '<span class="card-badge-hot"> Hot</span>' : '') + '</div><div class="card-title">' + esc(d.title) + '</div><div class="card-desc">' + esc(d.desc || '') + '</div><div class="card-footer"><div class="price-block"><span class="price-now">' + esc(d.price || 'See price on Amazon') + '</span>' + (d.was ? '<span class="price-was">' + esc(d.was) + '</span>' : '') + '</div><span class="discount-badge">' + esc(d.discount || '') + '</span></div>' + (d.hasCoupon ? '<div class="coupon-row"><span class="coupon-badge"> ' + esc(d.couponDisplay) + '</span></div>' : '') + '<button class="btn-deal">See Deal on Amazon </button></div></a>';
       }).join('');
 }
 
