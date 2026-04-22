@@ -1421,7 +1421,7 @@
     <div class="hot-title-wrap">
       <span class="hot-icon">HOT</span>
       <span class="hot-title">Hot Deals</span>
-      <span class="hot-subtitle">&mdash; 30% off or more</span>
+      <span class="hot-subtitle">&mdash; 40% off or more</span>
     </div>
     <span class="hot-pill" id="hot-count-pill"></span>
   </div>
@@ -1563,7 +1563,7 @@ async function loadDeals() {
     allDeals = Array.isArray(data.deals) ? data.deals : [];
 
     const totalDeals  = data.totalDeals  ?? allDeals.length;
-    const hotDeals    = data.hotDeals    ?? allDeals.filter(d => (Number(d.pct) >= 30 || d.hot)).length;
+    const hotDeals    = data.hotDeals    ?? allDeals.filter(d => (Number(d.pct) >= 40 || d.hot)).length;
     const couponDeals = data.couponDeals ?? allDeals.filter(d => d.hasCoupon).length;
 
     document.getElementById('stat-total').textContent          = totalDeals;
