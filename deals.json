@@ -1,6 +1,29 @@
 {
   "deals": [
     {
+      "asin": "B0BZQ8ZVXX",
+      "title": "AT-A-GLANCE 2024 Daily Four Person Appointment Book, DayMinder, Quarter-Hourly Appointment Book, 8\" x 11\", Large, Black (G5600024)",
+      "brand": "AT-A-GLANCE",
+      "cat": "Office Products",
+      "image": "https://m.media-amazon.com/images/I/41vFfrCccmL._SL500_.jpg",
+      "price": "$30.38",
+      "price_amount": 30.38,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B0BZQ8ZVXX?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "AT-A-GLANCE",
+      "seen_at": "2026-04-23T11:00:57.761886+00:00",
+      "updated_at": "2026-04-23T11:00:57.761886+00:00"
+    },
+    {
       "asin": "B0FVFCHRMG",
       "title": "Microplane Premium Classic Zester Grater in Lavendar Bloom - Vibrant Color | Lemon Zester tool, Cheese & Vegetable Grater | For Citrus, Parmesan Cheese, Garlic, Ginger | Stainless Steel Blade",
       "brand": "Microplane",
@@ -19068,9 +19091,9 @@
       "updated_at": "2026-04-22T11:01:00.965317+00:00"
     }
   ],
-  "count": 829,
-  "totalDeals": 829,
+  "count": 830,
+  "totalDeals": 830,
   "hotDeals": 101,
   "couponDeals": 0,
-  "updatedAt": "2026-04-23T10:55:50.154747+00:00"
+  "updatedAt": "2026-04-23T11:00:57.773422+00:00"
 }
