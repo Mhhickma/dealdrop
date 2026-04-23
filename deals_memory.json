@@ -19157,5 +19157,28 @@
     "desc": "PopSockets",
     "seen_at": "2026-04-23T23:11:28.875026+00:00",
     "updated_at": "2026-04-23T23:11:28.875026+00:00"
+  },
+  "B01CPX5B6W": {
+    "asin": "B01CPX5B6W",
+    "title": "Piatnik Presidents Playing Cards",
+    "brand": "Piatnik",
+    "cat": "Toys & Games",
+    "image": "https://m.media-amazon.com/images/I/51s0hC8IcAL._SL500_.jpg",
+    "price": "$12.99",
+    "price_amount": 12.99,
+    "currency": "USD",
+    "was": null,
+    "savings": null,
+    "pct": 5,
+    "discount": "-5%+",
+    "deal_type": "PRICE_DROP",
+    "availability": "IN_STOCK_SCARCE",
+    "link": "https://www.amazon.com/dp/B01CPX5B6W?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+    "hot": false,
+    "hasCoupon": false,
+    "couponDisplay": "",
+    "desc": "Piatnik",
+    "seen_at": "2026-04-23T23:30:38.323850+00:00",
+    "updated_at": "2026-04-23T23:30:38.323850+00:00"
   }
 }
