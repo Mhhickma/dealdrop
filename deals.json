@@ -1,6 +1,52 @@
 {
   "deals": [
     {
+      "asin": "B0F5K5J2CD",
+      "title": "Kids Duvet Cover Set Queen Size - 3 Piece Soccer Duvet Cover Set & 2 Pillow Shams with Zipper Closure & Ties - Easy-Care and Fade Free - Super Soft, Cute & Cozy Bedding Set for Kids, Girls and Teens",
+      "brand": "CGK Unlimited",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/41V4P+4DetL._SL500_.jpg",
+      "price": "$24.99",
+      "price_amount": 24.99,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B0F5K5J2CD?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "CGK Unlimited",
+      "seen_at": "2026-04-24T18:00:57.883089+00:00",
+      "updated_at": "2026-04-24T18:00:57.883089+00:00"
+    },
+    {
+      "asin": "B0CRJ2VF7H",
+      "title": "Apple iPhone 15, 256GB, Green - Unlocked (Renewed Premium)",
+      "brand": "Apple",
+      "cat": "Cell Phones & Accessories",
+      "image": "https://m.media-amazon.com/images/I/31U5++OP3FL._SL500_.jpg",
+      "price": "$521.80",
+      "price_amount": 521.8,
+      "currency": "USD",
+      "was": "$559.0",
+      "savings": "$559.0",
+      "pct": 7,
+      "discount": "-7%",
+      "deal_type": "PRICE_DROP",
+      "availability": "AVAILABLE_DATE",
+      "link": "https://www.amazon.com/dp/B0CRJ2VF7H?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Apple",
+      "seen_at": "2026-04-24T18:00:57.883089+00:00",
+      "updated_at": "2026-04-24T18:00:57.883089+00:00"
+    },
+    {
       "asin": "B0C1LTBV2D",
       "title": "STM Premium AL5 Grade C5 Brazed Carbide Tool Bit \u2013 Turning Style \"A\", High Hardness Cutting Tool for Steel & Non-Ferrous Metals \u2013 Industrial Lathe Tool for CNC & Manual Machines",
       "brand": "STM Premium",
@@ -20195,9 +20241,9 @@
       "updated_at": "2026-04-23T18:01:02.990577+00:00"
     }
   ],
-  "count": 878,
-  "totalDeals": 878,
+  "count": 880,
+  "totalDeals": 880,
   "hotDeals": 116,
   "couponDeals": 0,
-  "updatedAt": "2026-04-24T17:58:55.709904+00:00"
+  "updatedAt": "2026-04-24T18:00:57.897873+00:00"
 }
