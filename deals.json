@@ -1,6 +1,52 @@
 {
   "deals": [
     {
+      "asin": "B0GKNYBTPD",
+      "title": "Salt Earth Canvas Drop Cloth 4pcs, Reusable Paint Drop Cloth, 100% Recycled Cotton Canvas Tarp Cover for Painter, Furniture, Floor Protection, All Purpose Painters Dropcloth for Christmas DIY (4x5 FT)",
+      "brand": "Salt Earth",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/41DxlD0jpUL._SL500_.jpg",
+      "price": "$24.99",
+      "price_amount": 24.99,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK_SCARCE",
+      "link": "https://www.amazon.com/dp/B0GKNYBTPD?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Salt Earth",
+      "seen_at": "2026-04-26T10:30:57.599949+00:00",
+      "updated_at": "2026-04-26T10:30:57.599949+00:00"
+    },
+    {
+      "asin": "B0CMCHJP63",
+      "title": "Motorola Moto G Stylus 5G 2023, Fully Unlocked | Black, 256GB | XT2315 (Renewed)",
+      "brand": "Motorola",
+      "cat": "Cell Phones & Accessories",
+      "image": "https://m.media-amazon.com/images/I/41iymRgF2kL._SL500_.jpg",
+      "price": "$129.99",
+      "price_amount": 129.99,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "UNAVAILABLE",
+      "link": "https://www.amazon.com/dp/B0CMCHJP63?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Motorola",
+      "seen_at": "2026-04-26T10:30:57.599949+00:00",
+      "updated_at": "2026-04-26T10:30:57.599949+00:00"
+    },
+    {
       "asin": "B0CXK6YRHF",
       "title": "Umbro Youth Neo Shield Shinguard with Sleeve, Green/Black/White, YXS",
       "brand": "Umbro",
@@ -18769,9 +18815,9 @@
       "updated_at": "2026-04-25T10:31:07.294618+00:00"
     }
   ],
-  "count": 816,
-  "totalDeals": 816,
+  "count": 818,
+  "totalDeals": 818,
   "hotDeals": 91,
   "couponDeals": 0,
-  "updatedAt": "2026-04-26T10:11:57.612156+00:00"
+  "updatedAt": "2026-04-26T10:30:57.613832+00:00"
 }
