@@ -1,6 +1,52 @@
 {
   "deals": [
     {
+      "asin": "B008OE3MWM",
+      "title": "Lucas Oil 10299 SAE 15W-40 CJ-4 Synthetic Motor Oil - 1 Gallon",
+      "brand": "Lucas Oil",
+      "cat": "Automotive",
+      "image": "https://m.media-amazon.com/images/I/519MXxj6T0L._SL500_.jpg",
+      "price": "$47.33",
+      "price_amount": 47.33,
+      "currency": "USD",
+      "was": null,
+      "savings": null,
+      "pct": 5,
+      "discount": "-5%+",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B008OE3MWM?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": false,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "Lucas Oil",
+      "seen_at": "2026-04-28T21:00:52.288078+00:00",
+      "updated_at": "2026-04-28T21:00:52.288078+00:00"
+    },
+    {
+      "asin": "B0G4RLT8CR",
+      "title": "Modern mirror 3-in-1 magnifying glass, multiple colors, 24 cm/9.45inches, 50 times magnification, handheld/wall-mounted/desktop design, double-sided makeup mirror, with 360\u00b0 adjustable handle (white)",
+      "brand": "RYPFOEWBN",
+      "cat": "Home & Kitchen",
+      "image": "https://m.media-amazon.com/images/I/41UV8CtpJoL._SL500_.jpg",
+      "price": "$3.00",
+      "price_amount": 3.0,
+      "currency": "USD",
+      "was": "$12.44",
+      "savings": "$12.44",
+      "pct": 76,
+      "discount": "-76%",
+      "deal_type": "PRICE_DROP",
+      "availability": "IN_STOCK",
+      "link": "https://www.amazon.com/dp/B0G4RLT8CR?tag=sawdustsavings-20&linkCode=ogi&th=1&psc=1",
+      "hot": true,
+      "hasCoupon": false,
+      "couponDisplay": "",
+      "desc": "RYPFOEWBN",
+      "seen_at": "2026-04-28T21:00:52.288078+00:00",
+      "updated_at": "2026-04-28T21:00:52.288078+00:00"
+    },
+    {
       "asin": "B0CLB9D4F1",
       "title": "SHOWA AC800 Static Dissipative Touch Screen Compatible A4 Cut Resistant Safety Work Glove, 18-Gauge, X-Large (12 Pair)",
       "brand": "SHOWA",
@@ -18171,9 +18217,9 @@
       "updated_at": "2026-04-27T21:01:04.484947+00:00"
     }
   ],
-  "count": 790,
-  "totalDeals": 790,
-  "hotDeals": 104,
+  "count": 792,
+  "totalDeals": 792,
+  "hotDeals": 105,
   "couponDeals": 0,
-  "updatedAt": "2026-04-28T20:50:30.728385+00:00"
+  "updatedAt": "2026-04-28T21:00:52.298927+00:00"
 }
