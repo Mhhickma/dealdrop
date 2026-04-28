@@ -1149,6 +1149,128 @@
   footer a { color: var(--accent); text-decoration: none; }
   .disclaimer { max-width: 600px; margin: 8px auto 0; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
 
+
+  .browse-pages-section {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    padding: 0 24px;
+  }
+
+  .browse-pages-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+  }
+
+  .browse-pages-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .browse-pages-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--text-primary);
+  }
+
+  .browse-pages-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .browse-pages-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .browse-page-card {
+    display: block;
+    text-decoration: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .browse-page-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: #d7e1eb;
+  }
+
+  .browse-page-label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: var(--accent-light);
+    border-radius: 999px;
+    padding: 4px 9px;
+    margin-bottom: 10px;
+  }
+
+  .browse-page-card h3 {
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .browse-page-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .browse-more-links {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    padding: 0 24px;
+  }
+
+  .browse-more-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+  }
+
+  .browse-more-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  .browse-more-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .browse-more-list a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .browse-more-list a:hover {
+    text-decoration: underline;
+  }
+
   /* Sort control */
   .sort-wrap {
     max-width: 1100px;
@@ -1252,7 +1374,7 @@
     .mobile-stat-num { display: block; font-size: 18px; font-weight: 700; line-height: 1; }
     .mobile-stat-label { display: block; font-size: 10px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.85); }
 
-    .loading-bar, .error-msg, .hot-section, .search-wrap, .filters-wrap, .deals-section { padding-left: 16px; padding-right: 16px; }
+.loading-bar, .error-msg, .hot-section, .search-wrap, .filters-wrap, .deals-section, .browse-pages-section, .browse-more-links { padding-left: 16px; padding-right: 16px; }
     .loading-bar { margin-top: 2px; }
     .hot-section { margin-bottom: 20px; }
     .hot-header { display: none; }
@@ -1268,6 +1390,12 @@
     .hot-btn { padding: 10px; font-size: 13px; border-radius: 9px; }
     .search-wrap { margin-bottom: 14px; }
     .filters-wrap { margin-bottom: 18px; }
+
+    .browse-pages-section { margin-bottom: 20px; }
+    .browse-pages-panel, .browse-more-panel { padding: 16px; border-radius: 16px; }
+    .browse-pages-title { font-size: 24px; }
+    .browse-pages-grid { grid-template-columns: 1fr; gap: 10px; }
+    .browse-page-card { padding: 14px; }
     .filter-label { font-size: 11px; margin-bottom: 8px; }
     .deals-section { padding-bottom: 88px; }
     .section-header { margin-bottom: 12px; align-items: center; }
@@ -1322,6 +1450,8 @@
     </div>
     <div class="drawer-links">
       <button onclick="closeMobileMenu(); scrollToTop();">Home</button>
+      <a href="/best-amazon-tool-deals/">Tool Deals</a>
+      <a href="/best-amazon-deals-under-50/">Deals Under $50</a>
       <button onclick="closeMobileMenu(); scrollToHotDeals();">HOT Deals</button>
       <button onclick="closeMobileMenu(); scrollToAllDeals();">All Deals</button>
       <div class="drawer-cat-section">
@@ -1352,6 +1482,8 @@
     <div class="nav-right">
       <div class="desktop-nav">
         <a href="#" onclick="scrollToTop(); return false;">Home</a>
+        <a href="/best-amazon-tool-deals/">Tool Deals</a>
+        <a href="/best-amazon-deals-under-50/">Under $50</a>
         <div class="nav-dropdown" id="dropdown-hot">
           <button class="nav-dropdown-trigger" onclick="toggleDropdown('hot')" id="trigger-hot">
             HOT Deals <span class="nav-dropdown-arrow">v</span>
@@ -1473,6 +1605,31 @@
 
 <div class="divider"></div>
 
+
+<section class="browse-pages-section">
+  <div class="browse-pages-panel">
+    <div class="browse-pages-head">
+      <div>
+        <div class="browse-pages-title">Browse deal pages</div>
+        <div class="browse-pages-subtitle">Quick links to the completed live deal pages.</div>
+      </div>
+    </div>
+    <div class="browse-pages-grid">
+      <a class="browse-page-card" href="/best-amazon-tool-deals/">
+        <span class="browse-page-label">Category</span>
+        <h3>Best Amazon Tool Deals</h3>
+        <p>Power tools, hand tools, storage, and workshop finds.</p>
+      </a>
+      <a class="browse-page-card" href="/best-amazon-deals-under-50/">
+        <span class="browse-page-label">Budget</span>
+        <h3>Best Amazon Deals Under $50</h3>
+        <p>Budget-friendly deals across home, tech, kitchen, and more.</p>
+      </a>
+
+    </div>
+  </div>
+</section>
+
 <div class="loading-bar" id="loading-bar">
   <div class="loading-msg"><div class="spinner"></div> Loading fresh deals...</div>
 </div>
@@ -1526,6 +1683,18 @@
   <p style="margin-top:6px;font-size:12px;color:var(--text-muted);">Updated every 30 minutes &middot; Powered by live Amazon data</p>
   <p class="disclaimer">As an Amazon Associate I earn from qualifying purchases. Prices sourced live from Amazon. Some deals include clippable coupons on the Amazon product page.</p>
   <p class="footer-deal-statement">Every deal is at least 10% off the original price, verified through Amazon's live pricing. Hot deals are 40% off or more.</p>
+
+<section class="browse-more-links">
+  <div class="browse-more-panel">
+    <h3>Completed deal pages</h3>
+    <div class="browse-more-list">
+      <a href="/best-amazon-tool-deals/">Best Amazon Tool Deals</a>
+      <a href="/best-amazon-deals-under-50/">Best Amazon Deals Under $50</a>
+
+    </div>
+  </div>
+</section>
+
 </footer>
 
 <script>
