@@ -1542,53 +1542,6 @@
 }
 .bld-alert-btn:hover { background: var(--accent-mid); }
 .bld-alert-icon { color: var(--gold); font-size: 16px; line-height: 1; }
-.bld-pill-strip {
-  background: linear-gradient(180deg, #fff9ec 0%, #fffdf8 100%);
-  border-top: 1px solid #f0e5cc;
-  padding: 20px 24px 22px;
-}
-.bld-pill-row {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-}
-.bld-nav-pill {
-  min-height: 58px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  text-decoration: none;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(26,58,92,0.05);
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-}
-.bld-nav-pill:hover {
-  transform: translateY(-1px);
-  border-color: var(--gold);
-  box-shadow: 0 9px 20px rgba(26,58,92,0.08);
-}
-.bld-pill-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--gold-light);
-  color: var(--gold);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 36px;
-  font-weight: 900;
-}
 .bld-mobile-actions { display: none; }
 .bld-mobile-actions .mobile-alert-btn,
 .bld-mobile-actions .mobile-menu-btn { display: inline-flex; }
@@ -1611,22 +1564,6 @@
     gap: 10px;
     margin-left: auto;
   }
-.bld-pill-strip {
-    padding: 14px 16px 16px;
-    overflow-x: auto;
-  }
-  .bld-pill-row {
-    display: flex;
-    gap: 10px;
-    min-width: max-content;
-  }
-  .bld-nav-pill {
-    min-width: 190px;
-    min-height: 52px;
-    font-size: 14px;
-    padding: 8px 14px;
-  }
-}
 @media (max-width: 520px) {
   .bld-brand { gap: 12px; }
   .bld-brand-logo { width: 68px; height: 68px; }
@@ -1727,15 +1664,6 @@
     </div>
   </div>
 
-  <div class="bld-pill-strip" aria-label="Featured deal categories">
-    <div class="bld-pill-row">
-      <a class="bld-nav-pill" href="/best-amazon-tool-deals/"><span class="bld-pill-icon">T</span> Tool Deals</a>
-      <a class="bld-nav-pill" href="/best-amazon-home-kitchen-deals/"><span class="bld-pill-icon">H</span> Home &amp; Kitchen</a>
-      <a class="bld-nav-pill" href="/best-amazon-deals-under-50/"><span class="bld-pill-icon">$</span> Under $50</a>
-      <a class="bld-nav-pill" href="/top-100-amazon-deals-today/"><span class="bld-pill-icon">100</span> Top 100 Deals</a>
-      <button class="bld-nav-pill" type="button" onclick="scrollToAllDeals()"><span class="bld-pill-icon">N</span> New Deals Today</button>
-    </div>
-  </div>
 </header>
 
 <!-- Desktop hero (hidden on mobile via CSS) -->
