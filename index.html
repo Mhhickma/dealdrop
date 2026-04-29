@@ -4,21 +4,21 @@
 <meta charset="UTF-8">
 <meta name="google-site-verification" content="7KIx-WqVfE3DLEGgjUEcNQgiqbNf6xL3o3gZsj284kg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Black Lab Deals  Fresh Deals, Hourly</title>
-<meta name="description" content="Hot Amazon deals from across every category, refreshed every 30 minutes. Save on your orders.">
+<title>Black Lab Deals | Best Amazon Deals Today</title>
+<meta name="description" content="Find today’s best Amazon deals, price drops, hot deals, tool deals, home and kitchen deals, and Amazon deals under $50 updated throughout the day.">
 
 <!-- Open Graph / Facebook / iMessage -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://blacklabdeals.com/">
-<meta property="og:title" content="Black Lab Deals  Fresh Amazon Deals, Every 30 Minutes">
-<meta property="og:description" content="Hot Amazon deals from across every category, refreshed every 30 minutes. Save on your orders.">
+<meta property="og:title" content="Black Lab Deals | Best Amazon Deals Today">
+<meta property="og:description" content="Fresh Amazon deals, hot price drops, and trending bargains updated throughout the day.">
 <meta property="og:site_name" content="Black Lab Deals">
 <meta property="og:image" content="https://blacklabdeals.com/images/logos/black-lab-deals-logo.png">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Black Lab Deals  Fresh Amazon Deals, Every 30 Minutes">
-<meta name="twitter:description" content="Hot Amazon deals from across every category, refreshed every 30 minutes. Save on your orders.">
+<meta name="twitter:title" content="Black Lab Deals | Best Amazon Deals Today">
+<meta name="twitter:description" content="Fresh Amazon deals, hot price drops, and trending bargains updated throughout the day.">
 <meta name="twitter:image" content="https://blacklabdeals.com/images/logos/black-lab-deals-logo.png">
 
 <!-- PWA -->
@@ -1421,6 +1421,217 @@
     footer { padding: 26px 16px; }
     #back-to-top { bottom: 20px; right: 16px; width: 44px; height: 44px; font-size: 18px; }
   }
+
+/* === Black Lab Deals premium header refresh === */
+.bld-header-shell {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 10px 28px rgba(26,58,92,0.07);
+  position: sticky;
+  top: 0;
+  z-index: 300;
+}
+.bld-header-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 24px 18px;
+  min-height: 142px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.bld-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.bld-brand-logo {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  box-shadow: 0 8px 20px rgba(26,58,92,0.14);
+  background: white;
+}
+.bld-brand-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 0.98;
+  letter-spacing: -0.8px;
+  color: var(--text-primary);
+}
+.bld-brand-title span { color: var(--gold); }
+.bld-brand-rule {
+  width: 54px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gold);
+  margin: 12px 0 10px;
+}
+.bld-brand-tagline {
+  color: var(--text-muted);
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+.bld-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.bld-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 17px;
+  font-weight: 700;
+}
+.bld-desktop-nav a,
+.bld-category-trigger {
+  color: var(--text-primary);
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 2px;
+}
+.bld-desktop-nav a:hover,
+.bld-category-trigger:hover { color: var(--accent); }
+.bld-nav-divider {
+  width: 1px;
+  height: 34px;
+  background: var(--border);
+}
+.bld-category-wrap { position: relative; }
+.bld-category-wrap .dropdown-menu {
+  top: calc(100% + 10px);
+  left: auto;
+  right: 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+.bld-category-wrap:hover .dropdown-menu,
+.bld-category-wrap:focus-within .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.bld-alert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(26,58,92,0.24);
+}
+.bld-alert-btn:hover { background: var(--accent-mid); }
+.bld-alert-icon { color: var(--gold); font-size: 16px; line-height: 1; }
+.bld-pill-strip {
+  background: linear-gradient(180deg, #fff9ec 0%, #fffdf8 100%);
+  border-top: 1px solid #f0e5cc;
+  padding: 18px 24px 20px;
+}
+.bld-pill-row {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.bld-nav-pill {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(26,58,92,0.05);
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.bld-nav-pill:hover {
+  transform: translateY(-1px);
+  border-color: var(--gold);
+  box-shadow: 0 9px 20px rgba(26,58,92,0.08);
+}
+.bld-pill-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  font-weight: 900;
+}
+.bld-mobile-actions { display: none; }
+.bld-mobile-actions .mobile-alert-btn,
+.bld-mobile-actions .mobile-menu-btn { display: inline-flex; }
+@media (max-width: 900px) {
+  .bld-header-main {
+    min-height: 104px;
+    padding: 16px;
+  }
+  .bld-brand-logo {
+    width: 76px;
+    height: 76px;
+  }
+  .bld-brand-title { font-size: 28px; }
+  .bld-brand-rule { margin: 8px 0 6px; width: 42px; }
+  .bld-brand-tagline { font-size: 12px; }
+  .bld-header-actions { display: none; }
+  .bld-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .bld-pill-strip {
+    padding: 14px 16px 16px;
+    overflow-x: auto;
+  }
+  .bld-pill-row {
+    display: flex;
+    gap: 10px;
+    min-width: max-content;
+  }
+  .bld-nav-pill {
+    min-width: 190px;
+    min-height: 52px;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+}
+@media (max-width: 520px) {
+  .bld-brand { gap: 12px; }
+  .bld-brand-logo { width: 68px; height: 68px; }
+  .bld-brand-title { font-size: 24px; }
+  .bld-brand-tagline { font-size: 11px; }
+}
+
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ES3MC2ZTTM"></script>
@@ -1472,43 +1683,32 @@
 
 <button id="back-to-top" onclick="scrollToTop()" aria-label="Back to top">^</button>
 
-<nav>
-  <div class="nav-inner">
-    <div class="nav-left">
-      <a href="#" class="logo-wrap">
-        <img class="logo-img" src="https://raw.githubusercontent.com/Mhhickma/blacklabdeals/main/logo.png" alt="Black Lab Deals" />
-        <div class="logo-text">Black Lab <span>Deals</span></div>
-      </a>
-      <div class="nav-tagline">Fresh deals, hourly</div>
-    </div>
-    <div class="nav-right">
-      <div class="desktop-nav">
-        <a href="#" onclick="scrollToTop(); return false;">Home</a>
-        <a href="/best-amazon-tool-deals/">Tool Deals</a>
-        <a href="/best-amazon-deals-under-50/">Under $50</a>
-        <div class="nav-dropdown" id="dropdown-hot">
-          <button class="nav-dropdown-trigger" onclick="toggleDropdown('hot')" id="trigger-hot">
-            HOT Deals <span class="nav-dropdown-arrow">v</span>
-          </button>
-          <div class="dropdown-menu hot-dropdown" id="menu-hot">
-            <div class="hot-dropdown-header">
-              <span class="hot-dropdown-title">HOT Deals &mdash; 40%+ off</span>
-              <button class="hot-dropdown-see-all" onclick="closeAllDropdowns(); scrollToHotDeals();">See all &rarr;</button>
-            </div>
-            <div class="hot-dropdown-grid" id="hot-dropdown-grid">
-              <div class="hot-dropdown-empty">Loading...</div>
-            </div>
-          </div>
-        </div>
-        <div class="nav-dropdown" id="dropdown-categories">
-          <button class="nav-dropdown-trigger" onclick="toggleDropdown('categories')" id="trigger-categories">
-             Categories <span class="nav-dropdown-arrow">v</span>
-          </button>
+<header class="bld-header-shell">
+  <div class="bld-header-main">
+    <a href="#" class="bld-brand" onclick="scrollToTop(); return false;" aria-label="Black Lab Deals home">
+      <img class="bld-brand-logo" src="/images/logos/black-lab-deals-logo.png" alt="Black Lab Deals logo" />
+      <div>
+        <div class="bld-brand-title">Black Lab <span>Deals</span></div>
+        <div class="bld-brand-rule"></div>
+        <div class="bld-brand-tagline">Fresh Amazon deals updated daily</div>
+      </div>
+    </a>
+
+    <div class="bld-header-actions">
+      <nav class="bld-desktop-nav" aria-label="Main navigation">
+        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
+        <div class="bld-category-wrap">
+          <button class="bld-category-trigger" type="button">Categories <span aria-hidden="true">v</span></button>
           <div class="dropdown-menu" id="menu-categories" style="min-width:240px;"></div>
         </div>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
         <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
-      </div>
-      <button class="nav-alert-btn desktop-only" onclick="scrollToAlerts()">Get Alerts</button>
+      </nav>
+      <button class="bld-alert-btn" onclick="scrollToAlerts()" type="button"><span class="bld-alert-icon">●</span> Get Alerts</button>
+    </div>
+
+    <div class="bld-mobile-actions">
       <button class="mobile-alert-btn mobile-only" onclick="scrollToAlerts()" aria-label="Get alerts">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
@@ -1524,7 +1724,17 @@
       </button>
     </div>
   </div>
-</nav>
+
+  <div class="bld-pill-strip" aria-label="Featured deal categories">
+    <div class="bld-pill-row">
+      <a class="bld-nav-pill" href="/best-amazon-tool-deals/"><span class="bld-pill-icon">T</span> Tool Deals</a>
+      <a class="bld-nav-pill" href="/best-amazon-home-kitchen-deals/"><span class="bld-pill-icon">H</span> Home &amp; Kitchen</a>
+      <a class="bld-nav-pill" href="/best-amazon-deals-under-50/"><span class="bld-pill-icon">$</span> Under $50</a>
+      <a class="bld-nav-pill" href="/top-100-amazon-deals-today/"><span class="bld-pill-icon">100</span> Best Sellers on Sale</a>
+      <button class="bld-nav-pill" type="button" onclick="scrollToAllDeals()"><span class="bld-pill-icon">N</span> New Deals Today</button>
+    </div>
+  </div>
+</header>
 
 <div class="disclosure-bar">
   <span> As an Amazon Associate we earn from qualifying purchases. Prices and availability are accurate at time of posting. &nbsp;&middot;&nbsp; Trusted deal source since 2023.</span>
