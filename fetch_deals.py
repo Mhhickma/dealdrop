@@ -38,29 +38,20 @@ MIN_DISCOUNT_PCT  = 5
 KEEPA_DEALS_URL   = "https://api.keepa.com/deal"
 
 # Pull more candidates from Keepa by scanning multiple deal pages per price type.
+# Set MAX_NEW_ASINS_PER_RUN to 0 for no cap.
 # You can override these in GitHub Actions/Vercel env vars without editing code.
 KEEPA_DEAL_PAGES             = int(os.getenv("KEEPA_DEAL_PAGES", "10"))
-MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "400"))
+MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "0"))
 DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "3"))
 AMAZON_REQUEST_DELAY_SECONDS = float(os.getenv("AMAZON_REQUEST_DELAY_SECONDS", "1"))
 
 PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
 
 EXCLUDED_CATEGORIES = [
-    283155,       # Books
-    5174,         # CDs & Vinyl
-    133140011,    # Kindle Store
-    2625373011,   # Movies & TV
-    7141123011,   # Clothing
-    163856011,    # Digital Music
-    18145289011,  # Audible
-    2350149011,   # Apps & Games
-    2238192011,   # Gift Cards
-    4991425011,   # Collectibles & Fine Art
-    229534,       # Software
-    18981045011,  # Amazon Luxury
-    11260432011,  # Handmade Products
-    16310091,     # Industrial & Scientific
+    283155, 5174, 133140011, 2625373011, 7141123011,
+    163856011, 18145289011, 2350149011, 2238192011,
+    4991425011, 229534, 18981045011, 11260432011,
+    16310091,
 ]
 
 BAD_KEYWORDS = [
@@ -102,7 +93,6 @@ def decode_title(raw):
 def is_bad_title(title):
     if not title or len(title) < 3:
         return True
-    # Block foreign language titles (check first 10 chars)
     try:
         if not all(ord(c) < 128 for c in title[:10]):
             return True
@@ -263,7 +253,6 @@ def get_keepa_deals(api_key, cached_asins):
                 print(f"    priceType {pt} page {page} failed: {e}")
             time.sleep(DEAL_REQUEST_DELAY_SECONDS)
 
-    # Deduplicate and filter
     seen = set(BLACKLISTED_ASINS)
     unique_asins = []
 
@@ -272,14 +261,12 @@ def get_keepa_deals(api_key, cached_asins):
         if not asin or asin in seen:
             continue
 
-        # Decode title (may be int array or string)
         raw_title = item.get("title", "")
         title = decode_title(raw_title)
 
         if is_bad_title(title):
             continue
 
-        # Min price $10  current is a list, index varies by price type
         prices = [x for x in item.get("current", []) if isinstance(x, (int, float)) and x > 500]
         if not prices or min(prices) < 1000:
             continue
@@ -360,7 +347,6 @@ def build_and_merge(asins, amazon_items, memory):
         if not item:
             continue
 
-        # Title
         try:
             title = item.item_info.title.display_value
         except:
@@ -369,26 +355,22 @@ def build_and_merge(asins, amazon_items, memory):
             skip_count += 1
             continue
 
-        # Brand
         try:
             brand = item.item_info.by_line_info.brand.display_value
         except:
             brand = None
 
-        # Category
         try:
             raw_category = item.item_info.classifications.product_group.display_value
         except:
             raw_category = None
         category = normalize_category(raw_category)
 
-        # Image
         try:
             image = item.images.primary.large.url
         except:
             image = None
 
-        # Price
         try:
             listing       = item.offers_v2.listings[0]
             price_amount  = listing.price.money.amount
@@ -405,7 +387,6 @@ def build_and_merge(asins, amazon_items, memory):
             skip_count += 1
             continue
 
-        # Skip used items
         try:
             condition = listing.condition.value
             if condition and condition.lower() != "new":
@@ -414,25 +395,21 @@ def build_and_merge(asins, amazon_items, memory):
         except:
             pass
 
-        # Availability
         try:
             availability = listing.availability.type
         except:
             availability = None
 
-        # Deal type
         try:
             deal_type = listing.deal_details.access_type
         except:
             deal_type = "PRICE_DROP"
 
-        # URL
         try:
             url = item.detail_page_url
         except:
             url = f"https://www.amazon.com/dp/{asin}?tag={PARTNER_TAG}"
 
-        # Discount
         pct_off        = MIN_DISCOUNT_PCT
         was_display    = None
         discount_label = f"-{pct_off}%+"
@@ -448,7 +425,6 @@ def build_and_merge(asins, amazon_items, memory):
         except:
             pass
 
-        # Coupon detection
         has_coupon = False
         coupon_display = ""
         try:
