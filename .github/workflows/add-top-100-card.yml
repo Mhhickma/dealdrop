@@ -1,0 +1,57 @@
+name: Add Top 100 Card
+
+on:
+  push:
+    paths:
+      - '.github/triggers/add-top-100-card.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add Top 100 card to browse deal pages
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+
+          if '/top-100-amazon-deals-today/' in html:
+              print('Top 100 card already exists.')
+              raise SystemExit(0)
+
+          match = re.search(r'(<a[^>]+href=["\']/best-amazon-home-kitchen-deals/?["\'][\s\S]*?</a>)', html)
+          if not match:
+              match = re.search(r'(<a[^>]+href=["\']/best-amazon-deals-under-50/?["\'][\s\S]*?</a>)', html)
+
+          if not match:
+              raise SystemExit('Could not find an existing deal-page card to copy.')
+
+          card = match.group(1)
+          card = re.sub(r'href=["\']/[^"\']+["\']', 'href="/top-100-amazon-deals-today/"', card, count=1)
+          card = re.sub(r'>\s*(HOME|BUDGET|CATEGORY)\s*<', '>TOP 100<', card, count=1)
+          card = re.sub(r'Best Amazon Home\s*&amp;\s*Kitchen Deals|Best Amazon Home\s*&\s*Kitchen Deals|Best Amazon Deals Under \$50|Best Amazon Tool Deals', 'Top 100 Amazon Deals Today', card, count=1)
+          card = re.sub(r'Kitchen gadgets, cookware, storage, bedding, and everyday essentials\.|Budget-friendly deals across home, tech, kitchen, and more\.|Power tools, hand tools, storage, and workshop finds\.', 'Ranked daily deals, hot price drops, coupons, and best finds.', card, count=1)
+
+          html = html[:match.end()] + '\n' + card + html[match.end():]
+          p.write_text(html, encoding='utf-8')
+          print('Added Top 100 card.')
+          PY
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Add Top 100 card to homepage navigation"
+          git push
