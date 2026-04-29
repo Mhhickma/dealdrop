@@ -8,6 +8,18 @@
   ],
   "routes": [
     {
+      "src": "/images/pages/top-100-amazon-deals-today.png",
+      "dest": "/top100amazondealstoday.png"
+    },
+    {
+      "src": "/images/pages/best-amazon-home-kitchen-deals.png",
+      "dest": "/home-kitchen-deals-banner.png"
+    },
+    {
+      "src": "/images/pages/best-amazon-deals-under-50.png",
+      "dest": "/under50image.png"
+    },
+    {
       "src": "/",
       "dest": "/index.html"
     },
