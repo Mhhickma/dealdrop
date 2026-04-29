@@ -9,6 +9,7 @@ import json
 import os
 import time
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone, timedelta
 from amazon_creatorsapi import AmazonCreatorsApi, Country
 from amazon_creatorsapi.models import GetItemsResource
@@ -39,11 +40,14 @@ KEEPA_DEALS_URL   = "https://api.keepa.com/deal"
 
 # Pull more candidates from Keepa by scanning multiple deal pages per price type.
 # Set MAX_NEW_ASINS_PER_RUN to 0 for no cap.
+# Keep AMAZON_BATCH_SIZE at 10 because Amazon GetItems supports up to 10 ASINs per request.
+# AMAZON_CONCURRENT_BATCHES controls how many legal 10-ASIN requests run at the same time.
 # You can override these in GitHub Actions/Vercel env vars without editing code.
 KEEPA_DEAL_PAGES             = int(os.getenv("KEEPA_DEAL_PAGES", "10"))
 MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "0"))
 DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "3"))
 AMAZON_REQUEST_DELAY_SECONDS = float(os.getenv("AMAZON_REQUEST_DELAY_SECONDS", "1"))
+AMAZON_CONCURRENT_BATCHES    = int(os.getenv("AMAZON_CONCURRENT_BATCHES", "5"))
 
 PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
 
@@ -294,18 +298,8 @@ def get_keepa_deals(api_key, cached_asins):
 # ---------------------------------------------
 # STEP 2: Pull pricing from Amazon Creators API
 # ---------------------------------------------
-def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
-    print("\n[2/3] Fetching pricing from Amazon Creators API...")
-
-    amazon = AmazonCreatorsApi(
-        credential_id=credential_id,
-        credential_secret=credential_secret,
-        version="3.1",
-        tag=partner_tag,
-        country=Country.US,
-    )
-
-    resources = [
+def get_amazon_resources():
+    return [
         GetItemsResource.ITEM_INFO_DOT_TITLE,
         GetItemsResource.ITEM_INFO_DOT_BY_LINE_INFO,
         GetItemsResource.ITEM_INFO_DOT_CLASSIFICATIONS,
@@ -317,17 +311,61 @@ def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
         GetItemsResource.OFFERS_V2_DOT_LISTINGS_DOT_DEAL_DETAILS,
     ]
 
+
+def fetch_amazon_batch(batch, batch_num, total_batches, credential_id, credential_secret, partner_tag):
+    print(f"    Batch {batch_num}/{total_batches} ({len(batch)} items)...")
+    amazon = AmazonCreatorsApi(
+        credential_id=credential_id,
+        credential_secret=credential_secret,
+        version="3.1",
+        tag=partner_tag,
+        country=Country.US,
+    )
+    items = amazon.get_items(batch, resources=get_amazon_resources())
+    return batch_num, items
+
+
+def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
+    print("\n[2/3] Fetching pricing from Amazon Creators API...")
+
+    if not asins:
+        return {}
+
+    batches = [asins[i:i + AMAZON_BATCH_SIZE] for i in range(0, len(asins), AMAZON_BATCH_SIZE)]
+    total_batches = len(batches)
+    worker_count = max(1, min(AMAZON_CONCURRENT_BATCHES, total_batches))
+
+    print(
+        f"    Processing {len(asins)} ASINs in {total_batches} batches "
+        f"with {worker_count} concurrent worker(s)."
+    )
+
     all_items = {}
-    for i in range(0, len(asins), AMAZON_BATCH_SIZE):
-        batch = asins[i:i + AMAZON_BATCH_SIZE]
-        print(f"    Batch {i // AMAZON_BATCH_SIZE + 1} ({len(batch)} items)...")
-        try:
-            items = amazon.get_items(batch, resources=resources)
-            for item in items:
-                all_items[item.asin] = item
-        except Exception as e:
-            print(f"    Warning: batch failed - {e}")
-        time.sleep(AMAZON_REQUEST_DELAY_SECONDS)
+
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        futures = []
+        for idx, batch in enumerate(batches, start=1):
+            futures.append(
+                executor.submit(
+                    fetch_amazon_batch,
+                    batch,
+                    idx,
+                    total_batches,
+                    credential_id,
+                    credential_secret,
+                    partner_tag,
+                )
+            )
+            if AMAZON_REQUEST_DELAY_SECONDS > 0:
+                time.sleep(AMAZON_REQUEST_DELAY_SECONDS)
+
+        for future in as_completed(futures):
+            try:
+                batch_num, items = future.result()
+                for item in items:
+                    all_items[item.asin] = item
+            except Exception as e:
+                print(f"    Warning: batch failed - {e}")
 
     print(f"    Retrieved {len(all_items)} items from Amazon.")
     return all_items
