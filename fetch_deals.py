@@ -32,7 +32,7 @@ if not CREDENTIAL_ID or not CREDENTIAL_SECRET:
 # ---------------------------------------------
 OUTPUT_FILE       = "deals.json"
 MEMORY_FILE       = "deals_memory.json"
-MAX_DISPLAY       = 2000
+MAX_DISPLAY       = 5000
 DEAL_TTL_HOURS    = 24
 AMAZON_BATCH_SIZE = 10
 MIN_DISCOUNT_PCT  = 5
