@@ -1148,6 +1148,7 @@
 
   footer { background: var(--surface); border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
   footer p { font-size: 13px; color: var(--text-muted); }
+  .footer-disclosure { margin-bottom: 10px; font-size: 11px; color: #8a6a20; background: #fffbf0; border: 1px solid #f0e8d0; border-radius: 10px; padding: 10px 14px; display: inline-block; max-width: 900px; }
   footer a { color: var(--accent); text-decoration: none; }
   .disclaimer { max-width: 600px; margin: 8px auto 0; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
 
@@ -1434,12 +1435,12 @@
 .bld-header-main {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 20px 24px 18px;
-  min-height: 142px;
+  padding: 22px 24px 18px;
+  min-height: 140px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 32px;
 }
 .bld-brand {
   display: flex;
@@ -1480,7 +1481,8 @@
 .bld-header-actions {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 24px;
+  margin-left: auto;
 }
 .bld-desktop-nav {
   display: flex;
@@ -1543,7 +1545,7 @@
 .bld-pill-strip {
   background: linear-gradient(180deg, #fff9ec 0%, #fffdf8 100%);
   border-top: 1px solid #f0e5cc;
-  padding: 18px 24px 20px;
+  padding: 20px 24px 22px;
 }
 .bld-pill-row {
   max-width: 1180px;
@@ -1609,7 +1611,7 @@
     gap: 10px;
     margin-left: auto;
   }
-  .bld-pill-strip {
+.bld-pill-strip {
     padding: 14px 16px 16px;
     overflow-x: auto;
   }
@@ -1730,22 +1732,11 @@
       <a class="bld-nav-pill" href="/best-amazon-tool-deals/"><span class="bld-pill-icon">T</span> Tool Deals</a>
       <a class="bld-nav-pill" href="/best-amazon-home-kitchen-deals/"><span class="bld-pill-icon">H</span> Home &amp; Kitchen</a>
       <a class="bld-nav-pill" href="/best-amazon-deals-under-50/"><span class="bld-pill-icon">$</span> Under $50</a>
-      <a class="bld-nav-pill" href="/top-100-amazon-deals-today/"><span class="bld-pill-icon">100</span> Best Sellers on Sale</a>
+      <a class="bld-nav-pill" href="/top-100-amazon-deals-today/"><span class="bld-pill-icon">100</span> Top 100 Deals</a>
       <button class="bld-nav-pill" type="button" onclick="scrollToAllDeals()"><span class="bld-pill-icon">N</span> New Deals Today</button>
     </div>
   </div>
 </header>
-
-<div class="disclosure-bar">
-  <span> As an Amazon Associate we earn from qualifying purchases. Prices and availability are accurate at time of posting. &nbsp;&middot;&nbsp; Trusted deal source since 2023.</span>
-</div>
-
-<div class="search-strip">
-  <div class="search-inner">
-    <input type="text" id="search-input" placeholder="Search deals by name, brand or category..." oninput="handleSearch()" onkeydown="if(event.key==='Enter'){handleSearch();setTimeout(()=>{document.getElementById('deals-section').scrollIntoView({behavior:'smooth',block:'start'})},100)}" />
-    <button class="search-clear" id="search-clear" onclick="clearSearch()">x</button>
-  </div>
-</div>
 
 <!-- Desktop hero (hidden on mobile via CSS) -->
 <section class="hero">
@@ -1901,6 +1892,7 @@
 </div>
 
 <footer>
+  <p class="footer-disclosure">As an Amazon Associate we earn from qualifying purchases. Prices and availability are accurate at time of posting. &middot; Trusted deal source since 2023.</p>
   <p>Made with care by <strong>Black Lab Deals</strong> &middot; <a href="#">About</a> &middot; <a href="#">Contact</a> &middot; <a href="#">Privacy</a></p>
   <p style="margin-top:6px;font-size:12px;color:var(--text-muted);">Updated every 30 minutes &middot; Powered by live Amazon data</p>
   <p class="disclaimer">As an Amazon Associate I earn from qualifying purchases. Prices sourced live from Amazon. Some deals include clippable coupons on the Amazon product page.</p>
@@ -2133,17 +2125,31 @@ function sortDeals(arr) {
   return a;
 }
 
+function runHeaderSearch() {
+  const input = document.getElementById('header-search-input');
+  const legacyInput = document.getElementById('search-input');
+  if (!input) return;
+  searchQuery = input.value.trim().toLowerCase();
+  if (legacyInput) legacyInput.value = input.value;
+  renderDeals(getCurrentCategory());
+  scrollToAllDeals();
+}
+
 function handleSearch() {
   const input = document.getElementById('search-input');
   const clear  = document.getElementById('search-clear');
   searchQuery  = input.value.trim().toLowerCase();
-  clear.style.display = searchQuery ? 'block' : 'none';
+  if (clear) clear.style.display = searchQuery ? 'block' : 'none';
   renderDeals(getCurrentCategory());
 }
 
 function clearSearch() {
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-clear').style.display = 'none';
+  const mainSearch = document.getElementById('search-input');
+  const headerSearch = document.getElementById('header-search-input');
+  const clearBtn = document.getElementById('search-clear');
+  if (mainSearch) mainSearch.value = '';
+  if (headerSearch) headerSearch.value = '';
+  if (clearBtn) clearBtn.style.display = 'none';
   searchQuery = '';
   renderDeals(getCurrentCategory());
 }
