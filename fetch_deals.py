@@ -39,9 +39,9 @@ KEEPA_DEALS_URL   = "https://api.keepa.com/deal"
 
 # Pull more candidates from Keepa by scanning multiple deal pages per price type.
 # You can override these in GitHub Actions/Vercel env vars without editing code.
-KEEPA_DEAL_PAGES             = int(os.getenv("KEEPA_DEAL_PAGES", "3"))
-MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "250"))
-DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "1"))
+KEEPA_DEAL_PAGES             = int(os.getenv("KEEPA_DEAL_PAGES", "10"))
+MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "400"))
+DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "3"))
 AMAZON_REQUEST_DELAY_SECONDS = float(os.getenv("AMAZON_REQUEST_DELAY_SECONDS", "1"))
 
 PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
