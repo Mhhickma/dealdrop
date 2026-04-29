@@ -8,6 +8,38 @@
   ],
   "routes": [
     {
+      "src": "/top-100-amazon-deals-today",
+      "dest": "/top-100-amazon-deals-today/index.html"
+    },
+    {
+      "src": "/top-100-amazon-deals-today/",
+      "dest": "/top-100-amazon-deals-today/index.html"
+    },
+    {
+      "src": "/best-amazon-home-kitchen-deals",
+      "dest": "/best-amazon-home-kitchen-deals/index.html"
+    },
+    {
+      "src": "/best-amazon-home-kitchen-deals/",
+      "dest": "/best-amazon-home-kitchen-deals/index.html"
+    },
+    {
+      "src": "/best-amazon-tool-deals",
+      "dest": "/best-amazon-tool-deals/index.html"
+    },
+    {
+      "src": "/best-amazon-tool-deals/",
+      "dest": "/best-amazon-tool-deals/index.html"
+    },
+    {
+      "src": "/best-amazon-deals-under-50",
+      "dest": "/best-amazon-deals-under-50/index.html"
+    },
+    {
+      "src": "/best-amazon-deals-under-50/",
+      "dest": "/best-amazon-deals-under-50/index.html"
+    },
+    {
       "src": "/images/pages/top-100-amazon-deals-today.png",
       "dest": "/top100amazondealstoday.png"
     },
