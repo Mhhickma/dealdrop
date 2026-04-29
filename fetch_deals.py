@@ -37,6 +37,13 @@ AMAZON_BATCH_SIZE = 10
 MIN_DISCOUNT_PCT  = 5
 KEEPA_DEALS_URL   = "https://api.keepa.com/deal"
 
+# Pull more candidates from Keepa by scanning multiple deal pages per price type.
+# You can override these in GitHub Actions/Vercel env vars without editing code.
+KEEPA_DEAL_PAGES             = int(os.getenv("KEEPA_DEAL_PAGES", "3"))
+MAX_NEW_ASINS_PER_RUN        = int(os.getenv("MAX_NEW_ASINS_PER_RUN", "250"))
+DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "1"))
+AMAZON_REQUEST_DELAY_SECONDS = float(os.getenv("AMAZON_REQUEST_DELAY_SECONDS", "1"))
+
 PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
 
 EXCLUDED_CATEGORIES = [
@@ -219,37 +226,42 @@ def purge_expired(memory):
 # ---------------------------------------------
 def get_keepa_deals(api_key, cached_asins):
     print("\n[1/3] Fetching deals from Keepa deals endpoint...")
+    print(f"    Scanning {KEEPA_DEAL_PAGES} page(s) for each of {len(PRICE_TYPES)} price types.")
 
     all_deals = []
 
     for pt in PRICE_TYPES:
-        payload = {
-            "domainId":          1,
-            "priceTypes":        [pt],
-            "dateRange":         4,
-            "sortType":          4,
-            "page":              0,
-            "filterErotic":      True,
-            "hasReviews":        True,
-            "minRating":         40,
-            "deltaPercentRange": [-100, -MIN_DISCOUNT_PCT],
-            "excludeCategories": EXCLUDED_CATEGORIES,
-        }
-        try:
-            r = requests.post(
-                KEEPA_DEALS_URL,
-                params={"key": api_key, "domain": 1},
-                json=payload,
-                timeout=15,
-            )
-            r.raise_for_status()
-            data = r.json()
-            dr = data.get("deals", {}).get("dr", [])
-            all_deals.extend(dr)
-            print(f"    priceType {pt} -> {len(dr)} deals | tokens left: {data.get('tokensLeft', '?')}")
-        except Exception as e:
-            print(f"    priceType {pt} failed: {e}")
-        time.sleep(1)
+        for page in range(KEEPA_DEAL_PAGES):
+            payload = {
+                "domainId":          1,
+                "priceTypes":        [pt],
+                "dateRange":         4,
+                "sortType":          4,
+                "page":              page,
+                "filterErotic":      True,
+                "hasReviews":        True,
+                "minRating":         40,
+                "deltaPercentRange": [-100, -MIN_DISCOUNT_PCT],
+                "excludeCategories": EXCLUDED_CATEGORIES,
+            }
+            try:
+                r = requests.post(
+                    KEEPA_DEALS_URL,
+                    params={"key": api_key, "domain": 1},
+                    json=payload,
+                    timeout=15,
+                )
+                r.raise_for_status()
+                data = r.json()
+                dr = data.get("deals", {}).get("dr", [])
+                all_deals.extend(dr)
+                print(
+                    f"    priceType {pt} page {page} -> {len(dr)} deals | "
+                    f"tokens left: {data.get('tokensLeft', '?')}"
+                )
+            except Exception as e:
+                print(f"    priceType {pt} page {page} failed: {e}")
+            time.sleep(DEAL_REQUEST_DELAY_SECONDS)
 
     # Deduplicate and filter
     seen = set(BLACKLISTED_ASINS)
@@ -278,9 +290,17 @@ def get_keepa_deals(api_key, cached_asins):
     print(f"    {len(unique_asins)} unique clean ASINs after filtering.")
 
     new_asins = [a for a in unique_asins if a not in cached_asins]
-    print(f"    {len(new_asins)} new ASINs to fetch from Amazon "
-          f"({len(unique_asins) - len(new_asins)} already cached).")
+    cached_count = len(unique_asins) - len(new_asins)
+    print(f"    {len(new_asins)} new ASINs found ({cached_count} already cached).")
 
+    if MAX_NEW_ASINS_PER_RUN > 0 and len(new_asins) > MAX_NEW_ASINS_PER_RUN:
+        print(
+            f"    Capping Amazon pricing lookup to first {MAX_NEW_ASINS_PER_RUN} "
+            f"new ASINs this run."
+        )
+        new_asins = new_asins[:MAX_NEW_ASINS_PER_RUN]
+
+    print(f"    {len(new_asins)} new ASINs to fetch from Amazon.")
     return new_asins
 
 
@@ -320,7 +340,7 @@ def get_amazon_pricing(asins, credential_id, credential_secret, partner_tag):
                 all_items[item.asin] = item
         except Exception as e:
             print(f"    Warning: batch failed - {e}")
-        time.sleep(1)
+        time.sleep(AMAZON_REQUEST_DELAY_SECONDS)
 
     print(f"    Retrieved {len(all_items)} items from Amazon.")
     return all_items
