@@ -20,9 +20,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git revert --no-edit 3ecd8a37e899dd1c316f8ab220e416f3031b7809 || true
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "No changes needed."
-            exit 0
-          fi
+          git revert --no-edit 3ecd8a37e899dd1c316f8ab220e416f3031b7809
           git push
