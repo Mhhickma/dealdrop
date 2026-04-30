@@ -1634,7 +1634,16 @@
     </a>
 
     <div class="bld-header-actions">
-      <nav class="bld-desktop-nav" aria-label="Main navigation"><a href="/#hot-deals">Hot Deals</a><span class="bld-nav-divider"></span><div class="bld-category-wrap"><button class="bld-category-trigger" type="button">Categories <span>v</span></button><div class="dropdown-menu"><a class="dropdown-item" href="/best-amazon-tool-deals/">Tool Deals</a><a class="dropdown-item" href="/best-amazon-home-kitchen-deals/">Home &amp; Kitchen</a><a class="dropdown-item" href="/best-amazon-deals-under-50/">Under $50</a><a class="dropdown-item" href="/top-100-amazon-deals-today/">Top 100 Deals</a><a class="dropdown-item" href="/#deals-section">New Deals Today</a></div></div><span class="bld-nav-divider"></span><a href="/#deals-section">All Deals</a></nav>
+      <nav class="bld-desktop-nav" aria-label="Main navigation">
+        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
+        <div class="bld-category-wrap">
+          <button class="bld-category-trigger" type="button">Categories <span aria-hidden="true">v</span></button>
+          <div class="dropdown-menu" id="menu-categories" style="min-width:240px;"></div>
+        </div>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
+        <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
+      </nav>
       <button class="bld-alert-btn" onclick="scrollToAlerts()" type="button"><span class="bld-alert-icon">●</span> Get Alerts</button>
     </div>
 
