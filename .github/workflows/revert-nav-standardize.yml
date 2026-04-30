@@ -1,28 +1,28 @@
-name: Revert Navigation Standardization
+name: Undo Navigation Change
 
 on:
   push:
     paths:
-      - '.github/triggers/revert-nav-standardize.txt'
+      - '.github/triggers/undo-nav-change.txt'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  revert:
+  undo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Revert bad navigation standardization commit
+      - name: Undo the navigation commit that broke deal loading
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git revert --no-edit 3ecd8a37e899dd1c316f8ab220e416f3031b7809 || true
           if git diff --quiet && git diff --cached --quiet; then
-            echo "No revert changes needed."
+            echo "No changes needed."
             exit 0
           fi
           git push
