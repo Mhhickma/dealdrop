@@ -1,4 +1,4 @@
-name: Create Homepage Header Test
+name: Apply Shared Header to Homepage
 
 on:
   push:
@@ -10,51 +10,43 @@ permissions:
   contents: write
 
 jobs:
-  create-test-page:
+  patch-homepage-header:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Copy homepage and swap only the header for shared header test
+      - name: Replace only homepage header nav with shared header
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
 
-          src = Path('index.html')
-          out_dir = Path('homepage-header-test')
-          out_dir.mkdir(exist_ok=True)
-          out = out_dir / 'index.html'
-
-          html = src.read_text(encoding='utf-8')
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+          original = html
 
           if '/site-nav.css' not in html:
               html = html.replace('</head>', '<link rel="stylesheet" href="/site-nav.css">\n</head>', 1)
 
-          # Replace only the first real HTML <nav> block after <body>.
-          # This avoids touching CSS rules like "nav { ... }" inside <style>.
-          body_pos = html.lower().find('<body')
-          if body_pos == -1:
-              raise SystemExit('Could not find body tag.')
+          if '<div id="site-header"></div>' not in html:
+              body_pos = html.lower().find('<body')
+              if body_pos == -1:
+                  raise SystemExit('Could not find body tag.')
 
-          nav_start = html.lower().find('<nav', body_pos)
-          nav_end = html.lower().find('</nav>', nav_start)
-          if nav_start == -1 or nav_end == -1:
-              raise SystemExit('Could not find homepage nav block after body tag.')
+              nav_start = html.lower().find('<nav', body_pos)
+              nav_end = html.lower().find('</nav>', nav_start)
+              if nav_start == -1 or nav_end == -1:
+                  raise SystemExit('Could not find homepage nav block after body tag.')
 
-          nav_end += len('</nav>')
-          html = html[:nav_start] + '<div id="site-header"></div>' + html[nav_end:]
+              nav_end += len('</nav>')
+              html = html[:nav_start] + '<div id="site-header"></div>' + html[nav_end:]
 
           if '/site-header.js' not in html:
               html = html.replace('</body>', '<script src="/site-header.js"></script>\n</body>', 1)
 
-          # Keep this page out of search while testing.
-          if '<meta name="robots" content="noindex, nofollow">' not in html:
-              html = html.replace('<meta name="description"', '<meta name="robots" content="noindex, nofollow">\n<meta name="description"', 1)
-
-          html = re.sub(r'<title>[\s\S]*?</title>', '<title>Homepage Header Test | Black Lab Deals</title>', html, count=1)
-
-          out.write_text(html, encoding='utf-8')
-          print('Created homepage-header-test/index.html with shared header only.')
+          if html == original:
+              print('Homepage already uses shared header. No changes needed.')
+          else:
+              path.write_text(html, encoding='utf-8')
+              print('Updated homepage header only. Existing body content and deal scripts were left in place.')
           PY
       - name: Commit changes
         run: |
@@ -64,6 +56,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add homepage-header-test/index.html
-          git commit -m "Add homepage shared header test page"
+          git add index.html
+          git commit -m "Use shared header on homepage"
           git push
