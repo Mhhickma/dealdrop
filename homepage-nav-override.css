@@ -1,0 +1,140 @@
+/* Homepage-only navigation cleanup. Keeps the original working homepage header/scripts and only restyles the Categories dropdown. */
+.homepage-mega-menu {
+  width: min(680px, calc(100vw - 40px)) !important;
+  min-width: min(680px, calc(100vw - 40px)) !important;
+  max-width: calc(100vw - 40px) !important;
+  padding: 18px !important;
+  border-radius: 20px !important;
+  background: var(--surface, #fff) !important;
+  border: 1px solid var(--border, #e8e6e1) !important;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.16) !important;
+  overflow: visible !important;
+  z-index: 700 !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) translateY(-8px) !important;
+}
+
+.homepage-mega-menu.show {
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+.homepage-mega-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 4px 4px 16px;
+  border-bottom: 1px solid var(--border, #e8e6e1);
+  margin-bottom: 14px;
+}
+
+.homepage-mega-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--text-primary, #1a1a18);
+}
+
+.homepage-mega-subtitle {
+  color: var(--text-muted, #9e9e97);
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.homepage-mega-pill {
+  background: var(--accent-light, #e8eef5);
+  color: var(--accent, #1a3a5c);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 7px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.homepage-mega-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 14px;
+}
+
+.homepage-mega-column {
+  background: #fbfaf7;
+  border: 1px solid var(--border, #e8e6e1);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.homepage-mega-column h3 {
+  color: var(--text-primary, #1a1a18);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 900;
+}
+
+.homepage-mega-link {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 8px !important;
+  border-radius: 12px !important;
+  color: var(--text-secondary, #6b6b65) !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  background: transparent !important;
+  transition: background 0.12s, color 0.12s;
+  white-space: normal;
+}
+
+.homepage-mega-link:hover {
+  background: var(--accent-light, #e8eef5) !important;
+  color: var(--accent, #1a3a5c) !important;
+}
+
+.homepage-mega-icon {
+  width: 23px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--border, #e8e6e1);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.homepage-mega-footer {
+  margin-top: 14px;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  background: var(--accent, #1a3a5c) !important;
+  color: #fff !important;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+  font-weight: 900 !important;
+  font-size: 14px !important;
+}
+
+@media (max-width: 900px) {
+  .homepage-mega-menu {
+    width: min(92vw, 360px) !important;
+    min-width: min(92vw, 360px) !important;
+    max-height: 78vh;
+    overflow-y: auto !important;
+    left: auto !important;
+    right: 0 !important;
+    transform: translateY(-8px) !important;
+  }
+  .homepage-mega-menu.show { transform: translateY(0) !important; }
+  .homepage-mega-grid { grid-template-columns: 1fr; }
+  .homepage-mega-header { flex-direction: column; gap: 8px; }
+}
