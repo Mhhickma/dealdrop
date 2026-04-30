@@ -15,10 +15,26 @@
   z-index: 700 !important;
 }
 
+.bld-category-wrap {
+  position: relative;
+}
+
+/* Bridge the small space between the Categories button and the menu so hover does not drop. */
+.bld-category-wrap::after {
+  content: '';
+  position: absolute;
+  left: -24px;
+  right: -24px;
+  top: 100%;
+  height: 18px;
+  background: transparent;
+  pointer-events: auto;
+}
+
 .bld-category-wrap .dropdown-menu.bld-mega-menu {
   left: 50% !important;
   right: auto !important;
-  top: calc(100% + 14px) !important;
+  top: calc(100% + 4px) !important;
   transform: translateX(-50%) translateY(-8px) !important;
 }
 
@@ -139,6 +155,8 @@
 .bld-mega-footer:hover { background: var(--accent-mid, #2a5a8c) !important; }
 
 @media (max-width: 900px) {
+  .bld-category-wrap::after { display: none; }
+
   .bld-category-wrap .dropdown-menu.bld-mega-menu,
   #menu-categories.bld-mega-menu {
     width: min(92vw, 360px) !important;
