@@ -1,1 +1,1 @@
-apply shared header to homepage
+fix duplicate homepage header
