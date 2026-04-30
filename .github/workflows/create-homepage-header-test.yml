@@ -30,12 +30,19 @@ jobs:
           if '/site-nav.css' not in html:
               html = html.replace('</head>', '<link rel="stylesheet" href="/site-nav.css">\n</head>', 1)
 
-          # Replace only the original homepage top nav/header area.
-          # The homepage uses a <nav><div class="nav-inner">...</div></nav> block.
-          nav_pattern = re.compile(r'<nav>\s*<div class="nav-inner">[\s\S]*?</div>\s*</nav>', re.MULTILINE)
-          html, count = nav_pattern.subn('<div id="site-header"></div>', html, count=1)
-          if count != 1:
-              raise SystemExit('Could not find exactly one homepage nav block to replace.')
+          # Replace only the first real HTML <nav> block after <body>.
+          # This avoids touching CSS rules like "nav { ... }" inside <style>.
+          body_pos = html.lower().find('<body')
+          if body_pos == -1:
+              raise SystemExit('Could not find body tag.')
+
+          nav_start = html.lower().find('<nav', body_pos)
+          nav_end = html.lower().find('</nav>', nav_start)
+          if nav_start == -1 or nav_end == -1:
+              raise SystemExit('Could not find homepage nav block after body tag.')
+
+          nav_end += len('</nav>')
+          html = html[:nav_start] + '<div id="site-header"></div>' + html[nav_end:]
 
           if '/site-header.js' not in html:
               html = html.replace('</body>', '<script src="/site-header.js"></script>\n</body>', 1)
@@ -44,9 +51,7 @@ jobs:
           if '<meta name="robots" content="noindex, nofollow">' not in html:
               html = html.replace('<meta name="description"', '<meta name="robots" content="noindex, nofollow">\n<meta name="description"', 1)
 
-          # Make it visually clear this is a test copy.
-          if '<title>Homepage Header Test | Black Lab Deals</title>' not in html:
-              html = re.sub(r'<title>[\s\S]*?</title>', '<title>Homepage Header Test | Black Lab Deals</title>', html, count=1)
+          html = re.sub(r'<title>[\s\S]*?</title>', '<title>Homepage Header Test | Black Lab Deals</title>', html, count=1)
 
           out.write_text(html, encoding='utf-8')
           print('Created homepage-header-test/index.html with shared header only.')
