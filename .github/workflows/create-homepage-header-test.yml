@@ -14,48 +14,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Replace only homepage header nav with shared header
+      - name: Keep one homepage header
         run: |
           python - <<'PY'
           from pathlib import Path
-
           path = Path('index.html')
           html = path.read_text(encoding='utf-8')
-          original = html
-
+          old = html
+          marker = '<div id="site-header"></div>'
           if '/site-nav.css' not in html:
               html = html.replace('</head>', '<link rel="stylesheet" href="/site-nav.css">\n</head>', 1)
-
-          if '<div id="site-header"></div>' not in html:
-              body_pos = html.lower().find('<body')
-              if body_pos == -1:
-                  raise SystemExit('Could not find body tag.')
-
-              nav_start = html.lower().find('<nav', body_pos)
-              nav_end = html.lower().find('</nav>', nav_start)
-              if nav_start == -1 or nav_end == -1:
-                  raise SystemExit('Could not find homepage nav block after body tag.')
-
-              nav_end += len('</nav>')
-              html = html[:nav_start] + '<div id="site-header"></div>' + html[nav_end:]
-
+          body = html.lower().find('<body')
+          pos = html.find(marker, body)
+          if pos >= 0:
+              low = html.lower()
+              start = low.rfind('<header', body, pos)
+              end = low.find('</header>', pos)
+              if start >= 0 and end >= 0:
+                  html = html[:start] + marker + html[end+9:]
+              else:
+                  start = low.rfind('<nav', body, pos)
+                  end = low.find('</nav>', pos)
+                  if start >= 0 and end >= 0:
+                      html = html[:start] + marker + html[end+6:]
+          else:
+              low = html.lower()
+              start = low.find('<header', body)
+              end = low.find('</header>', start)
+              if start < 0 or end < 0:
+                  start = low.find('<nav', body)
+                  end = low.find('</nav>', start)
+                  close_len = 6
+              else:
+                  close_len = 9
+              if start < 0 or end < 0:
+                  raise SystemExit('header not found')
+              html = html[:start] + marker + html[end+close_len:]
           if '/site-header.js' not in html:
               html = html.replace('</body>', '<script src="/site-header.js"></script>\n</body>', 1)
-
-          if html == original:
-              print('Homepage already uses shared header. No changes needed.')
-          else:
+          if html != old:
               path.write_text(html, encoding='utf-8')
-              print('Updated homepage header only. Existing body content and deal scripts were left in place.')
           PY
       - name: Commit changes
         run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
+          if git diff --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Use shared header on homepage"
+          git commit -m "Fix homepage shared header"
           git push
