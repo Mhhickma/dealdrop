@@ -1,0 +1,64 @@
+name: Fetch Best Seller Deals
+
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-best-seller-deals-main
+  cancel-in-progress: true
+
+jobs:
+  fetch-best-seller-deals:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests keepa numpy python-amazon-paapi
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Run best seller deal fetcher
+        env:
+          KEEPA_API_KEY:              ${{ secrets.KEEPA_API_KEY }}
+          AFFILIATE_TAG:              ${{ secrets.AFFILIATE_TAG }}
+          CREATORS_CREDENTIAL_ID:     ${{ secrets.CREATORS_CREDENTIAL_ID }}
+          CREATORS_CREDENTIAL_SECRET: ${{ secrets.CREATORS_CREDENTIAL_SECRET }}
+          BEST_SELLER_ASINS_PER_RUN:  125
+        run: python fetch_best_seller_deals.py
+
+      - name: Commit and push updated best seller deal files
+        run: |
+          git config user.name "DealDrop Bot"
+          git config user.email "bot@dealdrop.com"
+
+          git add -f best_seller_categories.json || true
+          git add -f best_seller_watchlist.json || true
+          git add -f best_seller_state.json || true
+          git add -f best_seller_deals.json || true
+
+          git status
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update best seller deals $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push origin main
