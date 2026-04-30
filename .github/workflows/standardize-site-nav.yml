@@ -1,0 +1,68 @@
+name: Standardize Site Navigation
+
+on:
+  push:
+    paths:
+      - '.github/triggers/standardize-site-nav.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make navigation consistent across all pages
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          STANDARD_CATEGORY_WRAP = '''<div class="bld-category-wrap"><button class="bld-category-trigger" type="button">Categories <span>v</span></button><div class="dropdown-menu"><a class="dropdown-item" href="/best-amazon-tool-deals/">Tool Deals</a><a class="dropdown-item" href="/best-amazon-home-kitchen-deals/">Home &amp; Kitchen</a><a class="dropdown-item" href="/best-amazon-deals-under-50/">Under $50</a><a class="dropdown-item" href="/top-100-amazon-deals-today/">Top 100 Deals</a><a class="dropdown-item" href="/#deals-section">New Deals Today</a></div></div>'''
+
+          STANDARD_DESKTOP_NAV = '''<nav class="bld-desktop-nav" aria-label="Main navigation"><a href="/#hot-deals">Hot Deals</a><span class="bld-nav-divider"></span>''' + STANDARD_CATEGORY_WRAP + '''<span class="bld-nav-divider"></span><a href="/#deals-section">All Deals</a></nav>'''
+
+          changed = []
+          html_files = [p for p in Path('.').rglob('*.html') if '.git' not in p.parts and '.github' not in p.parts]
+
+          category_pattern = re.compile(r'<div class="bld-category-wrap">\s*<button[^>]*class="bld-category-trigger"[\s\S]*?</button>\s*<div class="dropdown-menu">[\s\S]*?</div>\s*</div>')
+          desktop_nav_pattern = re.compile(r'<nav class="bld-desktop-nav" aria-label="Main navigation">[\s\S]*?</nav>')
+
+          for path in html_files:
+              html = path.read_text(encoding='utf-8')
+              original = html
+
+              # Pages already using the Black Lab Deals shared header get the exact same desktop nav.
+              if 'class="bld-desktop-nav"' in html:
+                  html = desktop_nav_pattern.sub(STANDARD_DESKTOP_NAV, html, count=1)
+
+              # Safety pass for pages that only need the dropdown standardized.
+              html = category_pattern.sub(STANDARD_CATEGORY_WRAP, html)
+
+              # Keep the alert button consistent on shared-header pages.
+              html = re.sub(r'<a class="bld-alert-btn" href="[^"]*"><span class="bld-alert-icon">●</span>\s*(?:Get\s*)?Alerts</a>', '<a class="bld-alert-btn" href="/#alerts-box"><span class="bld-alert-icon">●</span> Get Alerts</a>', html)
+
+              if html != original:
+                  path.write_text(html, encoding='utf-8')
+                  changed.append(str(path))
+
+          if changed:
+              print('Updated navigation in:')
+              for item in changed:
+                  print(' -', item)
+          else:
+              print('No navigation changes needed.')
+          PY
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Standardize navigation across pages"
+          git push
