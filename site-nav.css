@@ -1,0 +1,162 @@
+/* Black Lab Deals uniform header navigation / mega menu only.
+   Step 1: shared CSS file only. This does not affect any page until a page links to it. */
+
+.bld-category-wrap .dropdown-menu.bld-mega-menu,
+#menu-categories.bld-mega-menu {
+  width: min(680px, calc(100vw - 40px)) !important;
+  min-width: min(680px, calc(100vw - 40px)) !important;
+  max-width: calc(100vw - 40px) !important;
+  padding: 18px !important;
+  border-radius: 20px !important;
+  background: var(--surface, #fff) !important;
+  border: 1px solid var(--border, #e8e6e1) !important;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.16) !important;
+  overflow: visible !important;
+  z-index: 700 !important;
+}
+
+.bld-category-wrap .dropdown-menu.bld-mega-menu {
+  left: 50% !important;
+  right: auto !important;
+  top: calc(100% + 14px) !important;
+  transform: translateX(-50%) translateY(-8px) !important;
+}
+
+.bld-category-wrap:hover .dropdown-menu.bld-mega-menu,
+.bld-category-wrap:focus-within .dropdown-menu.bld-mega-menu,
+.dropdown-menu.bld-mega-menu.show,
+#menu-categories.bld-mega-menu.show {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+.bld-mega-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 4px 4px 16px;
+  border-bottom: 1px solid var(--border, #e8e6e1);
+  margin-bottom: 14px;
+}
+
+.bld-mega-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--text-primary, #1a1a18);
+}
+
+.bld-mega-subtitle {
+  color: var(--text-muted, #9e9e97);
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.bld-mega-pill {
+  background: var(--accent-light, #e8eef5);
+  color: var(--accent, #1a3a5c);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 7px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.bld-mega-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 14px;
+}
+
+.bld-mega-column {
+  background: #fbfaf7;
+  border: 1px solid var(--border, #e8e6e1);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.bld-mega-column h3 {
+  color: var(--text-primary, #1a1a18);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 900;
+}
+
+.bld-mega-link {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 8px !important;
+  border-radius: 12px !important;
+  color: var(--text-secondary, #6b6b65) !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  background: transparent !important;
+  transition: background 0.12s, color 0.12s;
+  white-space: normal;
+}
+
+.bld-mega-link:hover {
+  background: var(--accent-light, #e8eef5) !important;
+  color: var(--accent, #1a3a5c) !important;
+}
+
+.bld-mega-icon {
+  width: 23px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--border, #e8e6e1);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.bld-mega-footer {
+  margin-top: 14px;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  background: var(--accent, #1a3a5c) !important;
+  color: #fff !important;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+  font-weight: 900 !important;
+  font-size: 14px !important;
+}
+
+.bld-mega-footer:hover { background: var(--accent-mid, #2a5a8c) !important; }
+
+@media (max-width: 900px) {
+  .bld-category-wrap .dropdown-menu.bld-mega-menu,
+  #menu-categories.bld-mega-menu {
+    width: min(92vw, 360px) !important;
+    min-width: min(92vw, 360px) !important;
+    max-height: 78vh;
+    overflow-y: auto !important;
+    left: auto !important;
+    right: 0 !important;
+    transform: translateY(-8px) !important;
+  }
+
+  .bld-category-wrap:hover .dropdown-menu.bld-mega-menu,
+  .bld-category-wrap:focus-within .dropdown-menu.bld-mega-menu,
+  .dropdown-menu.bld-mega-menu.show,
+  #menu-categories.bld-mega-menu.show {
+    transform: translateY(0) !important;
+  }
+
+  .bld-mega-grid { grid-template-columns: 1fr; }
+  .bld-mega-header { flex-direction: column; gap: 8px; }
+}
