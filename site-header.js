@@ -1,5 +1,5 @@
 /* Black Lab Deals uniform header navigation.
-   Step 2: shared header file only. This file does nothing unless a page loads it. */
+   Shared header used by pages that include /site-header.js. */
 
 (function () {
   const MEGA_MENU_HTML = `
@@ -24,18 +24,18 @@
         <h3>Popular Categories</h3>
         <a class="bld-mega-link" href="/best-amazon-tool-deals/"><span class="bld-mega-icon">🛠️</span>Tool Deals</a>
         <a class="bld-mega-link" href="/best-amazon-home-kitchen-deals/"><span class="bld-mega-icon">🏠</span>Home &amp; Kitchen</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="electronics"><span class="bld-mega-icon">💻</span>Electronics</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="automotive"><span class="bld-mega-icon">🚗</span>Automotive</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="patio"><span class="bld-mega-icon">🌿</span>Patio &amp; Garden</a>
+        <a class="bld-mega-link" href="/best-amazon-electronics-deals/"><span class="bld-mega-icon">💻</span>Electronics</a>
+        <a class="bld-mega-link" href="/best-amazon-automotive-deals/"><span class="bld-mega-icon">🚗</span>Automotive</a>
+        <a class="bld-mega-link" href="/best-amazon-patio-lawn-garden-deals/"><span class="bld-mega-icon">🌿</span>Patio &amp; Garden</a>
       </div>
 
       <div class="bld-mega-column">
         <h3>More</h3>
-        <a class="bld-mega-link" href="/#deals-section" data-category="sports"><span class="bld-mega-icon">🏈</span>Sports &amp; Outdoors</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="pet"><span class="bld-mega-icon">🐾</span>Pet Supplies</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="toys"><span class="bld-mega-icon">🧸</span>Toys &amp; Games</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="office"><span class="bld-mega-icon">🏢</span>Office Products</a>
-        <a class="bld-mega-link" href="/#deals-section" data-category="health"><span class="bld-mega-icon">🧼</span>Health &amp; Household</a>
+        <a class="bld-mega-link" href="/best-amazon-sports-outdoors-deals/"><span class="bld-mega-icon">🏈</span>Sports &amp; Outdoors</a>
+        <a class="bld-mega-link" href="/best-amazon-pet-supplies-deals/"><span class="bld-mega-icon">🐾</span>Pet Supplies</a>
+        <a class="bld-mega-link" href="/best-amazon-toys-games-deals/"><span class="bld-mega-icon">🧸</span>Toys &amp; Games</a>
+        <a class="bld-mega-link" href="/best-amazon-office-products-deals/"><span class="bld-mega-icon">🏢</span>Office Products</a>
+        <a class="bld-mega-link" href="/best-amazon-health-household-deals/"><span class="bld-mega-icon">🧼</span>Health &amp; Household</a>
       </div>
     </div>
 
