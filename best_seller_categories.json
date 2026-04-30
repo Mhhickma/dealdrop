@@ -1,0 +1,25 @@
+{
+  "domainId": 1,
+  "topPerCategory": 200,
+  "asinsPerRun": 125,
+  "minDropPercent": 10,
+  "dealTtlHours": 24,
+  "refreshBestSellerListHours": 168,
+  "categories": [
+    { "categoryId": 16333372011, "name": "Amazon Devices & Accessories", "slug": "amazon-devices-accessories", "enabled": true },
+    { "categoryId": 2619525011, "name": "Appliances", "slug": "appliances", "enabled": true },
+    { "categoryId": 165796011, "name": "Baby Products", "slug": "baby-products", "enabled": true },
+    { "categoryId": 3760911, "name": "Beauty & Personal Care", "slug": "beauty-personal-care", "enabled": true },
+    { "categoryId": 2335752011, "name": "Cell Phones & Accessories", "slug": "cell-phones-accessories", "enabled": true },
+    { "categoryId": 7141123011, "name": "Clothing, Shoes & Jewelry", "slug": "clothing-shoes-jewelry", "enabled": true },
+    { "categoryId": 172282, "name": "Electronics", "slug": "electronics", "enabled": true },
+    { "categoryId": 3760901, "name": "Health & Household", "slug": "health-household", "enabled": true },
+    { "categoryId": 1055398, "name": "Home & Kitchen", "slug": "home-kitchen", "enabled": true },
+    { "categoryId": 1064954, "name": "Office Products", "slug": "office-products", "enabled": true },
+    { "categoryId": 2972638011, "name": "Patio, Lawn & Garden", "slug": "patio-lawn-garden", "enabled": true },
+    { "categoryId": 2619533011, "name": "Pet Supplies", "slug": "pet-supplies", "enabled": true },
+    { "categoryId": 3375251, "name": "Sports & Outdoors", "slug": "sports-outdoors", "enabled": true },
+    { "categoryId": 228013, "name": "Tools & Home Improvement", "slug": "tools-home-improvement", "enabled": true },
+    { "categoryId": 165793011, "name": "Toys & Games", "slug": "toys-games", "enabled": true }
+  ]
+}
