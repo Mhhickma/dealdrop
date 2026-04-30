@@ -1,0 +1,64 @@
+name: Create Homepage Header Test
+
+on:
+  push:
+    paths:
+      - '.github/triggers/create-homepage-header-test.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create-test-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy homepage and swap only the header for shared header test
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          src = Path('index.html')
+          out_dir = Path('homepage-header-test')
+          out_dir.mkdir(exist_ok=True)
+          out = out_dir / 'index.html'
+
+          html = src.read_text(encoding='utf-8')
+
+          if '/site-nav.css' not in html:
+              html = html.replace('</head>', '<link rel="stylesheet" href="/site-nav.css">\n</head>', 1)
+
+          # Replace only the original homepage top nav/header area.
+          # The homepage uses a <nav><div class="nav-inner">...</div></nav> block.
+          nav_pattern = re.compile(r'<nav>\s*<div class="nav-inner">[\s\S]*?</div>\s*</nav>', re.MULTILINE)
+          html, count = nav_pattern.subn('<div id="site-header"></div>', html, count=1)
+          if count != 1:
+              raise SystemExit('Could not find exactly one homepage nav block to replace.')
+
+          if '/site-header.js' not in html:
+              html = html.replace('</body>', '<script src="/site-header.js"></script>\n</body>', 1)
+
+          # Keep this page out of search while testing.
+          if '<meta name="robots" content="noindex, nofollow">' not in html:
+              html = html.replace('<meta name="description"', '<meta name="robots" content="noindex, nofollow">\n<meta name="description"', 1)
+
+          # Make it visually clear this is a test copy.
+          if '<title>Homepage Header Test | Black Lab Deals</title>' not in html:
+              html = re.sub(r'<title>[\s\S]*?</title>', '<title>Homepage Header Test | Black Lab Deals</title>', html, count=1)
+
+          out.write_text(html, encoding='utf-8')
+          print('Created homepage-header-test/index.html with shared header only.')
+          PY
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add homepage-header-test/index.html
+          git commit -m "Add homepage shared header test page"
+          git push
