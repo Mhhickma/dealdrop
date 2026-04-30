@@ -71,6 +71,7 @@
 <footer class="footer">Prices and availability can change quickly. Always check the final price on Amazon before purchasing.</footer>
 <script>
 let allDeals = [];
+const DATA_URL = 'https://raw.githubusercontent.com/Mhhickma/blacklabdeals/main/best_seller_deals.json';
 const grid = document.getElementById('dealsGrid');
 const statusEl = document.getElementById('status');
 const searchBox = document.getElementById('searchBox');
@@ -92,6 +93,8 @@ function cleanText(value){
   return String(value || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 function renderFilters(){
+  const selected = categoryFilter.value;
+  categoryFilter.innerHTML = '<option value="all">All categories</option>';
   const cats = [...new Set(allDeals.map(d => d.cat).filter(Boolean))].sort();
   cats.forEach(cat => {
     const opt = document.createElement('option');
@@ -99,6 +102,7 @@ function renderFilters(){
     opt.textContent = cat;
     categoryFilter.appendChild(opt);
   });
+  categoryFilter.value = selected || 'all';
 }
 function dealCard(deal){
   const rank = deal.bestSellerRank ? `#${deal.bestSellerRank}` : 'Best Seller';
@@ -135,7 +139,7 @@ function render(){
 }
 async function loadDeals(){
   try{
-    const res = await fetch('/best_seller_deals.json?ts=' + Date.now(), {cache:'no-store'});
+    const res = await fetch(DATA_URL + '?ts=' + Date.now(), {cache:'no-store'});
     if(!res.ok) throw new Error('Missing best_seller_deals.json');
     const data = await res.json();
     allDeals = Array.isArray(data.deals) ? data.deals : [];
@@ -146,7 +150,7 @@ async function loadDeals(){
     renderFilters();
     render();
   }catch(err){
-    statusEl.textContent = 'Best seller deals are not loaded yet. Run the Fetch Best Seller Deals workflow once, then this page will populate automatically.';
+    statusEl.textContent = 'Best seller deals are not loaded yet. The data file exists in GitHub, but the page could not load it. Try refreshing in a few minutes.';
     statusEl.className = 'error';
   }
 }
