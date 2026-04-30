@@ -1580,7 +1580,6 @@
   gtag('js', new Date());
   gtag('config', 'G-ES3MC2ZTTM');
 </script>
-<link rel="stylesheet" href="/site-nav.css">
 </head>
 <body>
 
@@ -1623,8 +1622,49 @@
 
 <button id="back-to-top" onclick="scrollToTop()" aria-label="Back to top">^</button>
 
-<div id="site-header"></div>
-<script src="/site-header.js"></script>
+<header class="bld-header-shell">
+  <div class="bld-header-main">
+    <a href="#" class="bld-brand" onclick="scrollToTop(); return false;" aria-label="Black Lab Deals home">
+      <img class="bld-brand-logo" src="/logo.png" alt="Black Lab Deals logo" />
+      <div>
+        <div class="bld-brand-title">Black Lab <span>Deals</span></div>
+        <div class="bld-brand-rule"></div>
+        <div class="bld-brand-tagline">Fresh Amazon deals updated daily</div>
+      </div>
+    </a>
+
+    <div class="bld-header-actions">
+      <nav class="bld-desktop-nav" aria-label="Main navigation">
+        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
+        <div class="bld-category-wrap">
+          <button class="bld-category-trigger" type="button">Categories <span aria-hidden="true">v</span></button>
+          <div class="dropdown-menu" id="menu-categories" style="min-width:240px;"></div>
+        </div>
+        <span class="bld-nav-divider" aria-hidden="true"></span>
+        <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
+      </nav>
+      <button class="bld-alert-btn" onclick="scrollToAlerts()" type="button"><span class="bld-alert-icon">●</span> Get Alerts</button>
+    </div>
+
+    <div class="bld-mobile-actions">
+      <button class="mobile-alert-btn mobile-only" onclick="scrollToAlerts()" aria-label="Get alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path>
+          <path d="M10 17a2 2 0 0 0 4 0"></path>
+        </svg>
+      </button>
+      <button class="mobile-menu-btn mobile-only" onclick="openMobileMenu()" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18"></path>
+          <path d="M3 12h18"></path>
+          <path d="M3 18h18"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</header>
 
 <!-- Desktop hero (hidden on mobile via CSS) -->
 <section class="hero">
