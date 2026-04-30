@@ -1,4 +1,4 @@
-name: Restore Homepage Deal Loading
+name: Apply Homepage Navigation Dropdown Override
 
 on:
   push:
@@ -10,20 +10,34 @@ permissions:
   contents: write
 
 jobs:
-  restore-homepage:
+  patch-homepage-nav:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Restore homepage file
+      - name: Add homepage nav override files without changing deal scripts
         run: |
-          git restore --source e4329dfff5e98c4512190986087a84f1e44becc1 -- index.html
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+          old = html
+          css = '<link rel="stylesheet" href="/homepage-nav-override.css">'
+          js = '<script src="/homepage-nav-override.js"></script>'
+          if css not in html:
+              html = html.replace('</head>', css + '\n</head>', 1)
+          if js not in html:
+              html = html.replace('</body>', js + '\n</body>', 1)
+          if html != old:
+              path.write_text(html, encoding='utf-8')
+              print('Added homepage dropdown override files only.')
+          else:
+              print('Homepage override files already present.')
+          PY
       - name: Commit changes
         run: |
           if git diff --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Restore homepage deal loading"
+          git commit -m "Use homepage category dropdown override"
           git push
