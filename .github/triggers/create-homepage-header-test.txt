@@ -1,1 +1,1 @@
-create homepage header test page
+create homepage header test page after nav detection fix
