@@ -1580,6 +1580,7 @@
   gtag('js', new Date());
   gtag('config', 'G-ES3MC2ZTTM');
 </script>
+<link rel="stylesheet" href="/site-nav.css">
 </head>
 <body>
 
@@ -1634,16 +1635,7 @@
     </a>
 
     <div class="bld-header-actions">
-      <nav class="bld-desktop-nav" aria-label="Main navigation">
-        <a href="#" onclick="scrollToHotDeals(); return false;">Hot Deals</a>
-        <span class="bld-nav-divider" aria-hidden="true"></span>
-        <div class="bld-category-wrap">
-          <button class="bld-category-trigger" type="button">Categories <span aria-hidden="true">v</span></button>
-          <div class="dropdown-menu" id="menu-categories" style="min-width:240px;"></div>
-        </div>
-        <span class="bld-nav-divider" aria-hidden="true"></span>
-        <a href="#" onclick="scrollToAllDeals(); return false;">All Deals</a>
-      </nav>
+      <div id="site-header"></div>
       <button class="bld-alert-btn" onclick="scrollToAlerts()" type="button"><span class="bld-alert-icon">●</span> Get Alerts</button>
     </div>
 
@@ -2276,5 +2268,6 @@ function shareDeal(e, asin, title) {
   }
 }
 </script>
+<script src="/site-header.js"></script>
 </body>
 </html>
