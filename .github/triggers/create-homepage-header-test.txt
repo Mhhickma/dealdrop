@@ -1,1 +1,1 @@
-fix homepage deals loading after shared header
+run homepage repair
