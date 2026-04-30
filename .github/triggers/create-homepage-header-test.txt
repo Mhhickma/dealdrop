@@ -1,1 +1,1 @@
-create homepage header test page after nav detection fix
+apply shared header to homepage
