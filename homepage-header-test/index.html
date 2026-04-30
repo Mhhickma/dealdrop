@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homepage Header Test | Black Lab Deals</title>
+<meta name="description" content="Temporary Black Lab Deals homepage header test page.">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site-common.css">
+<link rel="stylesheet" href="/site-nav.css">
+</head>
+<body data-mode="all">
+<div id="site-header"></div>
+<main class="page-shell">
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>&gt;</span><span>Homepage Header Test</span></nav>
+  <section class="hero" id="hot-deals">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-pill" id="hero-pill">Loading live deals...</div>
+        <h1>Homepage header test.</h1>
+        <p>This temporary page tests the new shared Black Lab Deals header with the live deal feed before changing the real homepage.</p>
+      </div>
+      <div class="hero-image-wrap"><img src="/logo.png" alt="Black Lab Deals logo"></div>
+    </div>
+  </section>
+  <div class="stats-bar">
+    <div><div class="stat-num" id="stat-active">—</div><div class="stat-label">Active deals</div></div>
+    <div><div class="stat-num" id="stat-hot">—</div><div class="stat-label">Hot deals</div></div>
+    <div><div class="stat-num" id="stat-price">—</div><div class="stat-label">Avg. price</div></div>
+    <div><div class="stat-num" id="stat-discount">—</div><div class="stat-label">Avg. discount</div></div>
+    <div><div class="stat-num" id="stat-updated">—</div><div class="stat-label">Last updated</div></div>
+  </div>
+  <div class="divider"></div>
+  <section class="section-head" id="deals-section">
+    <div><h2>Live deal feed test <span class="muted">— using the shared header</span></h2></div>
+    <div class="deal-count" id="deal-count">0 deals</div>
+  </section>
+  <section class="hot-strip">
+    <div class="status-line" id="status-line">Loading live deals...</div>
+    <div class="hot-grid" id="hot-grid"></div>
+    <div class="load-more-wrap hidden" id="load-more-wrap"><button class="load-more-btn" id="load-more-btn" type="button">Load More Deals</button></div>
+  </section>
+</main>
+<footer class="bld-site-footer"><div class="footer-inner"><p class="footer-disclosure">As an Amazon Associate we earn from qualifying purchases. Prices and availability are accurate at time of posting.</p><p class="footer-links"><a href="/">Back to Homepage</a> &middot; <a href="/categories/">All Categories</a></p></div></footer>
+<script>
+  window.scrollToHotDeals = function(){ const el = document.getElementById('hot-deals'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
+  window.scrollToAllDeals = function(){ const el = document.getElementById('deals-section'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); };
+</script>
+<script src="/site-header.js"></script>
+<script src="/site-common.js"></script>
+</body>
+</html>
