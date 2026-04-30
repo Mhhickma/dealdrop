@@ -1,4 +1,4 @@
-name: Apply Shared Header to Homepage
+name: Restore Homepage Deal Loading
 
 on:
   push:
@@ -10,69 +10,20 @@ permissions:
   contents: write
 
 jobs:
-  patch-homepage-header:
+  restore-homepage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fix homepage header and load shared header before page scripts
+        with:
+          fetch-depth: 0
+      - name: Restore homepage file
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('index.html')
-          html = path.read_text(encoding='utf-8')
-          old = html
-          marker = '<div id="site-header"></div>'
-          mount = marker + '\n<script src="/site-header.js"></script>'
-
-          if '/site-nav.css' not in html:
-              html = html.replace('</head>', '<link rel="stylesheet" href="/site-nav.css">\n</head>', 1)
-
-          # The homepage has inline scripts near the bottom. The shared header must load before them.
-          html = html.replace('<script src="/site-header.js"></script>\n', '')
-          html = html.replace('<script src="/site-header.js"></script>', '')
-
-          body = html.lower().find('<body')
-          if body < 0:
-              raise SystemExit('body not found')
-
-          pos = html.find(marker, body)
-          if pos >= 0:
-              low = html.lower()
-              start = low.rfind('<header', body, pos)
-              end = low.find('</header>', pos)
-              if start >= 0 and end >= 0:
-                  html = html[:start] + mount + html[end+9:]
-              else:
-                  start = low.rfind('<nav', body, pos)
-                  end = low.find('</nav>', pos)
-                  if start >= 0 and end >= 0:
-                      html = html[:start] + mount + html[end+6:]
-                  else:
-                      html = html[:pos] + mount + html[pos+len(marker):]
-          else:
-              low = html.lower()
-              start = low.find('<header', body)
-              end = low.find('</header>', start)
-              close_len = 9
-              if start < 0 or end < 0:
-                  start = low.find('<nav', body)
-                  end = low.find('</nav>', start)
-                  close_len = 6
-              if start < 0 or end < 0:
-                  raise SystemExit('header/nav not found')
-              html = html[:start] + mount + html[end+close_len:]
-
-          if html != old:
-              path.write_text(html, encoding='utf-8')
-              print('Homepage header cleaned and site-header.js moved before page scripts.')
-          else:
-              print('No changes needed.')
-          PY
+          git restore --source e4329dfff5e98c4512190986087a84f1e44becc1 -- index.html
       - name: Commit changes
         run: |
           if git diff --quiet; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Fix homepage shared header script order"
+          git commit -m "Restore homepage deal loading"
           git push
