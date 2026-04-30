@@ -1,8 +1,8 @@
 """
 Keepa Deals Endpoint + Amazon Creators API  Deal Scraper
 ----------------------------------------------------------
-Uses Keepa's deals endpoint across all 7 price types (Buy Box, Amazon,
-New, FBA, FBM, Prime, Lightning) then validates pricing via Amazon PA API.
+Uses Keepa's deals endpoint across Amazon, New, and FBA price types,
+then validates pricing via Amazon Creators API.
 """
 
 import json
@@ -49,7 +49,8 @@ DEAL_REQUEST_DELAY_SECONDS   = float(os.getenv("DEAL_REQUEST_DELAY_SECONDS", "3"
 AMAZON_REQUEST_DELAY_SECONDS = float(os.getenv("AMAZON_REQUEST_DELAY_SECONDS", "1"))
 AMAZON_CONCURRENT_BATCHES    = int(os.getenv("AMAZON_CONCURRENT_BATCHES", "5"))
 
-PRICE_TYPES = [7, 0, 1, 10, 2, 13, 3]
+# Keepa price types: 0 = Amazon, 1 = New, 10 = New FBA.
+PRICE_TYPES = [0, 1, 10]
 
 EXCLUDED_CATEGORIES = [
     283155, 5174, 133140011, 2625373011, 7141123011,
